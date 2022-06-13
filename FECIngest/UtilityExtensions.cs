@@ -4,10 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace FECIngest
 {
-    internal static class UtilityExtensions
+    public static class UtilityExtensions
     //fixes dates in FECAPI not having UTC specified
     {
         public static object AddUTC(this object inputObj)
@@ -99,5 +100,12 @@ namespace FECIngest
             
             
         }
+        public static string GetMemberName<T, TValue>(Expression<Func<T, TValue>> memberAccess)
+        //https://stackoverflow.com/questions/7598968/getting-the-name-of-a-property-in-c-sharp
+
+        {
+            return ((MemberExpression)memberAccess.Body).Member.Name;
+        }
+
     }
 }

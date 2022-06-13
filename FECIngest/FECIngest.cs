@@ -11,7 +11,7 @@ namespace FECIngest
         private const string apiKey = "xT2E5C0eUKvhVY74ylbGf4NWXz57XlxTkWV9pOwu";
 
         [FunctionName("FECIngest")]
-        public static async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)
+        public static async Task Run([TimerTrigger("0 */5 * * * *")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
@@ -26,8 +26,13 @@ namespace FECIngest
             {
                 //candidate.ToTableEntity
                 var fixedCandidate = candidate.AddUTC();
+                TableEntity candidateEntity = fixedCandidate.ToTable(tableClient, "Candidate", candidate.CandidateId);
+                bool committeeProcessed = default(bool);
+                //add a column to track if committe data for the candidate has been downloaded
+                candidateEntity.Add("CommitteeProcessed", committeeProcessed);
 
-                var status = await tableClient.AddEntityAsync(fixedCandidate.ToTable(tableClient, "Candidate", candidate.CandidateId));
+                var status = await tableClient.AddEntityAsync(candidateEntity);
+                
                 if (status.IsError)
                 {
                     log.LogInformation("Problem writing candidate to table:{1}", candidate.Name);
