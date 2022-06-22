@@ -28,7 +28,7 @@ namespace FECIngest
                 var fixedCandidate = candidate.AddUTC();
                 TableEntity candidateEntity = fixedCandidate.ToTable(tableClient, "Candidate", candidate.CandidateId);
                 bool committeeProcessed = default(bool);
-                //add a column to track if committe data for the candidate has been downloaded
+                //add a column to track if committee data for the candidate has been downloaded
                 candidateEntity.Add("CommitteeProcessed", committeeProcessed);
 
                 var status = await tableClient.AddEntityAsync(candidateEntity);
@@ -39,27 +39,7 @@ namespace FECIngest
                 }
             }
 
-            /*
-            //get committee data
-            //CommitteeSearcher committeeInfo = new CommitteeSearcher(apiKey);
-            //committeeInfo.SetCandidate(mdCandidates.Candidates[1].CandidateId);
-
-            //need to batch requests to reduce calls, use queue or rate limiting to not exceed 1000 requests per hour
-            //await committeeInfo.Submit();
-
-            foreach (var candidate in mdCandidates.Candidates)
-            {
-                //log.LogInformation(candidate.CandidateId);
-                if (!string.IsNullOrEmpty(candidate.CandidateId))
-                {
-                    committeeInfo.SetCandidate(candidate.CandidateId);
-                    await committeeInfo.Submit();
-                }
-
-                //log.LogInformation(committeeInfo.Committees.Count.ToString());
-            }
-            log.LogInformation(committeeInfo.Committees.Count.ToString());
-            */
+            
         }
     }
 }
