@@ -75,6 +75,10 @@ namespace FECIngest
                 {
                     tableEntity.Add(prop.Name, prop.GetValue(source));
                 }
+                else if (Nullable.GetUnderlyingType(prop.PropertyType) == typeof(Decimal) | prop.PropertyType == typeof(long) & prop.GetValue(source) != null)
+                {
+                    tableEntity.Add(prop.Name, prop.GetValue(source));
+                }
                 else if (Nullable.GetUnderlyingType(prop.PropertyType) == typeof(string) | prop.PropertyType == typeof(string) & prop.GetValue(source) != null)
                 {
                     tableEntity.Add(prop.Name, prop.GetValue(source));

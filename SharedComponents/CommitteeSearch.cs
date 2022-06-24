@@ -14,7 +14,7 @@ namespace FECIngest
     {
         public string APIKey => _apiKey;
         public List<Committee> Committees => _committees;
-        public Configuration Configuration => _committeeConfiguration;
+        public Configuration Config => _committeeConfiguration;
         private string _candidateID;
         private string _apiKey;
         private List<Committee> _committees = new List<Committee>();
@@ -68,7 +68,7 @@ namespace FECIngest
 
             return true;
         }
-        public CommitteeSearcher(string apiKey)
+        public CommitteeSearch(string apiKey)
         {
             if (string.IsNullOrEmpty(apiKey))
             {

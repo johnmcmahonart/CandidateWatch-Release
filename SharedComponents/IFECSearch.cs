@@ -7,9 +7,9 @@ using FECIngest.Model;
 using FECIngest.Client;
 namespace FECIngest
 {
-    public interface IFECSearcher
+    public interface IFECSearch
     {
-        Configuration Configuration { get; }
+        Configuration Config { get; }
         string APIKey { get; }
         Task<bool> Submit();
     }

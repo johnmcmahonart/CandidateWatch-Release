@@ -9,10 +9,12 @@
     <Import_RootNamespace>SharedComponents</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)CandidateSearcher.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CommitteeSearcher.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CandidateFinanceTotalsSearch.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TablePurge.cs" />
+    <Compile Include="..\SharedComponents\CandidateSearch.cs" />
+    <Compile Include="..\SharedComponents\CommitteeSearch.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FECAPI.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IFECSearcher.cs" />
+    <Compile Include="..\SharedComponents\IFECSearch.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PollyPolicy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UtilityExtensions.cs" />
   </ItemGroup>

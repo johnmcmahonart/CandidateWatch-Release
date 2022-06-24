@@ -12,7 +12,7 @@ namespace FECIngest
     {
         
         public List<Candidate> Candidates => _candidates;
-        public Configuration Configuration => _candidateConfiguration;
+        public Configuration Config => _candidateConfiguration;
         public string APIKey => _apiKey;
         private string _apiKey;
         private string _state;
@@ -59,7 +59,7 @@ namespace FECIngest
             return true;
         }
 
-        public CandidateSearcher(string apiKey, string state)
+        public CandidateSearch(string apiKey, string state)
         {
             if (string.IsNullOrEmpty(apiKey))
             {

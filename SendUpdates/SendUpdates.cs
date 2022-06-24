@@ -19,22 +19,36 @@ namespace FECIngest
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
             //get entries from candidate partition that haven't been processed
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
-            QueueClient queueClient = new QueueClient("UseDevelopmentStorage=true", "committeeprocess");
-            Pageable<TableEntity> queryResult =tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'Candidate' and CommitteeProcessed eq false");
-            if (queryResult.Count()>0)
+            QueueClient committeeQueue = new QueueClient("UseDevelopmentStorage=true", "committeeprocess");
+            Pageable<TableEntity> committeeQuery =tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'Candidate' and CommitteeProcessed eq false");
+            if (committeeQuery.Count()>0)
             {
-                log.LogInformation("Found {1} candidates missing committee information: ",queryResult.Count());
+                log.LogInformation("Found {1} candidates missing committee information: ",committeeQuery.Count());
                 //write messages to queue for look up later, we only need the candidate ID to perform the lookup from the FEC API
-                foreach (var row in queryResult)
+                foreach (var row in committeeQuery)
                 {
                     object candidateID = new object();
                     row.TryGetValue(UtilityExtensions.GetMemberName((Candidate c) => c.CandidateId), out candidateID);
-                    await queueClient.SendMessageAsync(candidateID.ToString());
+                    await committeeQueue.SendMessageAsync(candidateID.ToString());
                 }
                 
             
             }
+            QueueClient financeTotalsQueue = new QueueClient("UseDevelopmentStorage=true", "financetotalsprocess");
+            Pageable<TableEntity> financeTotalsQuery = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'Candidate' and FinanceTotalProcessed eq false");
+            if (financeTotalsQuery.Count() > 0)
+            {
+                log.LogInformation("Found {1} candidates missing Financial Total (aggregate) information: ", financeTotalsQuery.Count());
+                //write messages to queue for look up later, we only need the candidate ID to perform the lookup from the FEC API
+                foreach (var row in financeTotalsQuery)
+                {
+                    object candidateID = new object();
+                    row.TryGetValue(UtilityExtensions.GetMemberName((Candidate c) => c.CandidateId), out candidateID);
+                    await financeTotalsQueue.SendMessageAsync(candidateID.ToString());
+                }
 
+
+            }
 
 
         }
