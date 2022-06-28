@@ -1,26 +1,26 @@
-using System;
-using System.Threading.Tasks;
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
-using System.Collections;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
 namespace FECIngest
 {
     public class FinanceTotals
     {
         private const string apiKey = "xT2E5C0eUKvhVY74ylbGf4NWXz57XlxTkWV9pOwu";
+
         [FunctionName("FinanceTotals")]
-        
-        public async Task Run([TimerTrigger("0 */2 * * * *")]TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
             QueueClient queueClient = new QueueClient("UseDevelopmentStorage=true", "financetotalsprocess");
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
             QueueMessage[] candidateIDs = await queueClient.ReceiveMessagesAsync(32);
-            CandidateFinanceTotalsSearch financeTotals = new CandidateFinanceTotalsSearch(apiKey);
+            CandidateFinanceTotals financeTotals = new CandidateFinanceTotals(apiKey);
             //process candidate IDs by looking up candidate ID from queue message using FEC API, write data to table storage
 
             foreach (var candidate in candidateIDs)
@@ -35,35 +35,33 @@ namespace FECIngest
                 }
                 else
                 {
-                    TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
-                    entity["FinanceTotalProcessed"] = true;
-                    await tableClient.UpdateEntityAsync(entity, entity.ETag);
-                    await queueClient.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
-                    
-                    
-                        //dates written to azure table storage must be UTC
-                        var fixedItem = financeTotals.FinanceTotals[financeTotals.FinanceTotals.Count-1].AddUTC();
-                        TableEntity fixedEntity = fixedItem.ToTable(tableClient, "FinanceTotals", Guid.NewGuid().ToString());
-                        var errorState = await tableClient.AddEntityAsync(fixedEntity);
-
-
-                        if (errorState.IsError) //schedule candidate to be processed later
+                    var cycleTotals = from cycle in financeTotals.Contributions where cycle.CandidateId.Contains(candidate.Body.ToString()) select cycle;
+                    if (candidate.Body.ToString().Contains("H2MD08126"))
+                    {
+                        log.LogInformation("Found H2MD08126");
+                    }
+                    try
+                    {
+                        foreach (var cycle in cycleTotals)
                         {
-                            //todo handle duplicate committee's during reprocessing
-                            log.LogInformation("Problem writing finance total to storage for {1}", candidate.Body.ToString());
-                            TableEntity failed = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
-                            entity["FinanceTotal"] = false;
-                            await tableClient.UpdateEntityAsync(failed, failed.ETag);
+                            //dates written to azure table storage must be UTC
+                            var fixedItem = cycle.AddUTC();
+                            TableEntity fixedEntity = fixedItem.ToTable(tableClient, "FinanceTotals", Guid.NewGuid().ToString());
+                            await tableClient.AddEntityAsync(fixedEntity);
+                            
+                            
                         }
-
-                    
-
+                        TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
+                        entity["FinanceTotalProcessed"] = true;
+                        await tableClient.UpdateEntityAsync(entity, entity.ETag);
+                        await queueClient.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
+                    }
+                    catch
+                    {
+                        log.LogInformation("problem writing FinanceTotals to table storage for {1}", candidate.Body.ToString());
+                    }
                 }
             }
         }
     }
 }
-        
-        
-    
-

@@ -9,7 +9,7 @@
     <Import_RootNamespace>SharedComponents</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)CandidateFinanceTotalsSearch.cs" />
+    <Compile Include="..\SharedComponents\CandidateFinanceTotals.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TablePurge.cs" />
     <Compile Include="..\SharedComponents\CandidateSearch.cs" />
     <Compile Include="..\SharedComponents\CommitteeSearch.cs" />

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 namespace FECIngest
 {
-    public class CandidateFinanceTotalsSearch : IFECSearch
+    public class CandidateFinanceTotals : IFECSearch
     {
         public Configuration Config => _configuration;
         public List<CandidateHistoryTotal> Contributions => _contributions;
@@ -31,20 +31,16 @@ namespace FECIngest
             }
             );
             CandidateApi candidate = new CandidateApi(_configuration);
-            CandidateHistoryTotalPage page =await  candidate.CandidatesTotalsGetAsync(apiKey: _APIKey, candidateId:new List<string> {_candidateId });
-            if (_candidateId =="S6MD03441")
-            {
-                Console.WriteLine("found candidate");
-            }
-                foreach (var i in page.Results)
+            CandidateHistoryTotalPage page = await candidate.CandidatesTotalsGetAsync(apiKey: _APIKey, candidateId: new List<string> { _candidateId });
+
+            foreach (var i in page.Results)
             {
                 _contributions.Add(i);
             }
-            
-            
+
             return true;
         }
-        public CandidateFinanceTotalsSearch(string APIKey)
+        public CandidateFinanceTotals(string APIKey)
         {
             _APIKey = APIKey ?? throw new ArgumentNullException(nameof(APIKey));
         }

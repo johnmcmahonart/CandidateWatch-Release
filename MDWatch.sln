@@ -13,7 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{E866F7
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedComponents", "SharedComponents\SharedComponents.shproj", "{78DD2C49-4445-4C08-8179-97B0F2E20BFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetFinanceTotals", "GetFinanceTotals\GetFinanceTotals.csproj", "{14D00B33-17CD-4128-A388-0E2B106F0B50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetFinanceTotals", "GetFinanceTotals\GetFinanceTotals.csproj", "{14D00B33-17CD-4128-A388-0E2B106F0B50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceTest", "FinanceTest\FinanceTest.csproj", "{E4B7E1AC-6E2D-4659-97D6-94C2E0B913D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +39,10 @@ Global
 		{14D00B33-17CD-4128-A388-0E2B106F0B50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14D00B33-17CD-4128-A388-0E2B106F0B50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14D00B33-17CD-4128-A388-0E2B106F0B50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4B7E1AC-6E2D-4659-97D6-94C2E0B913D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4B7E1AC-6E2D-4659-97D6-94C2E0B913D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4B7E1AC-6E2D-4659-97D6-94C2E0B913D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4B7E1AC-6E2D-4659-97D6-94C2E0B913D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,5 +59,6 @@ Global
 		SharedComponents\SharedComponents.projitems*{78dd2c49-4445-4c08-8179-97b0f2e20bff}*SharedItemsImports = 13
 		SharedComponents\SharedComponents.projitems*{afc188a1-3011-49bd-a168-606a670d8960}*SharedItemsImports = 5
 		SharedComponents\SharedComponents.projitems*{b399c9e7-ba89-4008-932e-d06a576ae8c4}*SharedItemsImports = 5
+		SharedComponents\SharedComponents.projitems*{e4b7e1ac-6e2d-4659-97d6-94c2e0b913d4}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
