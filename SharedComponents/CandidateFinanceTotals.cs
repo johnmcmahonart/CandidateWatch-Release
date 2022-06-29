@@ -3,6 +3,7 @@ using FECIngest.FECApi;
 using FECIngest.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 namespace FECIngest
 {
@@ -15,6 +16,41 @@ namespace FECIngest
         public string APIKey => _APIKey;
         private string _APIKey;
         private string _candidateId;
+
+        public Decimal GetTotalNonIndividualContributions()
+        {
+            if (String.IsNullOrEmpty(_candidateId))
+            {
+                throw new Exception("CandidateId must be set before calling this method");
+            }
+            else
+            {
+                var individualContributions = from c in _contributions where c.CandidateId.Contains(_candidateId) select c.OtherPoliticalCommitteeContributions;
+                Decimal total = 0;
+                foreach (Decimal i in individualContributions)
+                {
+                    total += i;
+                }
+                return total;
+            };
+        }
+        public Decimal GetTotalIndividualContributions()
+        {
+            if (String.IsNullOrEmpty(_candidateId))
+            {
+                throw new Exception("CandidateId must be set before calling this method");
+            }
+            else
+            {
+                var individualContributions = from c in _contributions where c.CandidateId.Contains(_candidateId) select c.IndividualItemizedContributions;
+                Decimal total = 0;
+                foreach (Decimal i in individualContributions)
+                {
+                    total += i;
+                }
+                return total;
+            };
+        }
 
         public void SetCandidate(string candidateID)
         {

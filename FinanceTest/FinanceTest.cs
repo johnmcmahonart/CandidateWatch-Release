@@ -16,8 +16,9 @@ namespace FECIngest
 
             financeTotals.SetCandidate("H2MD08126");
 
-            bool result = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => financeTotals.Submit());
-
+            await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => financeTotals.Submit());
+            log.LogInformation(financeTotals.GetTotalIndividualContributions().ToString());
+            log.LogInformation(financeTotals.GetTotalNonIndividualContributions().ToString());
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
         }
     }
