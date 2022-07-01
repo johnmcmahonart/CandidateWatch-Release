@@ -7,78 +7,90 @@ using System.Linq;
 using System.Threading.Tasks;
 namespace FECIngest
 {
-    public class CandidateFinanceTotals : IFECSearch
+    public class CandidateFinanceTotals : FECClient, IFECQueryParms
     {
-        public Configuration Config => _configuration;
         public List<CandidateHistoryTotal> Contributions => _contributions;
-        private Configuration _configuration;
+
         private List<CandidateHistoryTotal> _contributions = new List<CandidateHistoryTotal>();
-        public string APIKey => _APIKey;
-        private string _APIKey;
-        private string _candidateId;
 
-        public Decimal GetTotalNonIndividualContributions()
+        private Dictionary<string, string> _queryParms;
+
+        private CandidateApi _apiClient;
+        public Decimal? GetTotalNonIndividualContributions()
         {
-            if (String.IsNullOrEmpty(_candidateId))
+            if (_queryParms == null)
             {
-                throw new Exception("CandidateId must be set before calling this method");
+                throw new Exception("queryparms must be set before calling this method");
             }
             else
             {
-                var individualContributions = from c in _contributions where c.CandidateId.Contains(_candidateId) select c.OtherPoliticalCommitteeContributions;
-                Decimal total = 0;
-                foreach (Decimal i in individualContributions)
-                {
-                    total += i;
-                }
-                return total;
+                var nonIndividualContributions = from c in _contributions where c.CandidateId.Contains(_queryParms["candidateId"]) select c.OtherPoliticalCommitteeContributions;
+                return nonIndividualContributions.Sum();
             };
         }
-        public Decimal GetTotalIndividualContributions()
+        public Decimal? GetTotalIndividualContributions()
         {
-            if (String.IsNullOrEmpty(_candidateId))
+            if (_queryParms == null)
             {
-                throw new Exception("CandidateId must be set before calling this method");
+                throw new Exception("queryparms must be set before calling this method");
             }
             else
             {
-                var individualContributions = from c in _contributions where c.CandidateId.Contains(_candidateId) select c.IndividualItemizedContributions;
-                Decimal total = 0;
-                foreach (Decimal i in individualContributions)
-                {
-                    total += i;
-                }
-                return total;
+                var individualContributions = from c in _contributions where c.CandidateId.Contains(_queryParms["candidateId"]) select c.IndividualItemizedContributions;
+                return individualContributions.Sum();
+                
             };
         }
 
-        public void SetCandidate(string candidateID)
+        public void SetQuery(Dictionary<string, string> parms)
         {
-            _candidateId = candidateID ?? throw new ArgumentException(nameof(candidateID));
+            _queryParms = parms ?? throw new ArgumentException(nameof(parms));
         }
-        public async Task<bool> Submit()
+        protected override void ConfigureEndPoint()
         {
-            _configuration = new Configuration();
-            _configuration.BasePath = "https://api.open.fec.gov/v1";
-            _configuration.Servers.Add(new Dictionary<string, object>
+            _config = new Configuration();
+            _config.BasePath = "https://api.open.fec.gov/v1";
+            _config.Servers.Add(new Dictionary<string, object>
             {
                 {"url","/candidates/totals/" },
                 {"description","candidate totals" }
             }
             );
-            CandidateApi candidate = new CandidateApi(_configuration);
-            CandidateHistoryTotalPage page = await candidate.CandidatesTotalsGetAsync(apiKey: _APIKey, candidateId: new List<string> { _candidateId });
-
-            foreach (var i in page.Results)
+            _apiClient = new CandidateApi(_config); 
+        }
+        public override async Task<bool> Submit()
+        {
+            if (_queryParms == null)
             {
-                _contributions.Add(i);
+                throw new ArgumentException("Query parameters must be set. Use SetQuery before submission");
+
+            }
+            else
+            {
+                CandidateHistoryTotalPage page = await _apiClient.CandidatesTotalsGetAsync(apiKey: _apiKey, candidateId: new List<string> { _queryParms["candidateId"] });
+                if (page.Results.Count > 0)
+                {
+                    foreach (var i in page.Results)
+                    {
+                        _contributions.Add(i);
+                    }
+                    
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+                
+
             }
 
-            return true;
+            
         }
         public CandidateFinanceTotals(string APIKey)
         {
-            _APIKey = APIKey ?? throw new ArgumentNullException(nameof(APIKey));
+            _apiKey = APIKey ?? throw new ArgumentNullException(nameof(APIKey));
+            ConfigureEndPoint();
         }
     }
 }

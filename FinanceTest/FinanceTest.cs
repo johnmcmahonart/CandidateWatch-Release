@@ -2,7 +2,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-
+using System.Collections.Generic;
 namespace FECIngest
 {
     public class FinanceTest
@@ -14,7 +14,12 @@ namespace FECIngest
         {
             CandidateFinanceTotals financeTotals = new CandidateFinanceTotals(apiKey);
 
-            financeTotals.SetCandidate("H2MD08126");
+            financeTotals.SetQuery(new Dictionary<string, string>()
+                {
+                    {
+                     "candidateId", "H2MD08126"
+                    } }
+                ); 
 
             await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => financeTotals.Submit());
             log.LogInformation(financeTotals.GetTotalIndividualContributions().ToString());

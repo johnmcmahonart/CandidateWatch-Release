@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace FECIngest
 {
@@ -25,7 +26,12 @@ namespace FECIngest
 
             foreach (var candidate in candidateIDs)
             {
-                financeTotals.SetCandidate(candidate.Body.ToString());
+                financeTotals.SetQuery(new Dictionary<string, string>()
+                {
+                    {
+                     "candidateId", candidate.Body.ToString()
+                    } }
+                ); 
 
                 log.LogInformation("Getting aggregate financial information for candidate: {1}", candidate.Body.ToString());
                 bool result = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => financeTotals.Submit());
@@ -36,10 +42,7 @@ namespace FECIngest
                 else
                 {
                     var cycleTotals = from cycle in financeTotals.Contributions where cycle.CandidateId.Contains(candidate.Body.ToString()) select cycle;
-                    if (candidate.Body.ToString().Contains("H2MD08126"))
-                    {
-                        log.LogInformation("Found H2MD08126");
-                    }
+                    
                     try
                     {
                         foreach (var cycle in cycleTotals)

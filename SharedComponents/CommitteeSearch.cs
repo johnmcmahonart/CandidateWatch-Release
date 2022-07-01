@@ -1,48 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FECIngest.Client;
+﻿using FECIngest.Client;
 using FECIngest.FECApi;
 using FECIngest.Model;
-
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FECIngest
 {
-    public class CommitteeSearch:IFECSearch
+    public class CommitteeSearch : FECClient, IFECQueryParms
     {
-        public string APIKey => _apiKey;
         public List<Committee> Committees => _committees;
-        public Configuration Config => _committeeConfiguration;
-        private string _candidateID;
-        private string _apiKey;
+
+        private Dictionary<string, string> _queryParms;
+        
         private List<Committee> _committees = new List<Committee>();
-        private Configuration _committeeConfiguration;
+        
+        private CommitteeApi _apiClient;
 
-
-
-        public void SetCandidate(string candidateID)
+        public void SetQuery(Dictionary<string, string> parms)
         {
-            if (string.IsNullOrEmpty(candidateID))
+            _queryParms = parms ?? throw new ArgumentNullException(nameof(parms));
+        }
+        public override async Task<bool> Submit()
+        {
+            if (_queryParms == null)
             {
-                throw new ArgumentException($"'{nameof(candidateID)}' cannot be null or empty.", nameof(candidateID));
+                throw new ArgumentException("Query parameters must be set. Use SetQuery before submission");
+                
             }
             else
             {
-                _candidateID = candidateID;
+                CommitteePage page = await _apiClient.CommitteesGetAsync(apiKey: _apiKey, candidateId: new List<String> { _queryParms["candidateId"] });
+
+                if (page.Results.Count > 0)
+                {
+                    foreach (var committee in page.Results)
+                    {
+                        _committees.Add(committee);
+                    }
+                    return true;
+                }
+                
+                else
+                    return false;
             }
         }
-        public async Task<bool> Submit()
+
+        protected override void ConfigureEndPoint()
         {
-            if (string.IsNullOrEmpty(_candidateID))
-            {
-                throw new ArgumentException($"'{nameof(_candidateID)}' cannot be null or empty. Use SetCandidate to set which candidate we are interested in", nameof(_candidateID));
-            }
-            _committeeConfiguration = new Configuration();
-            _committeeConfiguration.BasePath = "https://api.open.fec.gov/v1";
-            
-            _committeeConfiguration.Servers.Add(new Dictionary<string, object>
+            _config = new Configuration();
+            _config.BasePath = "https://api.open.fec.gov/v1";
+
+            _config.Servers.Add(new Dictionary<string, object>
 
             {
                 {"url","/committees" },
@@ -50,36 +59,13 @@ namespace FECIngest
             }
 
                 );
-           
-
-            CommitteeApi committeeApi = new CommitteeApi(_committeeConfiguration);
-            //get all committees for a given candidate
-            CommitteePage page = await committeeApi.CommitteesGetAsync(apiKey: _apiKey,candidateId:new List<String> { _candidateID });
-
-            if (page.Results.Count >0)
-            {
-                foreach (var committee in page.Results)
-                {
-                    _committees.Add(committee);
-                }
-            }
-            
-
-
-            return true;
+            _apiClient = new CommitteeApi(_config);
         }
+
         public CommitteeSearch(string apiKey)
         {
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                throw new ArgumentException($"'{nameof(apiKey)}' cannot be null or empty.", nameof(apiKey));
-            }
-            else
-            {
-                _apiKey = apiKey;
-            }
-
-
+            _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
+            ConfigureEndPoint();
         }
     }
 }

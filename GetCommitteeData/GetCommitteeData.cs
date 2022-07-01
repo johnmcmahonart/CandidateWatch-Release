@@ -7,6 +7,7 @@ using Polly;
 using Polly.RateLimit;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace FECIngest
 {
@@ -28,7 +29,12 @@ namespace FECIngest
             
             foreach (var candidate in candidateIDs)
             {
-                committeeSearch.SetCandidate(candidate.Body.ToString());
+                committeeSearch.SetQuery(new Dictionary<string, string>() 
+                {
+                    {
+                     "candidateId", candidate.Body.ToString()
+                    } }
+                );
 
                 log.LogInformation("Getting committee information for candidate: {1}", candidate.Body.ToString());
                 bool result = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => committeeSearch.Submit());

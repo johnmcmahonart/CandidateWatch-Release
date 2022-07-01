@@ -7,24 +7,21 @@ using System.Threading.Tasks;
 
 namespace FECIngest
 {
-    public class CandidateSearch : IFECSearch
+    public class CandidateSearch : FECClient
 
     {
-        
         public List<Candidate> Candidates => _candidates;
-        public Configuration Config => _candidateConfiguration;
-        public string APIKey => _apiKey;
-        private string _apiKey;
+        private CandidateApi _apiClient;
+
         private string _state;
-        private DateTime _startDate;
         private List<Candidate> _candidates = new List<Candidate>();
-        private Configuration _candidateConfiguration;
-        public async Task<bool> Submit()
+        
+        protected override void ConfigureEndPoint()
         {
-            _candidateConfiguration = new Configuration();
-            _candidateConfiguration.BasePath = "https://api.open.fec.gov/v1";
-            //candidateConfiguration.
-            _candidateConfiguration.Servers.Add(new Dictionary<string, object>
+            _config = new Configuration();
+            _config.BasePath = "https://api.open.fec.gov/v1";
+            
+            _config.Servers.Add(new Dictionary<string, object>
 
             {
                 {"url","/candidates/search" },
@@ -32,9 +29,14 @@ namespace FECIngest
             }
 
                 );
-            CandidateApi candidateApi = new CandidateApi(_candidateConfiguration);
+            _apiClient = new CandidateApi(_config);
+        }
+        
+        public override async Task<bool> Submit()
+        {
+
             //get all MD candidates
-            CandidatePage page = await candidateApi.CandidatesSearchGetAsync(apiKey: _apiKey, state: new List<string> { _state });
+            CandidatePage page = await _apiClient.CandidatesSearchGetAsync(apiKey: _apiKey, state: new List<string> { _state}) ;
 
             foreach (var candidate in page.Results)
             {
@@ -48,7 +50,7 @@ namespace FECIngest
                 while (page.Pagination.Page <= page.Pagination.Pages)
                 {
                     currentPage++;
-                    page = await candidateApi.CandidatesSearchGetAsync(apiKey: _apiKey, state: new List<string> { _state }, page: currentPage);
+                    page = await _apiClient.CandidatesSearchGetAsync(apiKey: _apiKey, state: new List<string> { _state }, page: currentPage);
                     foreach (var candidate in page.Results)
                     {
                         _candidates.Add(candidate);
@@ -59,27 +61,14 @@ namespace FECIngest
             return true;
         }
 
+        
+
         public CandidateSearch(string apiKey, string state)
         {
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                throw new ArgumentException($"'{nameof(apiKey)}' cannot be null or empty.", nameof(apiKey));
-            }
-            else
-            {
-                _apiKey = apiKey;
-            }
-
-            if (string.IsNullOrEmpty(state))
-            {
-                throw new ArgumentException($"'{nameof(state)}' cannot be null or empty.", nameof(state));
-            }
-            else
-            {
-                _state = state;
-            }
+            _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
+            _state = state ?? throw new ArgumentNullException(nameof(state));
+            ConfigureEndPoint();
+            
         }
-
-        
     }
 }
