@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Azure.Data.Tables;
 using Azure;
-using Azure.Identity;
+//using Azure.Identity;
 namespace FECIngest
 {
     public static class TablePurge

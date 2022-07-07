@@ -26,18 +26,14 @@ namespace FECIngest
 
             foreach (var candidate in candidateIDs)
             {
-                financeTotals.SetQuery(new Dictionary<string, string>()
-                {
-                    {
-                     "candidateId", candidate.Body.ToString()
-                    } }
-                ); 
+                financeTotals.SetQuery(new FECQueryParmsModel { CandidateId = candidate.Body.ToString() });
+                    
 
                 log.LogInformation("Getting aggregate financial information for candidate: {1}", candidate.Body.ToString());
                 bool result = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => financeTotals.Submit());
                 if (!result)
                 {
-                    log.LogInformation("problem retrieving CandidateIds from queue for processing");
+                    log.LogInformation("problem retrieving CandidateIds from queue for processing"); //todo fix this, should reference the specific candidate
                 }
                 else
                 {

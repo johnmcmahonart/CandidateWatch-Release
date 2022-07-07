@@ -37,6 +37,7 @@ namespace FECIngest
                 //add a column to track if committee data for the candidate has been downloaded
                 candidateEntity.Add("CommitteeProcessed", processed);
                 candidateEntity.Add("FinanceTotalProcessed", processed);
+                candidateEntity.Add("ScheduleBProcessed", processed);
                 try
                 {
                     var status = await tableClient.AddEntityAsync(candidateEntity);

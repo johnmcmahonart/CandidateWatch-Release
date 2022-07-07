@@ -29,12 +29,8 @@ namespace FECIngest
             
             foreach (var candidate in candidateIDs)
             {
-                committeeSearch.SetQuery(new Dictionary<string, string>() 
-                {
-                    {
-                     "candidateId", candidate.Body.ToString()
-                    } }
-                );
+                committeeSearch.SetQuery(new FECQueryParmsModel { CandidateId =candidate.Body.ToString() });
+                    
 
                 log.LogInformation("Getting committee information for candidate: {1}", candidate.Body.ToString());
                 bool result = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => committeeSearch.Submit());

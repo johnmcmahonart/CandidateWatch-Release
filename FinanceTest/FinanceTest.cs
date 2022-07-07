@@ -14,12 +14,7 @@ namespace FECIngest
         {
             CandidateFinanceTotals financeTotals = new CandidateFinanceTotals(apiKey);
 
-            financeTotals.SetQuery(new Dictionary<string, string>()
-                {
-                    {
-                     "candidateId", "H2MD08126"
-                    } }
-                ); 
+            financeTotals.SetQuery(new FECQueryParmsModel{CandidateId ="H2MD08126"}); 
 
             await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => financeTotals.Submit());
             log.LogInformation(financeTotals.GetTotalIndividualContributions().ToString());

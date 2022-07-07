@@ -13,7 +13,7 @@ namespace FECIngest
 
         private List<CandidateHistoryTotal> _contributions = new List<CandidateHistoryTotal>();
 
-        private Dictionary<string, string> _queryParms;
+        private FECQueryParmsModel _queryParms;
 
         private CandidateApi _apiClient;
         public Decimal? GetTotalNonIndividualContributions()
@@ -24,7 +24,7 @@ namespace FECIngest
             }
             else
             {
-                var nonIndividualContributions = from c in _contributions where c.CandidateId.Contains(_queryParms["candidateId"]) select c.OtherPoliticalCommitteeContributions;
+                var nonIndividualContributions = from c in _contributions where c.CandidateId.Contains(_queryParms.CandidateId) select c.OtherPoliticalCommitteeContributions;
                 return nonIndividualContributions.Sum();
             };
         }
@@ -36,13 +36,12 @@ namespace FECIngest
             }
             else
             {
-                var individualContributions = from c in _contributions where c.CandidateId.Contains(_queryParms["candidateId"]) select c.IndividualItemizedContributions;
+                var individualContributions = from c in _contributions where c.CandidateId.Contains(_queryParms.CandidateId) select c.IndividualItemizedContributions;
                 return individualContributions.Sum();
-                
             };
         }
 
-        public void SetQuery(Dictionary<string, string> parms)
+        public void SetQuery(FECQueryParmsModel parms)
         {
             _queryParms = parms ?? throw new ArgumentException(nameof(parms));
         }
@@ -56,36 +55,29 @@ namespace FECIngest
                 {"description","candidate totals" }
             }
             );
-            _apiClient = new CandidateApi(_config); 
+            _apiClient = new CandidateApi(_config);
         }
         public override async Task<bool> Submit()
         {
             if (_queryParms == null)
             {
                 throw new ArgumentException("Query parameters must be set. Use SetQuery before submission");
-
             }
             else
             {
-                CandidateHistoryTotalPage page = await _apiClient.CandidatesTotalsGetAsync(apiKey: _apiKey, candidateId: new List<string> { _queryParms["candidateId"] });
+                CandidateHistoryTotalPage page = await _apiClient.CandidatesTotalsGetAsync(apiKey: _apiKey, candidateId: new List<string> { _queryParms.CandidateId });
                 if (page.Results.Count > 0)
                 {
-                    foreach (var i in page.Results)
-                    {
-                        _contributions.Add(i);
-                    }
+                    _contributions.AddRange(page.Results);
                     
+
                     return true;
                 }
                 else
                 {
                     return false;
                 }
-                
-
             }
-
-            
         }
         public CandidateFinanceTotals(string APIKey)
         {

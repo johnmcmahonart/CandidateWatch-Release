@@ -6,6 +6,6 @@ namespace FECIngest
 {
     public interface IFECQueryParms
     {
-        public void SetQuery(Dictionary<string, string> parms);
+        public void SetQuery(FECQueryParmsModel parms);
     }
 }

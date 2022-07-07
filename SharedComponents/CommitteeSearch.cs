@@ -11,13 +11,13 @@ namespace FECIngest
     {
         public List<Committee> Committees => _committees;
 
-        private Dictionary<string, string> _queryParms;
+        private FECQueryParmsModel _queryParms;
         
         private List<Committee> _committees = new List<Committee>();
         
         private CommitteeApi _apiClient;
 
-        public void SetQuery(Dictionary<string, string> parms)
+        public void SetQuery(FECQueryParmsModel parms)
         {
             _queryParms = parms ?? throw new ArgumentNullException(nameof(parms));
         }
@@ -30,14 +30,12 @@ namespace FECIngest
             }
             else
             {
-                CommitteePage page = await _apiClient.CommitteesGetAsync(apiKey: _apiKey, candidateId: new List<String> { _queryParms["candidateId"] });
+                CommitteePage page = await _apiClient.CommitteesGetAsync(apiKey: _apiKey, candidateId: new List<String> { _queryParms.CandidateId });
 
                 if (page.Results.Count > 0)
                 {
-                    foreach (var committee in page.Results)
-                    {
-                        _committees.Add(committee);
-                    }
+                    _committees.AddRange(page.Results);
+                    
                     return true;
                 }
                 

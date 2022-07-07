@@ -51,10 +51,8 @@ namespace FECIngest
                 {
                     currentPage++;
                     page = await _apiClient.CandidatesSearchGetAsync(apiKey: _apiKey, state: new List<string> { _state }, page: currentPage);
-                    foreach (var candidate in page.Results)
-                    {
-                        _candidates.Add(candidate);
-                    }
+                    _candidates.AddRange(page.Results);
+                    
                 }
             }
 
