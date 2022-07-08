@@ -13,7 +13,24 @@ namespace FECIngest
         private List<ScheduleBByRecipientID> _disbursements = new List<ScheduleBByRecipientID>();
         private ScheduleBByRecipientIDPage _page;
         private int _currentPage = 1;
+        public int TotalDisbursementsforCandidate
+        {
+            get
+            {
+                if (_totalDisbursementsforCandidate == 0)
+                {
+                    throw new Exception("Please submit query to API to retrieve result count");
 
+
+                }
+                else
+                {
+                    return _totalDisbursementsforCandidate;
+                }
+
+                }
+            }
+        private int _totalDisbursementsforCandidate;
         public List<ScheduleBByRecipientID> Disbursements => _disbursements;
         public void SetQuery(FECQueryParmsModel parms)
         {
@@ -22,6 +39,7 @@ namespace FECIngest
 
         public override async Task<bool> Submit()
         {
+           
             if (_queryParms == null)
             {
                 throw new ArgumentException("Query parameters must be set. Use SetQuery before submission");
@@ -29,6 +47,7 @@ namespace FECIngest
             else
             {
                 _page = await _apiClient.SchedulesScheduleBByRecipientIdGetAsync(apiKey: _apiKey, recipientId: new List<String> { _queryParms.CommitteeId }, page: _currentPage);
+                _totalDisbursementsforCandidate = _page.Pagination.Count;
                 if (_page.Results.Count > 0)
                 {
                     _disbursements.AddRange(_page.Results);
@@ -63,6 +82,7 @@ namespace FECIngest
             await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => this.Submit());
 
             var scheduleBResult = new FECPageResultScheduleB(_page);
+            
             if (scheduleBResult.IsLastPage)
             {
                 _currentPage = 1;

@@ -20,6 +20,9 @@ namespace FECIngest
             log.LogInformation(r1);
             string r2 = TablePurge.Purge("FinanceTotals") ? "Purge FinanceTotals table succeeded" : "Problem purging FinanceTotals table ";
             log.LogInformation(r2);
+            string r3 = TablePurge.Purge("ScheduleB") ? "Purge ScheduleB table succeeded" : "Problem purging ScheduleB table ";
+            log.LogInformation(r3);
+
             
             //find all candidates for MD
             CandidateSearch mdCandidates = new CandidateSearch(apiKey, "MD");

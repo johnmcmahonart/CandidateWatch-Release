@@ -44,27 +44,44 @@ namespace FECIngest
                         {
                             await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => scheduleBDisbursement.GetNextPage());
                         } while (!scheduleBDisbursement.GetNextPage().Result.IsLastPage);
+                        var committeeDisbursementsbyRecipient = from d in scheduleBDisbursement.Disbursements where d.RecipientId.Contains(committeeId) select d;
+                        foreach (var item in committeeDisbursementsbyRecipient)
+                        {
+                            var fixedDisbursement = item.AddUTC();
+                            TableEntity disbursementEntity = fixedDisbursement.ToTable(tableClient, "ScheduleB", Guid.NewGuid().ToString());
+                            disbursementEntity.Add("CandidateId", candidate.Body.ToString());
+                            //check if entity has alrerady been added to table, skip if it has
+                            Pageable<TableEntity> disbursementQuery = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleB' and CommitteeId eq '{item.CommitteeId}' and RecipientId eq '{item.RecipientId}' and Cycle eq '{item.Cycle}'");
+                            if (disbursementQuery.Count() <1)
+                            {
+                                await tableClient.AddEntityAsync(disbursementEntity);
+                            }
+
+                            
+
+
+                        }
+                        //check if table contains all data from API
+                        Pageable<TableEntity> candidateScheduleB = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleB' and CandidateId eq '{candidate.Body.ToString()}'");
+                        if (candidateScheduleB.Count() == scheduleBDisbursement.TotalDisbursementsforCandidate)
+                        {
+                            TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
+                            entity["ScheduleBProcessed"] = true;
+                            log.LogInformation("Candidate: {1} has been processed", candidate.Body.ToString());
+                            await tableClient.UpdateEntityAsync(entity, entity.ETag);
+                            await queueClient.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
+                            
+                        }
+                        
                     }
                     catch (Exception ex)
+                    
                     {
                         log.LogError(ex.Message);
                         log.LogInformation("Problem retrieving all ScheduleB data for:{1}", candidateEntity.RowKey);
                     }
 
-                    var committeeDisbursements = from d in scheduleBDisbursement.Disbursements where d.RecipientId.Contains(committeeId) select d;
-                    foreach (var item in committeeDisbursements)
-                    {
-                        var fixedDisbursement = item.AddUTC();
-                        TableEntity disbursementEntity = fixedDisbursement.ToTable(tableClient, "ScheduleB", Guid.NewGuid().ToString());
-                        disbursementEntity.Add("CandidateId", candidate.Body.ToString());
-                        await tableClient.AddEntityAsync(disbursementEntity);
-                        
-                        
-                    }
-                    TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
-                    entity["ScheduleBProcessed"] = true;
-                    await tableClient.UpdateEntityAsync(entity, entity.ETag);
-                    await queueClient.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
+                    
                 }
             }
 

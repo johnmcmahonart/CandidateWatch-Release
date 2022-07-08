@@ -12,6 +12,8 @@ namespace FECIngest
         private bool _isLastPage;
         public bool IsLastPage => _isLastPage;
 
+        private int _totalCount;
+        public int TotalCount => _totalCount;
         private ScheduleBByRecipientIDPage _page;
         public object PageData => _page;
 
@@ -26,6 +28,7 @@ namespace FECIngest
         public FECPageResultScheduleB(ScheduleBByRecipientIDPage page)
         {
             _page = page ?? throw new ArgumentNullException(nameof(page));
+            
             CheckLastPage();
 
 

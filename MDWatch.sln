@@ -15,9 +15,9 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedComponents", "SharedC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetFinanceTotals", "GetFinanceTotals\GetFinanceTotals.csproj", "{14D00B33-17CD-4128-A388-0E2B106F0B50}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinanceTest", "FinanceTest\FinanceTest.csproj", "{E4B7E1AC-6E2D-4659-97D6-94C2E0B913D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "FinanceTest\Tests.csproj", "{E4B7E1AC-6E2D-4659-97D6-94C2E0B913D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetScheduleBDisbursement", "GetScheduleBDisbursement\GetScheduleBDisbursement.csproj", "{A8DF492C-1942-4576-9B45-6155BD487EF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetScheduleBDisbursement", "GetScheduleBDisbursement\GetScheduleBDisbursement.csproj", "{A8DF492C-1942-4576-9B45-6155BD487EF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

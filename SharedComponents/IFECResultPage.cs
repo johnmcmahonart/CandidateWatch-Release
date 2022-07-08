@@ -8,5 +8,6 @@ namespace FECIngest
     {
         public bool IsLastPage { get; }
         public object PageData { get; }
+        
     }
 }
