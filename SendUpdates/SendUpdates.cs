@@ -50,7 +50,7 @@ namespace FECIngest
 
             }
 
-            QueueClient scheduleBQueue = new QueueClient("UseDevelopmentStorage=true", "schedulebprocess");
+            QueueClient scheduleBQueue = new QueueClient("UseDevelopmentStorage=true", "schedulebcandidateprocess");
             Pageable<TableEntity> scheduleBQuery = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'Candidate' and ScheduleBProcessed eq false");
             if (scheduleBQuery.Count() > 0)
             {

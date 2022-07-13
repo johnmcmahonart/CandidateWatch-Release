@@ -6,7 +6,7 @@ namespace FECIngest
     public abstract class FECClient
     {
         protected abstract void ConfigureEndPoint();
-        public abstract Task<bool> Submit();
+        public abstract Task SubmitAsync();
         
         
         public Configuration Config => _config;

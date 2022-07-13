@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)IFECQueryParms.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFECResultPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProcessItems.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScheduleBCandidateOverviewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScheduleBDisbursement.cs" />
     <Compile Include="..\SharedComponents\CandidateFinanceTotals.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TablePurge.cs" />

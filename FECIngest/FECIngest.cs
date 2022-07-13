@@ -9,24 +9,32 @@ namespace FECIngest
     public class GetFECData
     {
         private const string apiKey = "xT2E5C0eUKvhVY74ylbGf4NWXz57XlxTkWV9pOwu";
-
+        
+        
         [FunctionName("FECIngest")]
         public static async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)
         {
+            //dev stage only
+            string[] tableParittions = { "Candidate", "FinanceTotals", "ScheduleBOverview", "ScheduleBDetail" };
+            foreach (var partition in tableParittions)
+            {
+                log.LogInformation("Purging {1} table", partition);
+                string result = TablePurge.Purge(partition) ? "Purge partition succeeded": "Problem purging partition";
+                log.LogInformation(result);
+            }
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
             //reset solution tables
-            string r1 = TablePurge.Purge("Candidate") ? "Purge candidate table succeeded" : "Problem purging candidate table ";
-            log.LogInformation(r1);
-            string r2 = TablePurge.Purge("FinanceTotals") ? "Purge FinanceTotals table succeeded" : "Problem purging FinanceTotals table ";
+            
+            string r2 = TablePurge.Purge("FinanceTotals") ? "Purge FinanceTotals partition succeeded" : "Problem purging FinanceTotals partition ";
             log.LogInformation(r2);
-            string r3 = TablePurge.Purge("ScheduleB") ? "Purge ScheduleB table succeeded" : "Problem purging ScheduleB table ";
+            string r3 = TablePurge.Purge("ScheduleBOverview") ? "Purge ScheduleB Overview partition succeeded" : "Problem purging ScheduleB partition ";
             log.LogInformation(r3);
 
             
             //find all candidates for MD
             CandidateSearch mdCandidates = new CandidateSearch(apiKey, "MD");
-            await mdCandidates.Submit();
+            await mdCandidates.SubmitAsync();
             log.LogInformation("Found {1} candidates.", mdCandidates.Candidates.Count);
             //save candidate data to table storage
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");

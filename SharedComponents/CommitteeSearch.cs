@@ -21,7 +21,7 @@ namespace FECIngest
         {
             _queryParms = parms ?? throw new ArgumentNullException(nameof(parms));
         }
-        public override async Task<bool> Submit()
+        public override async Task<bool> SubmitAsync()
         {
             if (_queryParms == null)
             {

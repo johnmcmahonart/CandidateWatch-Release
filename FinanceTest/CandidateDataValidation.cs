@@ -23,7 +23,7 @@ namespace FECIngest
             financeTotals.SetQuery(new FECQueryParmsModel { CandidateId = candidateId });
 
 
-            await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => financeTotals.Submit());
+            await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => financeTotals.SubmitAsync());
             log.LogInformation(financeTotals.GetTotalIndividualContributions().ToString());
             log.LogInformation(financeTotals.GetTotalNonIndividualContributions().ToString());
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
@@ -42,6 +42,7 @@ namespace FECIngest
 
                 disbursement.SetQuery(new FECQueryParmsModel { CommitteeId = committeeId });
                 log.LogInformation("Getting ScheduleB data for candidate: {1}", candidateEntity.RowKey);
+                /*
                 try
                 {
                     await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => disbursement.Submit());
@@ -58,7 +59,8 @@ namespace FECIngest
 
                 var committeeDisbursements = from d in disbursement.Disbursements where d.RecipientId.Contains(committeeId) select d;
                 log.LogInformation("{1} has { 2} ScheduldeB disbursements", candidateId, committeeDisbursements.Count());
-            }
+            */
+                }
         }
     }
 }

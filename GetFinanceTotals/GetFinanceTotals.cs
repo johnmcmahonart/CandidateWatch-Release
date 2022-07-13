@@ -30,7 +30,7 @@ namespace FECIngest
                     
 
                 log.LogInformation("Getting aggregate financial information for candidate: {1}", candidate.Body.ToString());
-                bool result = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => financeTotals.Submit());
+                bool result = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => financeTotals.SubmitAsync());
                 if (!result)
                 {
                     log.LogInformation("problem retrieving CandidateIds from queue for processing"); //todo fix this, should reference the specific candidate

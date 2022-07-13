@@ -10,6 +10,7 @@ namespace FECIngest
         public string CandidateId { get; set; }
         public string State { get; set; }
         public string CommitteeId { get; set; }
+        public int PageIndex { get; set; }
     }
 
 }

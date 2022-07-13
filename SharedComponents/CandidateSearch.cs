@@ -32,7 +32,7 @@ namespace FECIngest
             _apiClient = new CandidateApi(_config);
         }
         
-        public override async Task<bool> Submit()
+        public override async Task<bool> SubmitAsync()
         {
 
             //get all MD candidates

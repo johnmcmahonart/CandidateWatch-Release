@@ -33,7 +33,7 @@ namespace FECIngest
                     
 
                 log.LogInformation("Getting committee information for candidate: {1}", candidate.Body.ToString());
-                bool result = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => committeeSearch.Submit());
+                bool result = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => committeeSearch.SubmitAsync());
                 if (!result)
                 {
                     log.LogInformation("problem retrieving CandidateIds from queue for processing");

@@ -6,20 +6,19 @@ using Polly.RateLimit;
 
 namespace SharedComponents
 {
-    public class PollyPolicy
+    public static class PollyPolicy
     {
-        private static Polly.RateLimit.AsyncRateLimitPolicy _rateLimit => Policy.RateLimitAsync(10, TimeSpan.FromMinutes(1));
-        private static Polly.Retry.AsyncRetryPolicy _retry = Policy.Handle<RateLimitRejectedException>()
-            .WaitAndRetryAsync(3, sleepDurationProvider: s => TimeSpan.FromMinutes(1));
+        private static Polly.RateLimit.AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(10, TimeSpan.FromSeconds(30), 10);
+        private static Polly.Retry.AsyncRetryPolicy _retry = Policy.Handle<RateLimitRejectedException>().WaitAndRetryAsync(3, sleepDurationProvider: s => TimeSpan.FromSeconds(35), onRetry: (exception, sleepDuration) => { Console.WriteLine("Retry Triggered"); });
         public static Polly.Wrap.AsyncPolicyWrap GetDefault
         {
             get
             {
-                return Policy.WrapAsync(_rateLimit, _retry);
+                return Policy.WrapAsync(_retry, _rateLimit); //policy order matters here!! rate limit policy before retry will NOT work
             }
         }
 
-
+        
         
     }
 }

@@ -6,58 +6,40 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 namespace FECIngest
 {
-    public class ScheduleBDisbursement : FECClient, IFECQueryParms, IFECPagination
+    public class ScheduleBDisbursement : FECClient, IFECQueryParms
     {
         private DisbursementsApi _apiClient;
         private FECQueryParmsModel _queryParms;
-        private List<ScheduleBByRecipientID> _disbursements = new List<ScheduleBByRecipientID>();
+        private List<ScheduleBByRecipientID> _disbursements;
         private ScheduleBByRecipientIDPage _page;
-        private int _currentPage = 1;
-        public int TotalDisbursementsforCandidate
-        {
-            get
-            {
-                if (_totalDisbursementsforCandidate == 0)
-                {
-                    throw new Exception("Please submit query to API to retrieve result count");
-
-
-                }
-                else
-                {
-                    return _totalDisbursementsforCandidate;
-                }
-
-                }
-            }
         private int _totalDisbursementsforCandidate;
+        private int _totalPages;
+        public int TotalPages => _totalPages;
+        public int TotalDisbursementsforCandidate => _totalDisbursementsforCandidate;
+
         public List<ScheduleBByRecipientID> Disbursements => _disbursements;
         public void SetQuery(FECQueryParmsModel parms)
         {
             _queryParms = parms ?? throw new ArgumentNullException(nameof(parms));
         }
 
-        public override async Task<bool> Submit()
+        public override async Task SubmitAsync()
         {
-           
+            _disbursements = new List<ScheduleBByRecipientID>();
+
             if (_queryParms == null)
             {
                 throw new ArgumentException("Query parameters must be set. Use SetQuery before submission");
             }
             else
             {
-                _page = await _apiClient.SchedulesScheduleBByRecipientIdGetAsync(apiKey: _apiKey, recipientId: new List<String> { _queryParms.CommitteeId }, page: _currentPage);
+                
+                _page = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => _apiClient.SchedulesScheduleBByRecipientIdGetAsync(apiKey: _apiKey, recipientId: new List<String> { _queryParms.CommitteeId }, page: _queryParms.PageIndex));
                 _totalDisbursementsforCandidate = _page.Pagination.Count;
+                _totalPages = _page.Pagination.Pages;
                 if (_page.Results.Count > 0)
                 {
                     _disbursements.AddRange(_page.Results);
-
-                    return true;
-                }
-                
-                else
-                {
-                    return false;
                 }
             }
         }
@@ -75,22 +57,6 @@ namespace FECIngest
             _apiClient = new DisbursementsApi(_config);
         }
 
-        public async Task<IFECResultPage> GetNextPage()
-        {
-            _currentPage++;
-            
-            await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => this.Submit());
-
-            var scheduleBResult = new FECPageResultScheduleB(_page);
-            
-            if (scheduleBResult.IsLastPage)
-            {
-                _currentPage = 1;
-            }
-            
-            return scheduleBResult;
-            
-        }
         public ScheduleBDisbursement(string APIKey)
         {
             _apiKey = APIKey ?? throw new ArgumentNullException(nameof(APIKey));
