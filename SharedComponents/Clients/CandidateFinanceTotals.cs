@@ -1,19 +1,20 @@
 ﻿using FECIngest.Client;
 using FECIngest.FECApi;
 using FECIngest.Model;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-namespace FECIngest
+namespace FECIngest.SolutionClients
 {
-    public class CandidateFinanceTotals : FECClient, IFECQueryParms
+    public class CandidateFinanceTotalsClient: FECClient, IFECQueryParms
     {
         public List<CandidateHistoryTotal> Contributions => _contributions;
 
         private List<CandidateHistoryTotal> _contributions = new List<CandidateHistoryTotal>();
 
-        private FECQueryParmsModel _queryParms;
+        private FECQueryParms _queryParms;
 
         private CandidateApi _apiClient;
         public Decimal? GetTotalNonIndividualContributions()
@@ -41,7 +42,7 @@ namespace FECIngest
             };
         }
 
-        public void SetQuery(FECQueryParmsModel parms)
+        public void SetQuery(FECQueryParms parms)
         {
             _queryParms = parms ?? throw new ArgumentException(nameof(parms));
         }
@@ -57,7 +58,7 @@ namespace FECIngest
             );
             _apiClient = new CandidateApi(_config);
         }
-        public override async Task<bool> SubmitAsync()
+        public override async Task SubmitAsync()
         {
             if (_queryParms == null)
             {
@@ -65,21 +66,16 @@ namespace FECIngest
             }
             else
             {
-                CandidateHistoryTotalPage page = await _apiClient.CandidatesTotalsGetAsync(apiKey: _apiKey, candidateId: new List<string> { _queryParms.CandidateId });
+                CandidateHistoryTotalPage page = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(()=> _apiClient.CandidatesTotalsGetAsync(apiKey: _apiKey, candidateId: new List<string> { _queryParms.CandidateId }));
                 if (page.Results.Count > 0)
                 {
                     _contributions.AddRange(page.Results);
-                    
-
-                    return true;
+                                 
                 }
-                else
-                {
-                    return false;
-                }
+                
             }
         }
-        public CandidateFinanceTotals(string APIKey)
+        public CandidateFinanceTotalsClient(string APIKey)
         {
             _apiKey = APIKey ?? throw new ArgumentNullException(nameof(APIKey));
             ConfigureEndPoint();

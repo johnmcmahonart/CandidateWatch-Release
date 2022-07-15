@@ -8,6 +8,9 @@ using Polly.RateLimit;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using FECIngest.Model;
+using FECIngest;
+using FECIngest.SolutionClients;
 
 namespace FECIngest
 {
@@ -24,22 +27,18 @@ namespace FECIngest
             QueueClient queueClient = new QueueClient("UseDevelopmentStorage=true", "committeeprocess");
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
             QueueMessage[] candidateIDs = await queueClient.ReceiveMessagesAsync(32);
-            CommitteeSearch committeeSearch = new CommitteeSearch(apiKey);
+            CommitteeSearchClient committeeSearch = new CommitteeSearchClient(apiKey);
             //process candidate IDs by looking up candidate ID from queue message using FEC API, write data to table storage
             
             foreach (var candidate in candidateIDs)
             {
-                committeeSearch.SetQuery(new FECQueryParmsModel { CandidateId =candidate.Body.ToString() });
+                committeeSearch.SetQuery(new FECQueryParms { CandidateId =candidate.Body.ToString() });
                     
 
                 log.LogInformation("Getting committee information for candidate: {1}", candidate.Body.ToString());
-                bool result = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => committeeSearch.SubmitAsync());
-                if (!result)
+                try
                 {
-                    log.LogInformation("problem retrieving CandidateIds from queue for processing");
-                }
-                else
-                {
+                    await committeeSearch.SubmitAsync();
                     TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
                     entity["CommitteeProcessed"] = true;
                     await tableClient.UpdateEntityAsync(entity, entity.ETag);
@@ -62,6 +61,16 @@ namespace FECIngest
                         }
 
                     }
+                }
+                catch (Exception ex)
+                {
+
+                    log.LogInformation(ex.ToString());
+                    log.LogInformation("problem retrieving CandidateIds from queue for processing");
+                }
+                
+                {
+                
 
                 }
             }

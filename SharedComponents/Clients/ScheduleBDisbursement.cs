@@ -4,12 +4,12 @@ using FECIngest.Model;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-namespace FECIngest
+namespace FECIngest.SolutionClients
 {
-    public class ScheduleBDisbursement : FECClient, IFECQueryParms
+    public class ScheduleBDisbursementClient : FECClient, IFECQueryParms
     {
         private DisbursementsApi _apiClient;
-        private FECQueryParmsModel _queryParms;
+        private FECQueryParms _queryParms;
         private List<ScheduleBByRecipientID> _disbursements;
         private ScheduleBByRecipientIDPage _page;
         private int _totalDisbursementsforCandidate;
@@ -18,7 +18,7 @@ namespace FECIngest
         public int TotalDisbursementsforCandidate => _totalDisbursementsforCandidate;
 
         public List<ScheduleBByRecipientID> Disbursements => _disbursements;
-        public void SetQuery(FECQueryParmsModel parms)
+        public void SetQuery(FECQueryParms parms)
         {
             _queryParms = parms ?? throw new ArgumentNullException(nameof(parms));
         }
@@ -57,7 +57,7 @@ namespace FECIngest
             _apiClient = new DisbursementsApi(_config);
         }
 
-        public ScheduleBDisbursement(string APIKey)
+        public ScheduleBDisbursementClient(string APIKey)
         {
             _apiKey = APIKey ?? throw new ArgumentNullException(nameof(APIKey));
 

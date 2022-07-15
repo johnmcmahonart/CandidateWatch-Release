@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetScheduleBDisbursement", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValidateScheduleB", "ValidateScheduleB\ValidateScheduleB.csproj", "{DD85F33B-2EDA-4373-84A0-D5C2C67C9FFC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RESTApi", "RESTApi\RESTApi.csproj", "{98EECF3C-5E41-41AD-8BF5-0C5CEA6E063F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{DD85F33B-2EDA-4373-84A0-D5C2C67C9FFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD85F33B-2EDA-4373-84A0-D5C2C67C9FFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD85F33B-2EDA-4373-84A0-D5C2C67C9FFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98EECF3C-5E41-41AD-8BF5-0C5CEA6E063F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98EECF3C-5E41-41AD-8BF5-0C5CEA6E063F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98EECF3C-5E41-41AD-8BF5-0C5CEA6E063F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98EECF3C-5E41-41AD-8BF5-0C5CEA6E063F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,6 +6,10 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
+using FECIngest.SolutionClients;
+using FECIngest.Model;
+
+
 
 namespace FECIngest
 {
@@ -21,7 +25,7 @@ namespace FECIngest
         {
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
             QueueClient scheduleBCandidateQueue = new QueueClient("UseDevelopmentStorage=true", "schedulebcandidateprocess");
-            ScheduleBDisbursement scheduleBDisbursement = new ScheduleBDisbursement(apiKey);
+            ScheduleBDisbursementClient scheduleBDisbursement = new ScheduleBDisbursementClient(apiKey);
             QueueMessage[] candidateIDs = await scheduleBCandidateQueue.ReceiveMessagesAsync(32);
 
             foreach (var candidate in candidateIDs)
@@ -35,7 +39,7 @@ namespace FECIngest
                 {
                     string committeeId = principalCommittee[0]["committee_id"];
 
-                    scheduleBDisbursement.SetQuery(new FECQueryParmsModel
+                    scheduleBDisbursement.SetQuery(new FECQueryParms
                     {
                         CommitteeId = committeeId,
                         PageIndex = 1
@@ -58,11 +62,13 @@ namespace FECIngest
                     if (scheduleBDisbursement.TotalDisbursementsforCandidate > 0)
                     {
                         //write overview data to table, for validation worker to use
-                        ScheduleBCandidateOverviewModel scheduleBCandidateOverview = new ScheduleBCandidateOverviewModel
+                        ScheduleBCandidateOverview scheduleBCandidateOverview = new ScheduleBCandidateOverview
                         {
                             CandidateId = candidate.Body.ToString(),
                             TotalDisbursements = scheduleBDisbursement.TotalDisbursementsforCandidate,
-                            TotalResultPages = scheduleBDisbursement.TotalPages
+                            TotalResultPages = scheduleBDisbursement.TotalPages,
+                            PrincipalCommitteeId = committeeId
+                            
                         };
                         TableEntity scheduleBOverview = scheduleBCandidateOverview.ToTable(tableClient, "ScheduleBOverview", scheduleBCandidateOverview.CandidateId);
                         try

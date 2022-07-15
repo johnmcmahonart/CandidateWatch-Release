@@ -9,24 +9,26 @@
     <Import_RootNamespace>SharedComponents</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)FECPageResultScheduleB.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FECQueryParmsModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SolutionModels\CandidatewProcessed.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SolutionModels\FECQueryParms.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFECPagination.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFECQueryParms.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFECResultPage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProcessItems.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ScheduleBCandidateOverviewModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ScheduleBDisbursement.cs" />
-    <Compile Include="..\SharedComponents\CandidateFinanceTotals.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SolutionModels\ScheduleBCandidateOverview.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clients\ScheduleBDisbursement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clients\CandidateFinanceTotals.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TablePurge.cs" />
-    <Compile Include="..\SharedComponents\CandidateSearch.cs" />
-    <Compile Include="..\SharedComponents\CommitteeSearch.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clients\CandidateSearch.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clients\CommitteeSearch.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FECAPI.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FECClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clients\FECClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PollyPolicy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UtilityExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)FECAPI" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Clients\" />
   </ItemGroup>
 </Project>

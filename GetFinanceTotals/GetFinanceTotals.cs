@@ -1,12 +1,14 @@
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
+using FECIngest.SolutionClients;
+using FECIngest.Model;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using FECIngest;
 
 namespace FECIngest
 {
@@ -21,24 +23,20 @@ namespace FECIngest
             QueueClient queueClient = new QueueClient("UseDevelopmentStorage=true", "financetotalsprocess");
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
             QueueMessage[] candidateIDs = await queueClient.ReceiveMessagesAsync(32);
-            CandidateFinanceTotals financeTotals = new CandidateFinanceTotals(apiKey);
+            CandidateFinanceTotalsClient financeTotals = new CandidateFinanceTotalsClient(apiKey);
             //process candidate IDs by looking up candidate ID from queue message using FEC API, write data to table storage
 
             foreach (var candidate in candidateIDs)
             {
-                financeTotals.SetQuery(new FECQueryParmsModel { CandidateId = candidate.Body.ToString() });
-                    
+                financeTotals.SetQuery(new FECQueryParms { CandidateId = candidate.Body.ToString() });
 
                 log.LogInformation("Getting aggregate financial information for candidate: {1}", candidate.Body.ToString());
-                bool result = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => financeTotals.SubmitAsync());
-                if (!result)
+
+                try
                 {
-                    log.LogInformation("problem retrieving CandidateIds from queue for processing"); //todo fix this, should reference the specific candidate
-                }
-                else
-                {
+                    await financeTotals.SubmitAsync();
                     var cycleTotals = from cycle in financeTotals.Contributions where cycle.CandidateId.Contains(candidate.Body.ToString()) select cycle;
-                    
+
                     try
                     {
                         foreach (var cycle in cycleTotals)
@@ -47,18 +45,22 @@ namespace FECIngest
                             var fixedItem = cycle.AddUTC();
                             TableEntity fixedEntity = fixedItem.ToTable(tableClient, "FinanceTotals", Guid.NewGuid().ToString());
                             await tableClient.AddEntityAsync(fixedEntity);
-                            
-                            
                         }
                         TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
-                        entity["FinanceTotalProcessed"] = true;
+                        entity[UtilityExtensions.GetMemberName((Candidate c) => c.FinanceTotalProcessed)] = true;
                         await tableClient.UpdateEntityAsync(entity, entity.ETag);
                         await queueClient.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        log.LogInformation(ex.ToString());
                         log.LogInformation("problem writing FinanceTotals to table storage for {1}", candidate.Body.ToString());
                     }
+                }
+                catch (Exception ex)
+                {
+                    log.LogInformation(ex.ToString());
+                    log.LogInformation("problem retrieving aggregate Financial information "); //todo fix this, should reference the specific candidate
                 }
             }
         }

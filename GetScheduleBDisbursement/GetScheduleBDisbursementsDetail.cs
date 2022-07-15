@@ -8,6 +8,8 @@ using Azure.Storage.Queues.Models;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using FECIngest;
+using FECIngest.Model;
+using FECIngest.SolutionClients;
 
 namespace GetScheduleBDisbursement
 {
@@ -19,18 +21,18 @@ namespace GetScheduleBDisbursement
         [FunctionName("GetScheduleBDisbursementsDetail")]
     
     
-        public async Task Run([TimerTrigger("0 */10 * * * *")]TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("0 */500 * * * *")]TimerInfo myTimer, ILogger log)
         {
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
             QueueClient scheduleBPageProcess = new QueueClient("UseDevelopmentStorage=true", "schedulebpageprocess");
-            ScheduleBDisbursement scheduleBDisbursement = new ScheduleBDisbursement(apiKey);
+            ScheduleBDisbursementClient scheduleBDisbursement = new ScheduleBDisbursementClient(apiKey);
             QueueMessage[] scheduleBPage = await scheduleBPageProcess.ReceiveMessagesAsync(32);
 
 //get committee page detail, write to storage, remove from queue
             foreach (var page in scheduleBPage)
             {
                 string[] scheduleBToken = page.Body.ToString().Split(',');
-                scheduleBDisbursement.SetQuery(new FECQueryParmsModel
+                scheduleBDisbursement.SetQuery(new FECQueryParms
                 {
                     CommitteeId = scheduleBToken[1],
                     PageIndex = Int32.Parse(scheduleBToken[2])

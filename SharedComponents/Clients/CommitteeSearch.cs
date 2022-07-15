@@ -5,23 +5,23 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FECIngest
+namespace FECIngest.SolutionClients
 {
-    public class CommitteeSearch : FECClient, IFECQueryParms
+    public class CommitteeSearchClient : FECClient, IFECQueryParms
     {
         public List<Committee> Committees => _committees;
 
-        private FECQueryParmsModel _queryParms;
+        private FECQueryParms _queryParms;
         
         private List<Committee> _committees = new List<Committee>();
         
         private CommitteeApi _apiClient;
 
-        public void SetQuery(FECQueryParmsModel parms)
+        public void SetQuery(FECQueryParms parms)
         {
             _queryParms = parms ?? throw new ArgumentNullException(nameof(parms));
         }
-        public override async Task<bool> SubmitAsync()
+        public override async Task SubmitAsync()
         {
             if (_queryParms == null)
             {
@@ -30,17 +30,15 @@ namespace FECIngest
             }
             else
             {
-                CommitteePage page = await _apiClient.CommitteesGetAsync(apiKey: _apiKey, candidateId: new List<String> { _queryParms.CandidateId });
+                CommitteePage page = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() =>_apiClient.CommitteesGetAsync(apiKey: _apiKey, candidateId: new List<String> { _queryParms.CandidateId }));
 
                 if (page.Results.Count > 0)
                 {
                     _committees.AddRange(page.Results);
                     
-                    return true;
+                    
                 }
-                
-                else
-                    return false;
+                    
             }
         }
 
@@ -60,7 +58,7 @@ namespace FECIngest
             _apiClient = new CommitteeApi(_config);
         }
 
-        public CommitteeSearch(string apiKey)
+        public CommitteeSearchClient(string apiKey)
         {
             _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
             ConfigureEndPoint();

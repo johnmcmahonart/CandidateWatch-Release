@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FECIngest
+namespace FECIngest.SolutionClients
 {
-    public class CandidateSearch : FECClient
+    public class CandidateSearchClient : FECClient
 
     {
         public List<Candidate> Candidates => _candidates;
@@ -61,7 +61,7 @@ namespace FECIngest
 
         
 
-        public CandidateSearch(string apiKey, string state)
+        public CandidateSearchClient(string apiKey, string state)
         {
             _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
             _state = state ?? throw new ArgumentNullException(nameof(state));

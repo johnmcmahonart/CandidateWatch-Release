@@ -1,7 +1,7 @@
 ﻿using FECIngest.Client;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-namespace FECIngest
+namespace FECIngest.SolutionClients
 {
     public abstract class FECClient
     {

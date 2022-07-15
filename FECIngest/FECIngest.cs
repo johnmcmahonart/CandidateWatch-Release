@@ -1,4 +1,5 @@
 using Azure.Data.Tables;
+using FECIngest.SolutionClients;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,6 +17,7 @@ namespace FECIngest
         {
             //dev stage only
             string[] tableParittions = { "Candidate", "FinanceTotals", "ScheduleBOverview", "ScheduleBDetail" };
+            //string[] tableParittions = { "Candidate","ScheduleBOverview" };
             foreach (var partition in tableParittions)
             {
                 log.LogInformation("Purging {1} table", partition);
@@ -33,7 +35,7 @@ namespace FECIngest
 
             
             //find all candidates for MD
-            CandidateSearch mdCandidates = new CandidateSearch(apiKey, "MD");
+            CandidateSearchClient mdCandidates = new CandidateSearchClient(apiKey, "MD");
             await mdCandidates.SubmitAsync();
             log.LogInformation("Found {1} candidates.", mdCandidates.Candidates.Count);
             //save candidate data to table storage
@@ -44,11 +46,6 @@ namespace FECIngest
                 //candidate.ToTableEntity
                 var fixedCandidate = candidate.AddUTC();
                 TableEntity candidateEntity = fixedCandidate.ToTable(tableClient, "Candidate", candidate.CandidateId);
-                bool processed = default(bool);
-                //add a column to track if committee data for the candidate has been downloaded
-                candidateEntity.Add("CommitteeProcessed", processed);
-                candidateEntity.Add("FinanceTotalProcessed", processed);
-                candidateEntity.Add("ScheduleBProcessed", processed);
                 try
                 {
                     var status = await tableClient.AddEntityAsync(candidateEntity);
