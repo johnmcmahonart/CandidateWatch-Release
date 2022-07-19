@@ -78,6 +78,7 @@ Global
 		SharedComponents\SharedComponents.projitems*{a8df492c-1942-4576-9b45-6155bd487ef1}*SharedItemsImports = 5
 		SharedComponents\SharedComponents.projitems*{afc188a1-3011-49bd-a168-606a670d8960}*SharedItemsImports = 5
 		SharedComponents\SharedComponents.projitems*{b399c9e7-ba89-4008-932e-d06a576ae8c4}*SharedItemsImports = 5
+		SharedComponents\SharedComponents.projitems*{dd85f33b-2eda-4373-84a0-d5c2c67c9ffc}*SharedItemsImports = 5
 		SharedComponents\SharedComponents.projitems*{e4b7e1ac-6e2d-4659-97d6-94c2e0b913d4}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

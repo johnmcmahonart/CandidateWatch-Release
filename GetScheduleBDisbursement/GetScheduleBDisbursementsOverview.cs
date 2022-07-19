@@ -1,15 +1,14 @@
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
+using FECIngest.Model;
+using FECIngest.SolutionClients;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
-using FECIngest.SolutionClients;
-using FECIngest.Model;
-
-
 
 namespace FECIngest
 {
@@ -30,85 +29,117 @@ namespace FECIngest
 
             foreach (var candidate in candidateIDs)
             {
+                //check if candidate already has overview data, if so we only need to try redownloading the detail data
+                TableEntity scheduleBOverview = await tableClient.GetEntityAsync<TableEntity>("ScheduleBOverview", candidate.Body.ToString());
                 TableEntity candidateEntity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
-
-                //check for empty json string
-
-                dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommittees-json"));
-                if (principalCommittee.Count > 0)
+                if (scheduleBOverview.Count() < 1)
                 {
-                    string committeeId = principalCommittee[0]["committee_id"];
+                    //check for empty json string
 
-                    scheduleBDisbursement.SetQuery(new FECQueryParms
+                    dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommittees-json"));
+                    if (principalCommittee.Count > 0)
                     {
-                        CommitteeId = committeeId,
-                        PageIndex = 1
-                    });
+                        string committeeId = principalCommittee[0]["committee_id"];
 
-                    //get overview data for candidate by asking for first page of results
-                    try
-                    {
-                       await scheduleBDisbursement.SubmitAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        log.LogInformation(ex.ToString());
-                        log.LogInformation("Problem retrieving scheduleB information for candidate:{1}", candidate.Body.ToString());
-                    }
-                    log.LogInformation("Total result pages for candidate: {1}={2}", candidate.Body.ToString(), scheduleBDisbursement.TotalPages);
-                    log.LogInformation("Total disbursements for candidate: {1}={2}", candidate.Body.ToString(), scheduleBDisbursement.TotalDisbursementsforCandidate);
-                    
-                    //check if candidate has ScheduleB disbursements, if so store overview data
-                    if (scheduleBDisbursement.TotalDisbursementsforCandidate > 0)
-                    {
-                        //write overview data to table, for validation worker to use
-                        ScheduleBCandidateOverview scheduleBCandidateOverview = new ScheduleBCandidateOverview
+                        //check if candidate has ScheduleB disbursements, if so store overview data
+                        if (scheduleBDisbursement.TotalDisbursementsforCandidate > 0)
                         {
-                            CandidateId = candidate.Body.ToString(),
-                            TotalDisbursements = scheduleBDisbursement.TotalDisbursementsforCandidate,
-                            TotalResultPages = scheduleBDisbursement.TotalPages,
-                            PrincipalCommitteeId = committeeId
-                            
-                        };
-                        TableEntity scheduleBOverview = scheduleBCandidateOverview.ToTable(tableClient, "ScheduleBOverview", scheduleBCandidateOverview.CandidateId);
-                        try
-                        {
-                            await tableClient.AddEntityAsync(scheduleBOverview);
-                            await scheduleBCandidateQueue.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
+                            var candidateOverview = await GenerateScheduleBOverview(log, tableClient, scheduleBCandidateQueue, scheduleBDisbursement, candidate, committeeId);
+
+                            //write messages to queue for each page, for each candidate
+                            await GenerateScheduleBDetailMessages(scheduleBCandidateQueue, candidateOverview, candidate, candidateEntity);
                         }
-                        catch (Exception ex)
+                        else //no scheduleBDisbursements, remove from queue
                         {
-                            log.LogInformation(ex.ToString());
-                            log.LogInformation("Problem writing scheduleB overview data for candidate");
-                        }
-
-                        //write messages to queue for each page, for each candidate
-                        QueueClient scheduleBPagesQueue = new QueueClient("UseDevelopmentStorage=true", "schedulebpageprocess");
-                        for (int i = 1; i < scheduleBDisbursement.TotalPages + 1; i++)
-                        {
-                            await scheduleBPagesQueue.SendMessageAsync(candidate.Body.ToString() + "," +committeeId+","+ i);
+                            await MarkProcessedandDequeue(log, tableClient, scheduleBCandidateQueue, candidate);
                         }
                     }
-                    else //no scheduleBDisbursements, remove from queue
+                    else //if candidate does not have an associated committee, mark entity as processed and remove message from queue
                     {
-                        TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
-                        entity["ScheduleBProcessed"] = true;
-                        log.LogInformation("Candidate: {1} No ScheduleB disbursements, will not be processed", candidate.Body.ToString());
-                        await tableClient.UpdateEntityAsync(entity, entity.ETag);
-                        await scheduleBCandidateQueue.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
+                        await MarkProcessedandDequeue(log, tableClient, scheduleBCandidateQueue, candidate);
                     }
                 }
-                else //if candidate does not have an associated committee, mark entity as processed and remove message from queue
+                else
                 {
-                    TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
-                    entity["ScheduleBProcessed"] = true;
-                    log.LogInformation("Candidate: {1} No associated committee found , will not be processed", candidate.Body.ToString());
-                    await tableClient.UpdateEntityAsync(entity, entity.ETag);
-                    await scheduleBCandidateQueue.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
+                    //get existing overview from storage, write detail messages to queue
+                    TableEntity scheduleBOverviewEntity = await tableClient.GetEntityAsync<TableEntity>("ScheduleBOverview", candidate.Body.ToString());
+
+                    ScheduleBCandidateOverview scheduleBCandidateOverview = new ScheduleBCandidateOverview
+                    {
+                        CandidateId = candidate.Body.ToString(),
+                        TotalDisbursements = (int)scheduleBOverviewEntity["TotalDisbursements"],
+                        TotalResultPages = (int)scheduleBOverviewEntity["TotalResultPages"],
+                        PrincipalCommitteeId = (string)scheduleBOverviewEntity["PrincipalCommitteeId"],
+                    };
+                    await GenerateScheduleBDetailMessages(scheduleBCandidateQueue, scheduleBCandidateOverview, candidate, candidateEntity);
                 }
             }
-
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+        }
+
+        private async Task<ScheduleBCandidateOverview> GenerateScheduleBOverview(ILogger log, TableClient tableClient, QueueClient scheduleBCandidateQueue, ScheduleBDisbursementClient scheduleBDisbursement, QueueMessage candidate, string committeeId)
+        {
+            //write overview data to table, for validation worker to use
+
+            scheduleBDisbursement.SetQuery(new FECQueryParms
+            {
+                CommitteeId = committeeId,
+                PageIndex = 1
+            });
+
+            //get overview data for candidate by asking for first page of results
+            try
+            {
+                await scheduleBDisbursement.SubmitAsync();
+            }
+            catch (Exception ex)
+            {
+                log.LogInformation(ex.ToString());
+                log.LogInformation("Problem retrieving scheduleB information for candidate:{1}", candidate.Body.ToString());
+            }
+            log.LogInformation("Total result pages for candidate: {1}={2}", candidate.Body.ToString(), scheduleBDisbursement.TotalPages);
+            log.LogInformation("Total disbursements for candidate: {1}={2}", candidate.Body.ToString(), scheduleBDisbursement.TotalDisbursementsforCandidate);
+            ScheduleBCandidateOverview scheduleBCandidateOverview = new ScheduleBCandidateOverview
+            {
+                CandidateId = candidate.Body.ToString(),
+                TotalDisbursements = scheduleBDisbursement.TotalDisbursementsforCandidate,
+                TotalResultPages = scheduleBDisbursement.TotalPages,
+                PrincipalCommitteeId = committeeId
+            };
+            TableEntity scheduleBOverviewEntity = scheduleBCandidateOverview.ToTable(tableClient, "ScheduleBOverview", scheduleBCandidateOverview.CandidateId);
+            try
+            {
+                await tableClient.AddEntityAsync(scheduleBOverviewEntity);
+                await scheduleBCandidateQueue.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
+                return scheduleBCandidateOverview;
+            }
+            catch (Exception ex)
+            {
+                log.LogInformation(ex.ToString());
+                log.LogInformation("Problem writing scheduleB overview data for candidate");
+                return scheduleBCandidateOverview;
+            }
+        }
+
+        private async Task GenerateScheduleBDetailMessages(QueueClient scheduleBCandidateQueue, ScheduleBCandidateOverview scheduleBCandidateOverview, QueueMessage candidate, TableEntity candidateEntity)
+        {
+            QueueClient scheduleBPagesQueue = new QueueClient("UseDevelopmentStorage=true", "schedulebpageprocess");
+            dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommittees-json"));
+            string recipientId = principalCommittee[0]["committee_id"];
+            for (int i = 1; i < scheduleBCandidateOverview.TotalResultPages + 1; i++)
+            {
+                await scheduleBPagesQueue.SendMessageAsync(candidate.Body.ToString() + "," + recipientId + "," + i);
+            }
+            await scheduleBCandidateQueue.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
+        }
+
+        private async Task MarkProcessedandDequeue(ILogger log, TableClient tableClient, QueueClient scheduleBCandidateQueue, QueueMessage candidate)
+        {
+            TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
+            entity["ScheduleBProcessed"] = true;
+            log.LogInformation("Candidate: {1} No ScheduleB disbursements, will not be processed", candidate.Body.ToString());
+            await tableClient.UpdateEntityAsync(entity, entity.ETag);
+            await scheduleBCandidateQueue.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
         }
     }
 }

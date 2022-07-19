@@ -54,7 +54,7 @@ namespace FECIngest
             Pageable<TableEntity> scheduleBQuery = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'Candidate' and ScheduleBProcessed eq false");
             if (scheduleBQuery.Count() > 0)
             {
-                log.LogInformation("Found {1} candidates missing ScheduleB information: ", committeeQuery.Count());
+                log.LogInformation("Found {1} candidates missing ScheduleB information: ", scheduleBQuery.Count());
                 //write messages to queue for look up later, we only need the candidate ID to perform the lookup from the FEC API
                 foreach (var row in scheduleBQuery)
                 {
