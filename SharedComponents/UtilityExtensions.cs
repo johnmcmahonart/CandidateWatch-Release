@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
-
+using System.Linq;
 namespace FECIngest
 {
     public static class UtilityExtensions
@@ -96,7 +96,42 @@ namespace FECIngest
             }
             return tableEntity;
         }
+        /*
+            private static T FromTableEntity<T> (TableEntity source, T outType) where T:new()
+        {
+            T outObj = new();
 
+            ;
+            //go through each property in destination, if a property is found in the source that matches copy the value to the output
+            foreach (PropertyInfo property in outType.GetType().GetProperties() )
+            {
+                object propertytoWrite = new();
+                //collections need to be handlded by deserializing the json string
+                if (property.PropertyType == typeof(List<>))
+                {
+                    if (source.TryGetValue(property.Name+"-json", out propertytoWrite))
+                    {
+                        //dynamic deserializedObj = JsonConvert.DeserializeObject((string)entity);
+                        //outObj.GetType().GetProperty(property.Name).SetValue(deserializedObj, deserializedObj, null);
+                        
+                    }
+                }
+                
+                
+                else if (source.TryGetValue(property.Name, out propertytoWrite))
+                {
+
+                    var val = propertytoWrite as ;
+                    property.SetValue(outObj.GetType().GetProperty(property.Name),val , null);
+                    
+                    
+                }
+                
+            }
+            return outObj;
+
+        }
+        */
         public static TableEntity ToTable(this object input, TableClient client, string partition, string rowKey)
         //converts input object to table entity
         {
@@ -104,6 +139,15 @@ namespace FECIngest
             
             
         }
+        /*
+        public static T FromTable<T>(this TableEntity input, T outType)where T:new()
+        //maps table entity to class
+        {
+            return FromTableEntity(input, outType);
+
+
+        }
+        */
         public static string GetMemberName<T, TValue>(Expression<Func<T, TValue>> memberAccess)
         //https://stackoverflow.com/questions/7598968/getting-the-name-of-a-property-in-c-sharp
 

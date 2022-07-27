@@ -22,12 +22,17 @@ namespace GetScheduleBDisbursement
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
             QueueClient scheduleBPageProcess = new QueueClient("UseDevelopmentStorage=true", "schedulebpageprocess");
             ScheduleBDisbursementClient scheduleBDisbursement = new ScheduleBDisbursementClient(apiKey);
-            QueueMessage[] scheduleBPage = await scheduleBPageProcess.ReceiveMessagesAsync(32);
+            QueueMessage[] scheduleBPages = await scheduleBPageProcess.ReceiveMessagesAsync(32);
 
             //get committee page detail, write to storage, remove from queue
-            foreach (var page in scheduleBPage)
+            foreach (var page in scheduleBPages)
             {
+                
                 string[] scheduleBToken = page.Body.ToString().Split(',');
+                if (scheduleBToken[0] == "H6MD04183")
+                {
+                    log.LogInformation("found candidate");
+                }
                 scheduleBDisbursement.SetQuery(new FECQueryParms
                 {
                     CommitteeId = scheduleBToken[1],
@@ -36,6 +41,17 @@ namespace GetScheduleBDisbursement
                 try
                 {
                     await scheduleBDisbursement.SubmitAsync();
+                    foreach (var item in scheduleBDisbursement.Disbursements)
+                    {
+
+                        var fixedItem = item.AddUTC();
+                        var scheduleBDetailEntity = fixedItem.ToTable(tableClient, "ScheduleBDetail", Guid.NewGuid().ToString());
+                        await tableClient.AddEntityAsync(scheduleBDetailEntity);
+
+                    }
+                    log.LogInformation("Added page {1} for {2} to storage", scheduleBToken[2], scheduleBToken[1]);
+                    
+                    await scheduleBPageProcess.DeleteMessageAsync(page.MessageId, page.PopReceipt);
                 }
                 catch (Exception ex)
                 {
@@ -43,16 +59,7 @@ namespace GetScheduleBDisbursement
                     log.LogInformation("Problem retrieving scheduleB details information for committee:{1} on page:{2}", scheduleBToken[1], scheduleBToken[2]);
                 }
                 
-                foreach (var item in scheduleBDisbursement.Disbursements)
-                {
                 
-                    var fixedItem = item.AddUTC();
-                    var scheduleBDetailEntity = fixedItem.ToTable(tableClient, "ScheduleBDetail", Guid.NewGuid().ToString());
-                    await tableClient.AddEntityAsync(scheduleBDetailEntity);
-                    
-                }
-                log.LogInformation("Added page {1} for {2} to storage", scheduleBToken[2], scheduleBToken[1]);
-                await scheduleBPageProcess.DeleteMessageAsync(page.MessageId, page.PopReceipt);
             }
 
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");

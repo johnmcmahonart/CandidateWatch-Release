@@ -32,8 +32,10 @@ namespace Tests
             var rand = new Random();
             int sampleCount = 0;
             int totalScheduleBCorrect = 0;
+            
             foreach (var candidate in scheduleBOverview)
             {
+                int foundScheduleBRows = 0;
                 if (rand.Next(0, 99) < 9)
                 {
                     sampleCount++;
@@ -42,8 +44,13 @@ namespace Tests
                     Pageable<TableEntity> scheduleBDetail =tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleBDetail' and {UtilityExtensions.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{candidate["PrincipalCommitteeId"]}'");
                     //TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
                     TableEntity candidatePartition = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.RowKey.ToString());
-
-                    if ((int)candidate["TotalDisbursements"] == scheduleBDetail.Count())
+                    
+                    //count how many rows were returned by query since there isn't another way to retrieve row count in table storage
+                    foreach (var rows in scheduleBDetail)
+                    {
+                        foundScheduleBRows++;
+                    }
+                    if ((int)candidate["TotalDisbursements"] == foundScheduleBRows)
                     {
                         log.LogInformation("{1} has correct number of ScheduleB disbursements stored", candidate["CandidateId"]);
                         totalScheduleBCorrect++;

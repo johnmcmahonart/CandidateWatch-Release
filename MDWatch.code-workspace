@@ -1,0 +1,35 @@
+{
+  "folders": [
+	{
+		"path": "FECIngest"
+	},
+	{
+		"path": "FinanceTest"
+	},
+	{
+		"path": "GetCommitteeData"
+	},
+	{
+		"path": "GetFinanceTotals"
+	},
+	{
+		"path": "GetScheduleBDisbursement"
+	},
+	{
+		"path": "PurgeAllSolutionTables"
+	},
+	{
+		"path": "RESTApi"
+	},
+	{
+		"path": "SendUpdates"
+	},
+	{
+		"path": "SharedComponents"
+	},
+	{
+		"path": "ValidateScheduleB"
+	}
+],
+  "settings": {}
+}

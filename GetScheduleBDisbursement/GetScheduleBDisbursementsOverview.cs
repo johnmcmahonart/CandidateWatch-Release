@@ -15,7 +15,7 @@ namespace FECIngest
     public class GetScheduleBDisbursementsOverview
     //this class retrieves basic ScheduleB data, such as total number of disbursements, and number of result pages
     //this is used to generate queue messages to be processed by downstream worker
-    //this is necessary because some candidates have hundreds of pages of ScheduleB data that can't be retrived quickly within API rate limit and non-durable function lifetime
+    //this is necessary because some candidates have hundreds of pages of ScheduleB data that can't be retrieved quickly within API rate limit and non-durable function lifetime
     {
         private const string apiKey = "xT2E5C0eUKvhVY74ylbGf4NWXz57XlxTkWV9pOwu";
 
@@ -29,22 +29,23 @@ namespace FECIngest
 
             foreach (var candidate in candidateIDs)
             {
-                //check if candidate already has overview data, if so we only need to try redownloading the detail data
-                TableEntity scheduleBOverview = await tableClient.GetEntityAsync<TableEntity>("ScheduleBOverview", candidate.Body.ToString());
-                TableEntity candidateEntity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
-                if (scheduleBOverview.Count() < 1)
+                if (candidate.Body.ToString()=="H6MD04183")
                 {
-                    //check for empty json string
+                    log.LogInformation("found candidate");
+                }
+                TableEntity candidateEntity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
+                //check for empty json string
 
-                    dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommittees-json"));
+                dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommittees-json"));
                     if (principalCommittee.Count > 0)
                     {
                         string committeeId = principalCommittee[0]["committee_id"];
 
                         //check if candidate has ScheduleB disbursements, if so store overview data
-                        if (scheduleBDisbursement.TotalDisbursementsforCandidate > 0)
+                        var candidateOverview = await GenerateScheduleBOverview(log, tableClient, scheduleBCandidateQueue, scheduleBDisbursement, candidate, committeeId);
+                        if (candidateOverview.TotalDisbursements > 0)
                         {
-                            var candidateOverview = await GenerateScheduleBOverview(log, tableClient, scheduleBCandidateQueue, scheduleBDisbursement, candidate, committeeId);
+               
 
                             //write messages to queue for each page, for each candidate
                             await GenerateScheduleBDetailMessages(scheduleBCandidateQueue, candidateOverview, candidate, candidateEntity);
@@ -58,21 +59,8 @@ namespace FECIngest
                     {
                         await MarkProcessedandDequeue(log, tableClient, scheduleBCandidateQueue, candidate);
                     }
-                }
-                else
-                {
-                    //get existing overview from storage, write detail messages to queue
-                    TableEntity scheduleBOverviewEntity = await tableClient.GetEntityAsync<TableEntity>("ScheduleBOverview", candidate.Body.ToString());
-
-                    ScheduleBCandidateOverview scheduleBCandidateOverview = new ScheduleBCandidateOverview
-                    {
-                        CandidateId = candidate.Body.ToString(),
-                        TotalDisbursements = (int)scheduleBOverviewEntity["TotalDisbursements"],
-                        TotalResultPages = (int)scheduleBOverviewEntity["TotalResultPages"],
-                        PrincipalCommitteeId = (string)scheduleBOverviewEntity["PrincipalCommitteeId"],
-                    };
-                    await GenerateScheduleBDetailMessages(scheduleBCandidateQueue, scheduleBCandidateOverview, candidate, candidateEntity);
-                }
+                
+                
             }
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
         }
@@ -80,14 +68,14 @@ namespace FECIngest
         private async Task<ScheduleBCandidateOverview> GenerateScheduleBOverview(ILogger log, TableClient tableClient, QueueClient scheduleBCandidateQueue, ScheduleBDisbursementClient scheduleBDisbursement, QueueMessage candidate, string committeeId)
         {
             //write overview data to table, for validation worker to use
-
+            //get overview data for candidate by asking for first page of results
             scheduleBDisbursement.SetQuery(new FECQueryParms
             {
                 CommitteeId = committeeId,
                 PageIndex = 1
             });
 
-            //get overview data for candidate by asking for first page of results
+            
             try
             {
                 await scheduleBDisbursement.SubmitAsync();
@@ -110,15 +98,16 @@ namespace FECIngest
             try
             {
                 await tableClient.AddEntityAsync(scheduleBOverviewEntity);
-                await scheduleBCandidateQueue.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
-                return scheduleBCandidateOverview;
+                //await scheduleBCandidateQueue.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
+                
             }
             catch (Exception ex)
             {
                 log.LogInformation(ex.ToString());
                 log.LogInformation("Problem writing scheduleB overview data for candidate");
-                return scheduleBCandidateOverview;
+                
             }
+            return scheduleBCandidateOverview;
         }
 
         private async Task GenerateScheduleBDetailMessages(QueueClient scheduleBCandidateQueue, ScheduleBCandidateOverview scheduleBCandidateOverview, QueueMessage candidate, TableEntity candidateEntity)
@@ -126,7 +115,7 @@ namespace FECIngest
             QueueClient scheduleBPagesQueue = new QueueClient("UseDevelopmentStorage=true", "schedulebpageprocess");
             dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommittees-json"));
             string recipientId = principalCommittee[0]["committee_id"];
-            for (int i = 1; i < scheduleBCandidateOverview.TotalResultPages + 1; i++)
+            for (int i = 1; i <= scheduleBCandidateOverview.TotalResultPages; i++)
             {
                 await scheduleBPagesQueue.SendMessageAsync(candidate.Body.ToString() + "," + recipientId + "," + i);
             }
