@@ -30,7 +30,7 @@ namespace FECIngest
                 TableEntity candidateEntity = fixedCandidate.ToTable(tableClient, "Candidate", candidate.CandidateId);
                 try
                 {
-                    var status = await tableClient.AddEntityAsync(candidateEntity);
+                    await tableClient.AddEntityAsync(candidateEntity);
                 }
                 catch (Exception ex)
                 {

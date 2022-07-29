@@ -28,7 +28,7 @@ namespace FECIngest
                 foreach (var row in committeeQuery)
                 {
                     object candidateID = new object();
-                    row.TryGetValue(UtilityExtensions.GetMemberName((Candidate c) => c.CandidateId), out candidateID);
+                    row.TryGetValue(Utilities.GetMemberName((Candidate c) => c.CandidateId), out candidateID);
                     await committeeQueue.SendMessageAsync(candidateID.ToString());
                 }
                 
@@ -43,7 +43,7 @@ namespace FECIngest
                 foreach (var row in financeTotalsQuery)
                 {
                     object candidateID = new object();
-                    row.TryGetValue(UtilityExtensions.GetMemberName((Candidate c) => c.CandidateId), out candidateID);
+                    row.TryGetValue(Utilities.GetMemberName((Candidate c) => c.CandidateId), out candidateID);
                     await financeTotalsQueue.SendMessageAsync(candidateID.ToString());
                 }
 
@@ -59,7 +59,7 @@ namespace FECIngest
                 foreach (var row in scheduleBQuery)
                 {
                     object candidateID = new object();
-                    row.TryGetValue(UtilityExtensions.GetMemberName((Candidate c) => c.CandidateId), out candidateID);
+                    row.TryGetValue(Utilities.GetMemberName((Candidate c) => c.CandidateId), out candidateID);
                     await scheduleBQueue.SendMessageAsync(candidateID.ToString());
                 }
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FECIngest.Model
+﻿namespace FECIngest.Model
 {
     public record class FECQueryParms
     //data model for FEC Query parameters, this is used to wrap optional parameters in an object since FEC methods contain many optional parms
@@ -12,6 +8,4 @@ namespace FECIngest.Model
         public string CommitteeId { get; set; }
         public int PageIndex { get; set; }
     }
-
 }
-

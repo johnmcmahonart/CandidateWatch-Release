@@ -1,9 +1,9 @@
-﻿using FECIngest.Client;
-using FECIngest.FECApi;
-using FECIngest.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FECIngest.Client;
+using FECIngest.FECApi;
+using FECIngest.Model;
 
 namespace FECIngest.SolutionClients
 {
@@ -15,12 +15,12 @@ namespace FECIngest.SolutionClients
 
         private string _state;
         private List<Candidate> _candidates = new List<Candidate>();
-        
+
         protected override void ConfigureEndPoint()
         {
             _config = new Configuration();
             _config.BasePath = "https://api.open.fec.gov/v1";
-            
+
             _config.Servers.Add(new Dictionary<string, object>
 
             {
@@ -31,12 +31,11 @@ namespace FECIngest.SolutionClients
                 );
             _apiClient = new CandidateApi(_config);
         }
-        
+
         public override async Task<bool> SubmitAsync()
         {
-
             //get all MD candidates
-            CandidatePage page = await _apiClient.CandidatesSearchGetAsync(apiKey: _apiKey, state: new List<string> { _state}) ;
+            CandidatePage page = await _apiClient.CandidatesSearchGetAsync(apiKey: _apiKey, state: new List<string> { _state });
 
             foreach (var candidate in page.Results)
             {
@@ -52,21 +51,17 @@ namespace FECIngest.SolutionClients
                     currentPage++;
                     page = await _apiClient.CandidatesSearchGetAsync(apiKey: _apiKey, state: new List<string> { _state }, page: currentPage);
                     _candidates.AddRange(page.Results);
-                    
                 }
             }
 
             return true;
         }
 
-        
-
         public CandidateSearchClient(string apiKey, string state)
         {
             _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
             _state = state ?? throw new ArgumentNullException(nameof(state));
             ConfigureEndPoint();
-            
         }
     }
 }

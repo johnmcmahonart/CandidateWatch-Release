@@ -1,9 +1,9 @@
-﻿using FECIngest.Client;
-using FECIngest.FECApi;
-using FECIngest.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FECIngest.Client;
+using FECIngest.FECApi;
+using FECIngest.Model;
 
 namespace FECIngest.SolutionClients
 {
@@ -12,33 +12,30 @@ namespace FECIngest.SolutionClients
         public List<Committee> Committees => _committees;
 
         private FECQueryParms _queryParms;
-        
+
         private List<Committee> _committees = new List<Committee>();
-        
+
         private CommitteeApi _apiClient;
 
         public void SetQuery(FECQueryParms parms)
         {
             _queryParms = parms ?? throw new ArgumentNullException(nameof(parms));
         }
+
         public override async Task SubmitAsync()
         {
             if (_queryParms == null)
             {
                 throw new ArgumentException("Query parameters must be set. Use SetQuery before submission");
-                
             }
             else
             {
-                CommitteePage page = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() =>_apiClient.CommitteesGetAsync(apiKey: _apiKey, candidateId: new List<String> { _queryParms.CandidateId }));
+                CommitteePage page = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => _apiClient.CommitteesGetAsync(apiKey: _apiKey, candidateId: new List<String> { _queryParms.CandidateId }));
 
                 if (page.Results.Count > 0)
                 {
                     _committees.AddRange(page.Results);
-                    
-                    
                 }
-                    
             }
         }
 

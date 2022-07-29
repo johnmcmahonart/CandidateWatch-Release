@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FECIngest.Model
+﻿namespace FECIngest.Model
 {
     public record class ScheduleBCandidateOverview
     {

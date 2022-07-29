@@ -4,12 +4,13 @@ using Azure.Storage.Queues.Models;
 using FECIngest;
 using FECIngest.Model;
 using FECIngest.SolutionClients;
+using FECIngest.ScheduleBDisbursement;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace GetScheduleBDisbursement
+namespace FECIngest
 {
     public class GetScheduleBDisbursementsDetail
     {
@@ -29,10 +30,7 @@ namespace GetScheduleBDisbursement
             {
                 
                 string[] scheduleBToken = page.Body.ToString().Split(',');
-                if (scheduleBToken[0] == "H6MD04183")
-                {
-                    log.LogInformation("found candidate");
-                }
+                
                 scheduleBDisbursement.SetQuery(new FECQueryParms
                 {
                     CommitteeId = scheduleBToken[1],

@@ -40,8 +40,8 @@ namespace Tests
                 {
                     sampleCount++;
                     object foundCandidate = new();
-                    candidate.TryGetValue(UtilityExtensions.GetMemberName((ScheduleBCandidateOverview c) => c.CandidateId), out foundCandidate);
-                    Pageable<TableEntity> scheduleBDetail =tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleBDetail' and {UtilityExtensions.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{candidate["PrincipalCommitteeId"]}'");
+                    candidate.TryGetValue(Utilities.GetMemberName((ScheduleBCandidateOverview c) => c.CandidateId), out foundCandidate);
+                    Pageable<TableEntity> scheduleBDetail =tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleBDetail' and {Utilities.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{candidate["PrincipalCommitteeId"]}'");
                     //TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
                     TableEntity candidatePartition = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.RowKey.ToString());
                     

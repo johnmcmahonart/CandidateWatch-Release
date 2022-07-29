@@ -1,9 +1,10 @@
-﻿using FECIngest.Client;
-using FECIngest.FECApi;
-using FECIngest.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FECIngest.Client;
+using FECIngest.FECApi;
+using FECIngest.Model;
+
 namespace FECIngest.SolutionClients
 {
     public class ScheduleBDisbursementClient : FECClient, IFECQueryParms
@@ -18,6 +19,7 @@ namespace FECIngest.SolutionClients
         public int TotalDisbursementsforCandidate => _totalDisbursementsforCandidate;
 
         public List<ScheduleBByRecipientID> Disbursements => _disbursements;
+
         public void SetQuery(FECQueryParms parms)
         {
             _queryParms = parms ?? throw new ArgumentNullException(nameof(parms));
@@ -33,7 +35,6 @@ namespace FECIngest.SolutionClients
             }
             else
             {
-                
                 _page = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => _apiClient.SchedulesScheduleBByRecipientIdGetAsync(apiKey: _apiKey, recipientId: new List<String> { _queryParms.CommitteeId }, page: _queryParms.PageIndex));
                 _totalDisbursementsforCandidate = _page.Pagination.Count;
                 _totalPages = _page.Pagination.Pages;

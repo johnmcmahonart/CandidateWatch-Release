@@ -1,18 +1,17 @@
-﻿using FECIngest.Client;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using FECIngest.Client;
+
 namespace FECIngest.SolutionClients
 {
     public abstract class FECClient
     {
         protected abstract void ConfigureEndPoint();
+
         public abstract Task SubmitAsync();
-        
-        
+
         public Configuration Config => _config;
         public string APIKey => _apiKey;
-        private protected Configuration _config;
-        private protected string _apiKey;
-        
+        protected Configuration _config;
+        protected string _apiKey;
     }
 }

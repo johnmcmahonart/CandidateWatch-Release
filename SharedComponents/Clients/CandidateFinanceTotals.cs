@@ -1,14 +1,14 @@
-﻿using FECIngest.Client;
-using FECIngest.FECApi;
-using FECIngest.Model;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FECIngest.Client;
+using FECIngest.FECApi;
+using FECIngest.Model;
+
 namespace FECIngest.SolutionClients
 {
-    public class CandidateFinanceTotalsClient: FECClient, IFECQueryParms
+    public class CandidateFinanceTotalsClient : FECClient, IFECQueryParms
     {
         public List<CandidateHistoryTotal> Contributions => _contributions;
 
@@ -17,6 +17,7 @@ namespace FECIngest.SolutionClients
         private FECQueryParms _queryParms;
 
         private CandidateApi _apiClient;
+
         public Decimal? GetTotalNonIndividualContributions()
         {
             if (_queryParms == null)
@@ -29,6 +30,7 @@ namespace FECIngest.SolutionClients
                 return nonIndividualContributions.Sum();
             };
         }
+
         public Decimal? GetTotalIndividualContributions()
         {
             if (_queryParms == null)
@@ -46,6 +48,7 @@ namespace FECIngest.SolutionClients
         {
             _queryParms = parms ?? throw new ArgumentException(nameof(parms));
         }
+
         protected override void ConfigureEndPoint()
         {
             _config = new Configuration();
@@ -58,6 +61,7 @@ namespace FECIngest.SolutionClients
             );
             _apiClient = new CandidateApi(_config);
         }
+
         public override async Task SubmitAsync()
         {
             if (_queryParms == null)
@@ -66,15 +70,14 @@ namespace FECIngest.SolutionClients
             }
             else
             {
-                CandidateHistoryTotalPage page = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(()=> _apiClient.CandidatesTotalsGetAsync(apiKey: _apiKey, candidateId: new List<string> { _queryParms.CandidateId }));
+                CandidateHistoryTotalPage page = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() => _apiClient.CandidatesTotalsGetAsync(apiKey: _apiKey, candidateId: new List<string> { _queryParms.CandidateId }));
                 if (page.Results.Count > 0)
                 {
                     _contributions.AddRange(page.Results);
-                                 
                 }
-                
             }
         }
+
         public CandidateFinanceTotalsClient(string APIKey)
         {
             _apiKey = APIKey ?? throw new ArgumentNullException(nameof(APIKey));

@@ -47,7 +47,7 @@ namespace FECIngest
                             await tableClient.AddEntityAsync(fixedEntity);
                         }
                         TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
-                        entity[UtilityExtensions.GetMemberName((Candidate c) => c.FinanceTotalProcessed)] = true;
+                        entity[Utilities.GetMemberName((Candidate c) => c.FinanceTotalProcessed)] = true;
                         await tableClient.UpdateEntityAsync(entity, entity.ETag);
                         await queueClient.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
                     }
