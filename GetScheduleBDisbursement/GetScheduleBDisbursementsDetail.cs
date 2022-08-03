@@ -4,6 +4,7 @@ using Azure.Storage.Queues.Models;
 using FECIngest;
 using FECIngest.Model;
 using FECIngest.SolutionClients;
+using FECIngest.Utilities;
 using FECIngest.ScheduleBDisbursement;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -43,7 +44,7 @@ namespace FECIngest
                     {
 
                         var fixedItem = item.AddUTC();
-                        var scheduleBDetailEntity = fixedItem.ToTable(tableClient, "ScheduleBDetail", Guid.NewGuid().ToString());
+                        var scheduleBDetailEntity = fixedItem.ModelToTableEntity(tableClient, "ScheduleBDetail", Guid.NewGuid().ToString());
                         await tableClient.AddEntityAsync(scheduleBDetailEntity);
 
                     }

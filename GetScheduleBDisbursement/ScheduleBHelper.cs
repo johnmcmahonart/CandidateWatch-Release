@@ -10,6 +10,7 @@ using Azure.Storage.Queues.Models;
 using FECIngest;
 using FECIngest.Model;
 using FECIngest.SolutionClients;
+using FECIngest.Utilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -20,7 +21,7 @@ namespace FECIngest.ScheduleBDisbursement
         public static bool CommitteeExistsinOverview(TableClient tableClient, string committeeId)
         {
 
-            Pageable<TableEntity> foundCandidates = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleBOverview' and {Utilities.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)} eq '{committeeId}'");
+            Pageable<TableEntity> foundCandidates = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleBOverview' and {Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)} eq '{committeeId}'");
             
             if (foundCandidates.Any())
             {
@@ -57,7 +58,7 @@ namespace FECIngest.ScheduleBDisbursement
                 TotalResultPages = scheduleBDisbursement.TotalPages,
                 PrincipalCommitteeId = committeeId
             };
-            TableEntity scheduleBOverviewEntity = scheduleBCandidateOverview.ToTable(tableClient, "ScheduleBOverview", scheduleBCandidateOverview.CandidateId);
+            TableEntity scheduleBOverviewEntity = scheduleBCandidateOverview.ModelToTableEntity(tableClient, "ScheduleBOverview", scheduleBCandidateOverview.CandidateId);
             try
             {
                 await tableClient.AddEntityAsync(scheduleBOverviewEntity);

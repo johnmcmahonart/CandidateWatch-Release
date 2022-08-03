@@ -9,6 +9,7 @@
     <Import_RootNamespace>SharedComponents</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AzTableUtilitites.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\CandidatewProcessed.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\FECQueryParms.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFECPagination.cs" />

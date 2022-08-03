@@ -5,6 +5,7 @@ using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using FECIngest.ScheduleBDisbursement;
 using FECIngest.SolutionClients;
+using FECIngest.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -33,8 +34,8 @@ namespace FECIngest
 
                 dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommittees-json"));
 
-                //logic is this. If the candidate has a principal committee, check if there is overview data for them, if they don't we dequeue the message and mark the candidate as processed. If there is, it was already written
-                //and remove it from the queue. If not check if the candidate has ScheduleB disbursements. If they do, write to storage, otherwise dequeue the message and mark as processed
+                //logic is this. If the candidate has a principal committee, check if there is overview data for them, if they don't we dequeue the message and mark the candidate as processed. If there is, detail data was already written
+                //We create the overviewdata and then remove the from the queue so we don't redownload the detail data. If not check if the candidate has ScheduleB disbursements. If they do, write to storage, otherwise dequeue the message and mark as processed
 
                 if (principalCommittee.Count > 0)
                 {
@@ -42,7 +43,7 @@ namespace FECIngest
 
                     if (ScheduleBHelper.CommitteeExistsinOverview(tableClient, committeeId))
                     {
-                        //create candidateOverview but don't generate detail messages since they already exists
+                        //create candidateOverview but don't generate detail messages since they already exist
 
                         var candidateOverview = await ScheduleBHelper.GenerateScheduleBOverviewAsync(log, tableClient, scheduleBCandidateQueue, scheduleBDisbursement, candidate, committeeId);
                         await scheduleBCandidateQueue.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);

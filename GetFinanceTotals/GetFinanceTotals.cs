@@ -3,12 +3,13 @@ using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using FECIngest.SolutionClients;
 using FECIngest.Model;
+using FECIngest.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using FECIngest;
+
 
 namespace FECIngest
 {
@@ -26,6 +27,7 @@ namespace FECIngest
             CandidateFinanceTotalsClient financeTotals = new CandidateFinanceTotalsClient(apiKey);
             //process candidate IDs by looking up candidate ID from queue message using FEC API, write data to table storage
 
+            
             foreach (var candidate in candidateIDs)
             {
                 financeTotals.SetQuery(new FECQueryParms { CandidateId = candidate.Body.ToString() });
@@ -43,11 +45,11 @@ namespace FECIngest
                         {
                             //dates written to azure table storage must be UTC
                             var fixedItem = cycle.AddUTC();
-                            TableEntity fixedEntity = fixedItem.ToTable(tableClient, "FinanceTotals", Guid.NewGuid().ToString());
+                            TableEntity fixedEntity = fixedItem.ModelToTableEntity(tableClient, "FinanceTotals", Guid.NewGuid().ToString());
                             await tableClient.AddEntityAsync(fixedEntity);
                         }
                         TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
-                        entity[Utilities.GetMemberName((Candidate c) => c.FinanceTotalProcessed)] = true;
+                        entity[Utilities.General.GetMemberName((Candidate c) => c.FinanceTotalProcessed)] = true;
                         await tableClient.UpdateEntityAsync(entity, entity.ETag);
                         await queueClient.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
                     }

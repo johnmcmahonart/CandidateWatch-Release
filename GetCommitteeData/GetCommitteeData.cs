@@ -1,16 +1,13 @@
+using System;
+using System.Threading.Tasks;
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
+using FECIngest.Model;
+using FECIngest.SolutionClients;
+using FECIngest.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Polly;
-using Polly.RateLimit;
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using FECIngest.Model;
-using FECIngest;
-using FECIngest.SolutionClients;
 
 namespace FECIngest
 {
@@ -23,17 +20,16 @@ namespace FECIngest
         public async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-                        
+
             QueueClient queueClient = new QueueClient("UseDevelopmentStorage=true", "committeeprocess");
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
             QueueMessage[] candidateIDs = await queueClient.ReceiveMessagesAsync(32);
             CommitteeSearchClient committeeSearch = new CommitteeSearchClient(apiKey);
             //process candidate IDs by looking up candidate ID from queue message using FEC API, write data to table storage
-            
+
             foreach (var candidate in candidateIDs)
             {
-                committeeSearch.SetQuery(new FECQueryParms { CandidateId =candidate.Body.ToString() });
-                    
+                committeeSearch.SetQuery(new FECQueryParms { CandidateId = candidate.Body.ToString() });
 
                 log.LogInformation("Getting committee information for candidate: {1}", candidate.Body.ToString());
                 try
@@ -47,9 +43,8 @@ namespace FECIngest
                     {
                         //dates written to azure table storage must be UTC
                         var fixedCommittee = committee.AddUTC();
-                        TableEntity committeeEntity = fixedCommittee.ToTable(tableClient, "Committee", Guid.NewGuid().ToString());
+                        TableEntity committeeEntity = fixedCommittee.ModelToTableEntity(tableClient, "Committee", Guid.NewGuid().ToString());
                         var errorState = await tableClient.AddEntityAsync(committeeEntity);
-
 
                         if (errorState.IsError) //schedule candidate to be processed later
                         {
@@ -59,19 +54,12 @@ namespace FECIngest
                             entity["CommitteeProcessed"] = false;
                             await tableClient.UpdateEntityAsync(failed, failed.ETag);
                         }
-
                     }
                 }
                 catch (Exception ex)
                 {
-
                     log.LogInformation(ex.ToString());
                     log.LogInformation("problem retrieving CandidateIds from queue for processing");
-                }
-                
-                {
-                
-
                 }
             }
         }

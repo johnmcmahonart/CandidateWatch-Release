@@ -1,5 +1,6 @@
 using Azure.Data.Tables;
 using FECIngest.SolutionClients;
+using FECIngest.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
@@ -27,7 +28,7 @@ namespace FECIngest
             {
                 //candidate.ToTableEntity
                 var fixedCandidate = candidate.AddUTC();
-                TableEntity candidateEntity = fixedCandidate.ToTable(tableClient, "Candidate", candidate.CandidateId);
+                TableEntity candidateEntity = fixedCandidate.ModelToTableEntity(tableClient, "Candidate", candidate.CandidateId);
                 try
                 {
                     await tableClient.AddEntityAsync(candidateEntity);

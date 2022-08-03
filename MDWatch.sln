@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValidateScheduleB", "Valida
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RESTApi", "RESTApi\RESTApi.csproj", "{98EECF3C-5E41-41AD-8BF5-0C5CEA6E063F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeAllSolutionTables", "PurgeAllSolutionTables\PurgeAllSolutionTables.csproj", "{55FFD790-9C01-43C1-9B7D-14C500658A19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PurgeAllSolutionTables", "PurgeAllSolutionTables\PurgeAllSolutionTables.csproj", "{55FFD790-9C01-43C1-9B7D-14C500658A19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

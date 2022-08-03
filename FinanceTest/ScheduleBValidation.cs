@@ -4,6 +4,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using FECIngest.SolutionClients;
 using FECIngest.Model;
+using FECIngest.Utilities;
 using Azure.Data.Tables;
 using Azure.Data.Tables.Models;
 using System.Threading.Tasks;
@@ -40,8 +41,8 @@ namespace Tests
                 {
                     sampleCount++;
                     object foundCandidate = new();
-                    candidate.TryGetValue(Utilities.GetMemberName((ScheduleBCandidateOverview c) => c.CandidateId), out foundCandidate);
-                    Pageable<TableEntity> scheduleBDetail =tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleBDetail' and {Utilities.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{candidate["PrincipalCommitteeId"]}'");
+                    candidate.TryGetValue(General.GetMemberName((ScheduleBCandidateOverview c) => c.CandidateId), out foundCandidate);
+                    Pageable<TableEntity> scheduleBDetail =tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleBDetail' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{candidate["PrincipalCommitteeId"]}'");
                     //TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
                     TableEntity candidatePartition = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.RowKey.ToString());
                     

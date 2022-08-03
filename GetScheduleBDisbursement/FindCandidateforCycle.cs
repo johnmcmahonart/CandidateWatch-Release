@@ -7,6 +7,7 @@ using Azure;
 using Azure.Data.Tables;
 using FECIngest.Model;
 using FECIngest.SolutionClients;
+using FECIngest.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -24,7 +25,7 @@ namespace FECIngest.ScheduleBDisbursement
         private static async Task<bool> HasCycleAsync(TableEntity entity, int findCycle)
         {
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
-            TableEntity foundCandidate = await tableClient.GetEntityAsync<TableEntity>("Candidate", (string)entity[Utilities.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)]);
+            TableEntity foundCandidate = await tableClient.GetEntityAsync<TableEntity>("Candidate", (string)entity[Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)]);
             dynamic principalCommittee = JsonConvert.DeserializeObject(foundCandidate.GetString("PrincipalCommittees-json"));
 
             foreach (var cycle in principalCommittee[0]["cycles"][0])
@@ -42,7 +43,7 @@ namespace FECIngest.ScheduleBDisbursement
         private static async Task<int> GetCycleCountAsync(TableEntity entity)
         {
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
-            TableEntity foundCandidate = await tableClient.GetEntityAsync<TableEntity>("Candidate", (string)entity[Utilities.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)]);
+            TableEntity foundCandidate = await tableClient.GetEntityAsync<TableEntity>("Candidate", (string)entity[Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)]);
             dynamic principalCommittee = JsonConvert.DeserializeObject(foundCandidate.GetString("PrincipalCommittees-json"));
             return principalCommittee[0]["cycles"][0].Count();
 
@@ -52,7 +53,7 @@ namespace FECIngest.ScheduleBDisbursement
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
 
             //get candidates that match committeeId
-            Pageable<TableEntity> candidatesWithCommittee = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleBOverview' and {Utilities.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)} eq '{schedubleB.CommitteeId}'");
+            Pageable<TableEntity> candidatesWithCommittee = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleBOverview' and {Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)} eq '{schedubleB.CommitteeId}'");
 
             //find candidate with the fewest cycles from Candidate partition
 

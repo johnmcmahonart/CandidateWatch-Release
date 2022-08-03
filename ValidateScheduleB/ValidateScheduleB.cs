@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
 using FECIngest.Model;
+using FECIngest.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 
@@ -21,26 +22,26 @@ namespace FECIngest
             int totalCorrect = 0;
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
 
-            Pageable<TableEntity> candidatesScheduleBNotProcessed = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'Candidate' and {Utilities.GetMemberName((Candidate c) => c.ScheduleBProcessed)} eq false");
+            Pageable<TableEntity> candidatesScheduleBNotProcessed = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'Candidate' and {Utilities.General.GetMemberName((Candidate c) => c.ScheduleBProcessed)} eq false");
 
             foreach (var candidate in candidatesScheduleBNotProcessed)
             {
-                string candidateId = (string)candidate[Utilities.GetMemberName((ScheduleBCandidateOverview c) => c.CandidateId)];
+                string candidateId = (string)candidate[Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.CandidateId)];
                 TableEntity scheduleBOverview = await tableClient.GetEntityAsync<TableEntity>("ScheduleBOverview", candidateId);
-                string committeeId = (string)scheduleBOverview[Utilities.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)];
-                Pageable<TableEntity> scheduleBDetail = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleBDetail' and {Utilities.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{committeeId}'");
+                string committeeId = (string)scheduleBOverview[Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)];
+                Pageable<TableEntity> scheduleBDetail = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'ScheduleBDetail' and {Utilities.General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{committeeId}'");
 
-                if ((int)scheduleBOverview[Utilities.GetMemberName((ScheduleBCandidateOverview c) => c.TotalDisbursements)] == scheduleBDetail.Count())
+                if ((int)scheduleBOverview[Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.TotalDisbursements)] == scheduleBDetail.Count())
                 {
                     TableEntity candidateScheduleBProcessed = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidateId);
-                    candidateScheduleBProcessed[Utilities.GetMemberName((Candidate c) => c.ScheduleBProcessed)] = true;
+                    candidateScheduleBProcessed[Utilities.General.GetMemberName((Candidate c) => c.ScheduleBProcessed)] = true;
                     await tableClient.UpdateEntityAsync(candidateScheduleBProcessed, candidateScheduleBProcessed.ETag);
                     //log.LogInformation("{1} has correct number of ScheduleB disbursements stored", (string)candidate.CandidateId);
                     totalCorrect++;
                 }
                 else
                 {
-                    log.LogInformation("{1} has {2} out of {3} ScheduleB entries downloaded", candidateId, scheduleBDetail.Count(), scheduleBOverview[Utilities.GetMemberName((ScheduleBCandidateOverview c) => c.TotalDisbursements)]);
+                    log.LogInformation("{1} has {2} out of {3} ScheduleB entries downloaded", candidateId, scheduleBDetail.Count(), scheduleBOverview[Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.TotalDisbursements)]);
                     log.LogInformation("Cleaning up previously downloaded data for {1}. Will try downloading ScheduleB data at a later time", candidateId);
 
                     //remove overview data since it may change between the next run of getting the overview information, which can cause the API and DB to disagree
