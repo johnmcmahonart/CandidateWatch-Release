@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using Azure.Data.Tables;
 using Newtonsoft.Json;
 using System.Linq;
-using FECIngest.Model;
-using FECIngest.SolutionClients;
-namespace FECIngest
+using MDWatch.Model;
+using MDWatch.SolutionClients;
+namespace MDWatch
 {
     public class CandidateDataValidation
     {

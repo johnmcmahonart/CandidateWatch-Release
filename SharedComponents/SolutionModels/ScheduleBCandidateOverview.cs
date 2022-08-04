@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FECIngest.Model
+namespace MDWatch.Model
 {
     public record class ScheduleBCandidateOverview
     {

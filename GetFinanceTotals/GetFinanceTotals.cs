@@ -1,9 +1,9 @@
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using FECIngest.SolutionClients;
-using FECIngest.Model;
-using FECIngest.Utilities;
+using MDWatch.SolutionClients;
+using MDWatch.Model;
+using MDWatch.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 
-namespace FECIngest
+namespace MDWatch
 {
     public class FinanceTotals
     {

@@ -2,15 +2,15 @@ using System;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
-using FECIngest.SolutionClients;
-using FECIngest.Model;
-using FECIngest.Utilities;
+using MDWatch.SolutionClients;
+using MDWatch.Model;
+using MDWatch.Utilities;
 using Azure.Data.Tables;
 using Azure.Data.Tables.Models;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Azure;
-using FECIngest;
+using MDWatch;
 using System.Linq;
 namespace Tests
 {

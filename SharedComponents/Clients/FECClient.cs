@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using FECIngest.Client;
+using MDWatch.Client;
 
-namespace FECIngest.SolutionClients
+namespace MDWatch.SolutionClients
 {
     public abstract class FECClient
     {

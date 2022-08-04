@@ -8,7 +8,7 @@ using System.Text;
 using Azure.Data.Tables;
 using Newtonsoft.Json;
 
-namespace FECIngest.Utilities
+namespace MDWatch.Utilities
 {
     public static class AzTableUtilitites
     {

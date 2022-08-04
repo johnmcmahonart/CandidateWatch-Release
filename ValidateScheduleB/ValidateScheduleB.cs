@@ -3,12 +3,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
-using FECIngest.Model;
-using FECIngest.Utilities;
+using MDWatch.Model;
+using MDWatch.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 
-namespace FECIngest
+namespace MDWatch
 {
     public class ValidateScheduleB
     {

@@ -4,7 +4,7 @@ using System.Text;
 using Azure.Data.Tables;
 using Azure;
 //using Azure.Identity;
-namespace FECIngest
+namespace MDWatch
 {
     public static class TablePurge
     //deletes all rows from azure table partition

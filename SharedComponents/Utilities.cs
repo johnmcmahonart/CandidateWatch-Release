@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-namespace FECIngest.Utilities
+namespace MDWatch.Utilities
 {
     public static class General
 

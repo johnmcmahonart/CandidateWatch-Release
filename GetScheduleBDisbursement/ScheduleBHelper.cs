@@ -7,14 +7,14 @@ using Azure;
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using FECIngest;
-using FECIngest.Model;
-using FECIngest.SolutionClients;
-using FECIngest.Utilities;
+using MDWatch;
+using MDWatch.Model;
+using MDWatch.SolutionClients;
+using MDWatch.Utilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace FECIngest.ScheduleBDisbursement
+namespace MDWatch.ScheduleBDisbursement
 {
     internal static class ScheduleBHelper
     {

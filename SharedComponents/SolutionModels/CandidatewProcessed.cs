@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-namespace FECIngest.Model
+namespace MDWatch.Model
 {
     //adds validation parms for downstream worker processes
     public partial class Candidate

@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using FECIngest.Model;
-using FECIngest.SolutionClients;
-using FECIngest.Utilities;
+using MDWatch.Model;
+using MDWatch.SolutionClients;
+using MDWatch.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 
-namespace FECIngest
+namespace MDWatch
 {
     public class GetCommitteeData
     //get detailed committee data for each candidate, uses poly to rate limit requests because of limitations in free API (1000 requests per hour)

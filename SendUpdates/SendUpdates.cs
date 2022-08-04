@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging;
 using Azure;
 using Azure.Storage.Queues;
 using System.Linq;
-using FECIngest.Model;
-using FECIngest.Utilities;
+using MDWatch.Model;
+using MDWatch.Utilities;
 using System.Threading.Tasks;
 
-namespace FECIngest
+namespace MDWatch
 {
     public class SendUpdates
     {

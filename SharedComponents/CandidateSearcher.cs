@@ -1,11 +1,11 @@
-﻿using FECIngest.Client;
-using FECIngest.FECApi;
-using FECIngest.Model;
+﻿using MDWatch.Client;
+using MDWatch.FECApi;
+using MDWatch.Model;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FECIngest
+namespace MDWatch
 {
     public class CandidateSearch : IFECSearch
 

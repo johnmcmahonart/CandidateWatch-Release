@@ -1,17 +1,17 @@
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using FECIngest;
-using FECIngest.Model;
-using FECIngest.SolutionClients;
-using FECIngest.Utilities;
-using FECIngest.ScheduleBDisbursement;
+using MDWatch;
+using MDWatch.Model;
+using MDWatch.SolutionClients;
+using MDWatch.Utilities;
+using MDWatch.ScheduleBDisbursement;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace FECIngest
+namespace MDWatch
 {
     public class GetScheduleBDisbursementsDetail
     {

@@ -5,15 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
-using FECIngest.Model;
-using FECIngest.SolutionClients;
-using FECIngest.Utilities;
+using MDWatch.Model;
+using MDWatch.SolutionClients;
+using MDWatch.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 
-namespace FECIngest.ScheduleBDisbursement
+namespace MDWatch.ScheduleBDisbursement
 {
 
     static internal class FindCandidateforCycle

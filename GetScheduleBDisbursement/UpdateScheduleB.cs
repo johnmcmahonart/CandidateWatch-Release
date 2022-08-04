@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using FECIngest.Model;
-using FECIngest.SolutionClients;
+using MDWatch.Model;
+using MDWatch.SolutionClients;
 using Newtonsoft.Json;
 using System.Linq;
 

@@ -1,9 +1,9 @@
-﻿using FECIngest.Model;
+﻿using MDWatch.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FECIngest
+namespace MDWatch
 {
     public interface IFECQueryParms
     {

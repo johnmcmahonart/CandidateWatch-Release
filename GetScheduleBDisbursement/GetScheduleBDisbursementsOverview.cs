@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using FECIngest.ScheduleBDisbursement;
-using FECIngest.SolutionClients;
-using FECIngest.Utilities;
+using MDWatch.ScheduleBDisbursement;
+using MDWatch.SolutionClients;
+using MDWatch.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace FECIngest
+namespace MDWatch
 {
     public class GetScheduleBDisbursementsOverview
     //this class retrieves basic ScheduleB data, such as total number of disbursements, and number of result pages
