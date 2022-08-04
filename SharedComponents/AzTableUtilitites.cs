@@ -167,9 +167,8 @@ namespace MDWatch.Utilities
 
         }
         public static TableEntity ModelToTableEntity(this object input, TableClient client, string partition, string rowKey)
-        //converts input object to table entity
-        {
-            return BuildEntity(partition, rowKey, input);
+        { //converts input object to table entity
+                    return BuildEntity(partition, rowKey, input.AddUTC());
         }
 
 

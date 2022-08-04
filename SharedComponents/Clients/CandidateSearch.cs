@@ -16,7 +16,7 @@ namespace MDWatch.SolutionClients
         private string _state;
         private List<Candidate> _candidates = new List<Candidate>();
 
-        protected override void ConfigureEndPoint()
+        private protected override void ConfigureEndPoint()
         {
             _config = new Configuration();
             _config.BasePath = "https://api.open.fec.gov/v1";

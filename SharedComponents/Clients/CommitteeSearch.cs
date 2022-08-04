@@ -39,7 +39,7 @@ namespace MDWatch.SolutionClients
             }
         }
 
-        protected override void ConfigureEndPoint()
+        private protected override void ConfigureEndPoint()
         {
             _config = new Configuration();
             _config.BasePath = "https://api.open.fec.gov/v1";
