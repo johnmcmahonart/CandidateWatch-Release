@@ -5,29 +5,32 @@ using MDWatch.Utilities;
 using System.Threading.Tasks;
 using Azure;
 using Newtonsoft;
+using System.Linq.Expressions;
+using static System.Linq.Expressions.Expression;
+using System.Reflection;
 
 namespace RESTApi.Repositories
 {
-    public class CandidateRepository : IRepository<Candidate>
+    public class CandidateRepository :AzureTable, IRepository<Candidate>
     {
-        private static string _partitionKey = "Candidate";
-        private static TableClient _tableClient= new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
+
         public async Task  AddAsync(Candidate inEntity)
         {
-            TableEntity outEntity = inEntity.ModelToTableEntity(_tableClient, _partitionKey, inEntity.CandidateId);
+            TableEntity outEntity = inEntity.ModelToTableEntity(_tableClient, _partitionKey!, inEntity.CandidateId);
             await _tableClient.AddEntityAsync(outEntity);
         }
 
-        void IRepository<Candidate>.Delete(Candidate entity)
+        public async Task DeleteAsync(Candidate entity)
         {
-            throw new NotImplementedException();
+            TableEntity entityDelete = entity.ModelToTableEntity(_tableClient, _partitionKey!, entity.CandidateId);
+            await _tableClient.DeleteEntityAsync(entityDelete.PartitionKey, entityDelete.RowKey);
         }
 
-        public ICollection<Candidate> GetAll()
+        public async Task<ICollection<Candidate>> GetAllAsync()
         {
             List<Candidate> outList = new List<Candidate>();
-            Pageable<TableEntity> candidates = _tableClient.Query<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
-            foreach (var candidate in candidates)
+            AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
+            await foreach (var candidate in candidates)
             {
                 outList.Add(candidate.TableEntityToModel<Candidate>());
             }
@@ -38,22 +41,33 @@ namespace RESTApi.Repositories
         {
             TableEntity candidate = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey,key);
             return candidate.TableEntityToModel<Candidate>();
+        
         }
 
-        ICollection<Candidate> IRepository<Candidate>.GetbyQuery(IQueryable<Candidate> query)
+        public async Task< ICollection<Candidate>> GetCandidatesProcessedAsync(PropertyInfo property, bool state)
         {
-            throw new NotImplementedException();
+            List<Candidate> outList = new List<Candidate>();
+            AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {property.Name} eq {state}");
+            await foreach (var candidate in candidates)
+            {
+                outList.Add(candidate.TableEntityToModel<Candidate>());
+            }
+            return outList;
+            
         }
 
         public async Task UpdateAsync(Candidate inEntity)
         {
             TableEntity entity = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, inEntity.CandidateId);
-            entity = inEntity.ModelToTableEntity(_tableClient, _partitionKey, inEntity.CandidateId);
+            entity = inEntity.ModelToTableEntity(_tableClient, _partitionKey!, inEntity.CandidateId);
             
             await _tableClient.UpdateEntityAsync(entity, entity.ETag);
 
         }
-        CandidateRepository() { }
+        CandidateRepository() 
+        {
+            _partitionKey= "Candidate";
+        }
         
                     }
         
