@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AzTableUtilitites.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models\CandidatewProcessed.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\CandidateStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\FECQueryParms.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFECQueryParms.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\ScheduleBCandidateOverview.cs" />

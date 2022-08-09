@@ -1,6 +1,7 @@
 using Azure.Data.Tables;
 using MDWatch.SolutionClients;
 using MDWatch.Utilities;
+using MDWatch.Model;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
@@ -26,12 +27,14 @@ namespace MDWatch
 
             foreach (var candidate in mdCandidates.Candidates)
             {
-                //candidate.ToTableEntity
-                var fixedCandidate = candidate.AddUTC();
-                TableEntity candidateEntity = fixedCandidate.ModelToTableEntity(tableClient, "Candidate", candidate.CandidateId);
+                                
+                TableEntity candidateEntity = candidate.ModelToTableEntity(tableClient, "Candidate", candidate.CandidateId);
+                CandidateStatus candidateStatus = new CandidateStatus(){ CandidateId = candidate.CandidateId };
+                TableEntity candidateStatusEntity = candidateStatus.ModelToTableEntity(tableClient,"CandidateStatus", candidate.CandidateId);
                 try
                 {
                     await tableClient.AddEntityAsync(candidateEntity);
+                    await tableClient.AddEntityAsync(candidateStatusEntity);
                 }
                 catch (Exception ex)
                 {

@@ -22,7 +22,7 @@ namespace MDWatch
             int totalCorrect = 0;
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
 
-            Pageable<TableEntity> candidatesScheduleBNotProcessed = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'Candidate' and {Utilities.General.GetMemberName((Candidate c) => c.ScheduleBProcessed)} eq false");
+            Pageable<TableEntity> candidatesScheduleBNotProcessed = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'CandidateStatus' and {Utilities.General.GetMemberName((CandidateStatus c) => c.ScheduleBProcessed)} eq false");
 
             foreach (var candidate in candidatesScheduleBNotProcessed)
             {
@@ -33,8 +33,8 @@ namespace MDWatch
 
                 if ((int)scheduleBOverview[Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.TotalDisbursements)] == scheduleBDetail.Count())
                 {
-                    TableEntity candidateScheduleBProcessed = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidateId);
-                    candidateScheduleBProcessed[Utilities.General.GetMemberName((Candidate c) => c.ScheduleBProcessed)] = true;
+                    TableEntity candidateScheduleBProcessed = await tableClient.GetEntityAsync<TableEntity>("CandidateStatus", candidateId);
+                    candidateScheduleBProcessed[Utilities.General.GetMemberName((CandidateStatus c) => c.ScheduleBProcessed)] = true;
                     await tableClient.UpdateEntityAsync(candidateScheduleBProcessed, candidateScheduleBProcessed.ETag);
                     //log.LogInformation("{1} has correct number of ScheduleB disbursements stored", (string)candidate.CandidateId);
                     totalCorrect++;

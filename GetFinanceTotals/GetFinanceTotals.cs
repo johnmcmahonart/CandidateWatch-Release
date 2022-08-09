@@ -44,12 +44,12 @@ namespace MDWatch
                         foreach (var cycle in cycleTotals)
                         {
                             //dates written to azure table storage must be UTC
-                            var fixedItem = cycle.AddUTC();
-                            TableEntity fixedEntity = fixedItem.ModelToTableEntity(tableClient, "FinanceTotals", Guid.NewGuid().ToString());
-                            await tableClient.AddEntityAsync(fixedEntity);
+                 
+                            TableEntity cycleEntity = cycle.ModelToTableEntity(tableClient, "FinanceTotals", Guid.NewGuid().ToString());
+                            await tableClient.AddEntityAsync(cycleEntity);
                         }
-                        TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
-                        entity[Utilities.General.GetMemberName((Candidate c) => c.FinanceTotalProcessed)] = true;
+                        TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("CandidateStatus", candidate.Body.ToString());
+                        entity[Utilities.General.GetMemberName((CandidateStatus c) => c.FinanceTotalProcessed)] = true;
                         await tableClient.UpdateEntityAsync(entity, entity.ETag);
                         await queueClient.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
                     }

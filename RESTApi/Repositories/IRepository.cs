@@ -4,12 +4,12 @@ namespace RESTApi.Repositories
 {
     public interface IRepository<T>
     {
-        public Task<T> GetbyKeyAsync(string key);
-        public Task<ICollection<T>> GetAllAsync();
+        public Task<IEnumerable<T>> GetbyKeyAsync(string key);
+        public Task<IEnumerable<T>> GetAllAsync();
         
-        public Task AddAsync(T entity);
-        public Task UpdateAsync(T entity);
-        public Task DeleteAsync(T entity);
+        public Task AddAsync(IEnumerable<T> entity);
+        public Task UpdateAsync(IEnumerable<T> entity);
+        public Task DeleteAsync(IEnumerable<T> entity);
     
     }
 }

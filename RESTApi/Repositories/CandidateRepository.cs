@@ -11,22 +11,37 @@ using System.Reflection;
 
 namespace RESTApi.Repositories
 {
-    public class CandidateRepository :AzureTable, IRepository<Candidate>
+    public class CandidateRepository :AzTable, IRepository<Candidate>, ICandidateRepository<Candidate>
     {
 
-        public async Task  AddAsync(Candidate inEntity)
+        public async Task  AddAsync(IEnumerable<Candidate> inEntity)
         {
-            TableEntity outEntity = inEntity.ModelToTableEntity(_tableClient, _partitionKey!, inEntity.CandidateId);
-            await _tableClient.AddEntityAsync(outEntity);
+            try
+            {
+                foreach (var item in inEntity)
+                {
+                    TableEntity outEntity = inEntity.ModelToTableEntity(_tableClient, _partitionKey!, item.CandidateId);
+                    await _tableClient.AddEntityAsync(outEntity);
+                }
+            }
+            catch
+            {
+                //todo
+            }
+            
         }
 
-        public async Task DeleteAsync(Candidate entity)
+        public async Task DeleteAsync(IEnumerable<Candidate> entity)
         {
-            TableEntity entityDelete = entity.ModelToTableEntity(_tableClient, _partitionKey!, entity.CandidateId);
-            await _tableClient.DeleteEntityAsync(entityDelete.PartitionKey, entityDelete.RowKey);
+            foreach (var item in entity)
+            {
+                TableEntity entityDelete = entity.ModelToTableEntity(_tableClient, _partitionKey!, item.CandidateId);
+                await _tableClient.DeleteEntityAsync(entityDelete.PartitionKey, entityDelete.RowKey);
+            }
+            
         }
 
-        public async Task<ICollection<Candidate>> GetAllAsync()
+        public async Task<IEnumerable<Candidate>> GetAllAsync()
         {
             List<Candidate> outList = new List<Candidate>();
             AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
@@ -34,34 +49,42 @@ namespace RESTApi.Repositories
             {
                 outList.Add(candidate.TableEntityToModel<Candidate>());
             }
-            return outList;
+            return outList.AsReadOnly();
         }
 
-        public async Task<Candidate> GetbyKeyAsync(string key)
+        public async Task<IEnumerable<Candidate>> GetbyKeyAsync(string key)
         {
             TableEntity candidate = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey,key);
-            return candidate.TableEntityToModel<Candidate>();
+            return (IEnumerable<Candidate>)candidate.TableEntityToModel<Candidate>();
         
         }
 
-        public async Task< ICollection<Candidate>> GetCandidatesProcessedAsync(PropertyInfo property, bool state)
+        public async Task<IEnumerable<Candidate>> GetbyCycle(int[] cycles)
         {
             List<Candidate> outList = new List<Candidate>();
-            AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {property.Name} eq {state}");
-            await foreach (var candidate in candidates)
+            foreach (var cycle in cycles)
             {
-                outList.Add(candidate.TableEntityToModel<Candidate>());
+                
+                AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and Cycles-json substringof '{cycle.ToString()}'");
+                await foreach (var candidate in candidates)
+                {
+                    outList.Add(candidate.TableEntityToModel<Candidate>());
+                }
+                
             }
-            return outList;
-            
+            return outList.AsReadOnly();
         }
 
-        public async Task UpdateAsync(Candidate inEntity)
+        public async Task UpdateAsync(IEnumerable<Candidate> inEntity)
         {
-            TableEntity entity = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, inEntity.CandidateId);
-            entity = inEntity.ModelToTableEntity(_tableClient, _partitionKey!, inEntity.CandidateId);
+            foreach (var item in inEntity)
+            {
+                TableEntity entity = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, item.CandidateId);
+                entity = inEntity.ModelToTableEntity(_tableClient, _partitionKey!, item.CandidateId);
+
+                await _tableClient.UpdateEntityAsync(entity, entity.ETag);
+            }
             
-            await _tableClient.UpdateEntityAsync(entity, entity.ETag);
 
         }
         CandidateRepository() 
