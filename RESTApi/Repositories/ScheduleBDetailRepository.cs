@@ -40,8 +40,9 @@ namespace RESTApi.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyKeyAsync(string key)
+        public async Task<ScheduleBByRecipientID> GetbyKeyAsync(string key)
         {
+            /*
             List<ScheduleBByRecipientID> outList = new();
             TableEntity candidateScheduleBOverview = await _tableClient.GetEntityAsync<TableEntity>("ScheduleBOverview", key);
             AsyncPageable<TableEntity> scheduleBDetail = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{candidateScheduleBOverview.TableEntityToModel<ScheduleBCandidateOverview>().PrincipalCommitteeId}'");
@@ -50,6 +51,8 @@ namespace RESTApi.Repositories
                 outList.Add(disbursement.TableEntityToModel<ScheduleBByRecipientID>());
             }
             return outList.AsReadOnly();
+        */
+            return new ScheduleBByRecipientID();  
         }
 
         public async Task UpdateAsync(IEnumerable<ScheduleBByRecipientID> inEntity)
@@ -67,7 +70,7 @@ namespace RESTApi.Repositories
             }
         }
 
-        private ScheduleBDetailRepository()
+        public ScheduleBDetailRepository()
         {
             _partitionKey = "ScheduleBDetail";
         }

@@ -37,10 +37,10 @@ namespace RESTApi.Repositories
             return outList.AsReadOnly();
         }
 
-        public async Task<IEnumerable<CandidateStatus>> GetbyKeyAsync(string key)
+        public async Task<CandidateStatus> GetbyKeyAsync(string key)
         {
             TableEntity candidate = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, key);
-            return (IEnumerable<CandidateStatus>)candidate.TableEntityToModel<CandidateStatus>();
+            return candidate.TableEntityToModel<CandidateStatus>();
         }
 
         public async Task AddAsync(IEnumerable<CandidateStatus> inEntity)
@@ -72,7 +72,7 @@ namespace RESTApi.Repositories
             }
         }
 
-        private CandidateStatusRepository()
+        public CandidateStatusRepository()
         {
             _partitionKey = "CandidateStatus";
         }

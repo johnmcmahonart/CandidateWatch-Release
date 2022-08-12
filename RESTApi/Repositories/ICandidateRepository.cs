@@ -1,8 +1,8 @@
 ﻿namespace RESTApi.Repositories
 {
-    public interface ICandidateRepository<T> where T : class
+    public interface ICandidateRepository<T>: IRepository<T> where T : class
     {
-        public Task<IEnumerable<T>> GetbyCycle(int[] cycles);
+        public Task<IEnumerable<T>> GetbyCycleAsync(int[] cycles);
 
 
     }

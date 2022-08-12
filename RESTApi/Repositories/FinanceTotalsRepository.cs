@@ -18,11 +18,24 @@ namespace RESTApi.Repositories
 
         public async Task DeleteAsync(IEnumerable<CandidateHistoryTotal> inEntity)
         {
-            //this needs to be fixed, should delete work on all rows for candidate?
-            foreach (var item in inEntity)
+            
+            try
             {
-                TableEntity outEntity = inEntity.ModelToTableEntity(_tableClient, _partitionKey!, item.CandidateId);
-                await _tableClient.AddEntityAsync(outEntity);
+                foreach (var item in inEntity)
+                {
+                    AsyncPageable<TableEntity> financeRow = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateId)}  eq '{item.CandidateId}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateElectionYear)}  eq '{item.CandidateElectionYear}' ");
+                    await foreach (var row in financeRow)
+                    {
+                        await _tableClient.DeleteEntityAsync(row.PartitionKey, row.RowKey);
+                        
+                    }
+                    
+
+                }
+            }
+            catch (Exception ex)
+            {
+                //todo
             }
         }
 
@@ -37,15 +50,19 @@ namespace RESTApi.Repositories
             return outList.AsReadOnly();
         }
 
-        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyKeyAsync(string key)
+        public async Task<CandidateHistoryTotal> GetbyKeyAsync(string key)
         {
-            List<CandidateHistoryTotal> outList = new List<CandidateHistoryTotal>();
+            /*
+            List<CandidateHistoryTotal> outList 
+                = new List<CandidateHistoryTotal>();
             AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateId)} eq '{key}'");
             await foreach (var historyRows in candidate)
             {
                 outList.Add(historyRows.TableEntityToModel<CandidateHistoryTotal>());
             }
             return outList.AsReadOnly();
+        */
+            return new CandidateHistoryTotal();  
         }
 
         public async Task UpdateAsync(IEnumerable<CandidateHistoryTotal> inEntity)

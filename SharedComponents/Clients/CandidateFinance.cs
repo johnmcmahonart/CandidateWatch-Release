@@ -8,7 +8,7 @@ using MDWatch.Model;
 
 namespace MDWatch.SolutionClients
 {
-    public class CandidateFinanceTotalsClient : FECClient, IFECQueryParms
+    public class CandidateFinanceClient : FECClient, IFECQueryParms
     {
         public List<CandidateHistoryTotal> Contributions => _contributions;
 
@@ -79,7 +79,7 @@ namespace MDWatch.SolutionClients
             }
         }
 
-        public CandidateFinanceTotalsClient(string APIKey)
+        public CandidateFinanceClient(string APIKey)
         {
             _apiKey = APIKey ?? throw new ArgumentNullException(nameof(APIKey));
             ConfigureEndPoint();

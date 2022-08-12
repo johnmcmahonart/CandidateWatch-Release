@@ -1,7 +1,7 @@
 ﻿namespace MDWatch.Model
 {
     //adds validation parms for downstream worker processes
-    public class CandidateStatus
+    public  record class CandidateStatus
     {
         public string CandidateId { get; set; }
         public bool CommitteeProcessed { get; set; }

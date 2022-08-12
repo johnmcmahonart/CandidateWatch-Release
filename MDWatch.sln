@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{E866F7
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedComponents", "SharedComponents\SharedComponents.shproj", "{78DD2C49-4445-4C08-8179-97B0F2E20BFF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetFinanceTotals", "GetFinanceTotals\GetFinanceTotals.csproj", "{14D00B33-17CD-4128-A388-0E2B106F0B50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetFinanceData", "GetFinanceTotals\GetFinanceData.csproj", "{14D00B33-17CD-4128-A388-0E2B106F0B50}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "FinanceTest\Tests.csproj", "{E4B7E1AC-6E2D-4659-97D6-94C2E0B913D4}"
 EndProject

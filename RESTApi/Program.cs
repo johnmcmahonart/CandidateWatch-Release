@@ -1,13 +1,21 @@
 using RESTApi.Controllers;
-
+using RESTApi.Repositories;
+using MDWatch.Model;
+using Microsoft.Extensions.Azure;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddSingleton<ICandidateRepository<Candidate>, CandidateRepository>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["default:blob"], preferMsi: true);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["default:queue"], preferMsi: true);
+});
 
 var app = builder.Build();
 

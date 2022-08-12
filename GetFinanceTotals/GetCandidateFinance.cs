@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace MDWatch
 {
-    public class FinanceTotals
+    public class CandidateFinance
     {
         private const string apiKey = "xT2E5C0eUKvhVY74ylbGf4NWXz57XlxTkWV9pOwu";
 
@@ -24,26 +24,38 @@ namespace MDWatch
             QueueClient queueClient = new QueueClient("UseDevelopmentStorage=true", "financetotalsprocess");
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
             QueueMessage[] candidateIDs = await queueClient.ReceiveMessagesAsync(32);
-            CandidateFinanceTotalsClient financeTotals = new CandidateFinanceTotalsClient(apiKey);
+            CandidateFinanceClient finance = new CandidateFinanceClient(apiKey);
             //process candidate IDs by looking up candidate ID from queue message using FEC API, write data to table storage
 
             
             foreach (var candidate in candidateIDs)
             {
-                financeTotals.SetQuery(new FECQueryParms { CandidateId = candidate.Body.ToString() });
+                finance.SetQuery(new FECQueryParms { CandidateId = candidate.Body.ToString() });
 
                 log.LogInformation("Getting aggregate financial information for candidate: {1}", candidate.Body.ToString());
 
                 try
                 {
-                    await financeTotals.SubmitAsync();
-                    var cycleTotals = from cycle in financeTotals.Contributions where cycle.CandidateId.Contains(candidate.Body.ToString()) select cycle;
-
+                    await finance.SubmitAsync();
+                    var cycleTotals = from cycle in finance.Contributions where cycle.CandidateId.Contains(candidate.Body.ToString()) select cycle;
+                    
+                    var nonIndividualContributions = from c in finance.Contributions where c.CandidateId.Contains(candidate.Body.ToString()) select c.OtherPoliticalCommitteeContributions;
+                    var individualContributions = from c in finance.Contributions where c.CandidateId.Contains(candidate.Body.ToString()) select c.IndividualItemizedContributions;
+                    CandidateFinanceOverview overview = new()
+                    {
+                        CandidateId = candidate.Body.ToString(),
+                        TotalIndividualContributions = (decimal)individualContributions.Sum(),
+                        TotalNonIndividualContributions = (decimal)nonIndividualContributions.Sum()
+                    };
+                    
                     try
                     {
+                        TableEntity overviewEntity = overview.ModelToTableEntity(tableClient, "FinanceOverview", overview.CandidateId);
+                        await tableClient.AddEntityAsync(overviewEntity);
+
                         foreach (var cycle in cycleTotals)
                         {
-                            //dates written to azure table storage must be UTC
+                         
                  
                             TableEntity cycleEntity = cycle.ModelToTableEntity(tableClient, "FinanceTotals", Guid.NewGuid().ToString());
                             await tableClient.AddEntityAsync(cycleEntity);

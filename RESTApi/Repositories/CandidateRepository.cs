@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace RESTApi.Repositories
 {
-    public class CandidateRepository :AzTable, IRepository<Candidate>, ICandidateRepository<Candidate>
+    public class CandidateRepository :AzTable, ICandidateRepository<Candidate>
     {
 
         public async Task  AddAsync(IEnumerable<Candidate> inEntity)
@@ -52,14 +52,22 @@ namespace RESTApi.Repositories
             return outList.AsReadOnly();
         }
 
-        public async Task<IEnumerable<Candidate>> GetbyKeyAsync(string key)
+        public async Task<Candidate> GetbyKeyAsync(string key)
         {
-            TableEntity candidate = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey,key);
-            return (IEnumerable<Candidate>)candidate.TableEntityToModel<Candidate>();
-        
+            try
+            {
+                TableEntity candidate = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, key);
+                return candidate.TableEntityToModel<Candidate>();
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+
         }
 
-        public async Task<IEnumerable<Candidate>> GetbyCycle(int[] cycles)
+        public async Task<IEnumerable<Candidate>> GetbyCycleAsync(int[] cycles)
         {
             List<Candidate> outList = new List<Candidate>();
             foreach (var cycle in cycles)
@@ -87,7 +95,7 @@ namespace RESTApi.Repositories
             
 
         }
-        CandidateRepository() 
+        public CandidateRepository() 
         {
             _partitionKey= "Candidate";
         }

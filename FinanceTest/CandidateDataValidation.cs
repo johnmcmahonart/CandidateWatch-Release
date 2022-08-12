@@ -20,7 +20,7 @@ namespace MDWatch
             var candidateId = "H0MD00010";
             //validate finance aggregation is correct
 
-            CandidateFinanceTotalsClient financeTotals = new CandidateFinanceTotalsClient(apiKey);
+            CandidateFinanceClient financeTotals = new CandidateFinanceClient(apiKey);
 
             financeTotals.SetQuery(new FECQueryParms { CandidateId = candidateId });
 

@@ -21,7 +21,7 @@ namespace MDWatch
             //get entries from candidate partition that haven't been processed
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
             QueueClient committeeQueue = new QueueClient("UseDevelopmentStorage=true", "committeeprocess");
-            Pageable<TableEntity> committeeQuery =tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'Candidate' and CommitteeProcessed eq false");
+            Pageable<TableEntity> committeeQuery =tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'CandidateStatus' and CommitteeProcessed eq false");
             if (committeeQuery.Count()>0)
             {
                 log.LogInformation("Found {1} candidates missing committee information: ",committeeQuery.Count());
@@ -36,7 +36,7 @@ namespace MDWatch
             
             }
             QueueClient financeTotalsQueue = new QueueClient("UseDevelopmentStorage=true", "financetotalsprocess");
-            Pageable<TableEntity> financeTotalsQuery = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'Candidate' and FinanceTotalProcessed eq false");
+            Pageable<TableEntity> financeTotalsQuery = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'CandidateStatus' and FinanceTotalProcessed eq false");
             if (financeTotalsQuery.Count() > 0)
             {
                 log.LogInformation("Found {1} candidates missing Financial Total (aggregate) information: ", financeTotalsQuery.Count());
@@ -52,7 +52,7 @@ namespace MDWatch
             }
 
             QueueClient scheduleBQueue = new QueueClient("UseDevelopmentStorage=true", "schedulebcandidateprocess");
-            Pageable<TableEntity> scheduleBQuery = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'Candidate' and ScheduleBProcessed eq false");
+            Pageable<TableEntity> scheduleBQuery = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'CandidateStatus' and ScheduleBProcessed eq false");
             if (scheduleBQuery.Count() > 0)
             {
                 log.LogInformation("Found {1} candidates missing ScheduleB information: ", scheduleBQuery.Count());
