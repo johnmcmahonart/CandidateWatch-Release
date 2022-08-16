@@ -19,36 +19,14 @@ namespace RESTApi.Controllers
             return await _candidateRepository.GetbyKeyAsync(key);
         }
 
-
-        [HttpGet]
-        public async Task<IEnumerable<Candidate>> GetbyAllAsync()
-
+                
+        [HttpGet("years")]
+        public async Task<IEnumerable<Candidate>> GetbyElectionYearAsync([FromQuery]List<int> years)
         {
-            return await _candidateRepository.GetAllAsync();
-        }
-        [HttpGet("Cycle")]
-        public async Task<IEnumerable<Candidate>> GetbyCycleAsync([FromQuery]int[] cycles)
-        {
-            return await _candidateRepository.GetbyCycleAsync(cycles);
+            return await _candidateRepository.GetbyElectionYearAsync(years);
         }
 
-        // POST api/<CandidateController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<CandidateController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<CandidateController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        
         public CandidateController(ICandidateRepository<Candidate> candidateRepository)
         {
             _candidateRepository=candidateRepository;        

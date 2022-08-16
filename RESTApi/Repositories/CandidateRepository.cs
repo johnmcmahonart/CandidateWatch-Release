@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Azure;
 using Newtonsoft;
 using System.Linq.Expressions;
-using static System.Linq.Expressions.Expression;
+using System.Linq;
 using System.Reflection;
 
 namespace RESTApi.Repositories
@@ -67,16 +67,22 @@ namespace RESTApi.Repositories
 
         }
 
-        public async Task<IEnumerable<Candidate>> GetbyCycleAsync(int[] cycles)
+        public async Task<IEnumerable<Candidate>> GetbyElectionYearAsync(List<int> years)
         {
+            List<Candidate> inMemList = new List<Candidate>();
             List<Candidate> outList = new List<Candidate>();
-            foreach (var cycle in cycles)
+            //is there a better way then creating an in memory copy of entire partition?
+            AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
+            await foreach (var candidate in candidates)
             {
-                
-                AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and Cycles-json substringof '{cycle.ToString()}'");
-                await foreach (var candidate in candidates)
+                inMemList.Add(candidate.TableEntityToModel<Candidate>());
+            }
+
+            foreach (var cycle in years)
+            {
+
                 {
-                    outList.Add(candidate.TableEntityToModel<Candidate>());
+                    outList.AddRange(from c in inMemList where c.ElectionYears.Contains(cycle) select c);
                 }
                 
             }

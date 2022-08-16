@@ -2,7 +2,7 @@
 {
     public interface ICandidateRepository<T>: IRepository<T> where T : class
     {
-        public Task<IEnumerable<T>> GetbyCycleAsync(int[] cycles);
+        public Task<IEnumerable<T>> GetbyElectionYearAsync(List<int> years);
 
 
     }
