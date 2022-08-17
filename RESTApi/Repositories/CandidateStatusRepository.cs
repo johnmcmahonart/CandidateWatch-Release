@@ -37,10 +37,10 @@ namespace RESTApi.Repositories
             return outList.AsReadOnly();
         }
 
-        public async Task<CandidateStatus> GetbyKeyAsync(string key)
+        public async Task<IEnumerable<CandidateStatus>> GetbyKeyAsync(string key)
         {
             TableEntity candidate = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, key);
-            return candidate.TableEntityToModel<CandidateStatus>();
+            return new List<CandidateStatus> { candidate.TableEntityToModel<CandidateStatus>() };
         }
 
         public async Task AddAsync(IEnumerable<CandidateStatus> inEntity)

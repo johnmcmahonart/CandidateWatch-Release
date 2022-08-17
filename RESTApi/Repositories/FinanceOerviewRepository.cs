@@ -52,10 +52,10 @@ namespace RESTApi.Repositories
             return outList.AsReadOnly();
         }
 
-        public async Task<CandidateFinanceOverview> GetbyKeyAsync(string key)
+        public async Task<IEnumerable<CandidateFinanceOverview>> GetbyKeyAsync(string key)
         {
             TableEntity candidate = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, key);
-            return candidate.TableEntityToModel<CandidateFinanceOverview>();
+            return  new List<CandidateFinanceOverview> { candidate.TableEntityToModel<CandidateFinanceOverview>() };
         }
 
         public async Task UpdateAsync(IEnumerable<CandidateFinanceOverview> inEntity)

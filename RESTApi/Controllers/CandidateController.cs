@@ -10,10 +10,10 @@ namespace RESTApi.Controllers
     [ApiController]
     public class CandidateController : ControllerBase
     {
-        private readonly ICandidateRepository<Candidate> _candidateRepository;
+        private readonly IGetbyElectionYears<Candidate> _candidateRepository;
         // GET: api/<CandidateController>
         [HttpGet("{key}")]
-        public async Task<Candidate> GetbyKeyAsync(string key)
+        public async Task<IEnumerable<Candidate>> GetbyKeyAsync(string key)
 
         {
             return await _candidateRepository.GetbyKeyAsync(key);
@@ -27,7 +27,7 @@ namespace RESTApi.Controllers
         }
 
         
-        public CandidateController(ICandidateRepository<Candidate> candidateRepository)
+        public CandidateController(IGetbyElectionYears<Candidate> candidateRepository)
         {
             _candidateRepository=candidateRepository;        
 

@@ -5,8 +5,9 @@ using MDWatch.Utilities;
 
 namespace RESTApi.Repositories
 {
-    public class FinanceTotalsRepository : AzTable, IRepository<CandidateHistoryTotal>
+    public class FinanceTotalsRepository : AzTable, IRepository<CandidateHistoryTotal>, IGetbyElectionYears<CandidateHistoryTotal>
     {
+        private List<CandidateHistoryTotal> _inMemList = new();
         public async Task AddAsync(IEnumerable<CandidateHistoryTotal> inEntity)
         {
             foreach (var item in inEntity)
@@ -50,9 +51,9 @@ namespace RESTApi.Repositories
             return outList.AsReadOnly();
         }
 
-        public async Task<CandidateHistoryTotal> GetbyKeyAsync(string key)
+        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyKeyAsync(string key)
         {
-            /*
+            
             List<CandidateHistoryTotal> outList 
                 = new List<CandidateHistoryTotal>();
             AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateId)} eq '{key}'");
@@ -61,10 +62,35 @@ namespace RESTApi.Repositories
                 outList.Add(historyRows.TableEntityToModel<CandidateHistoryTotal>());
             }
             return outList.AsReadOnly();
-        */
-            return new CandidateHistoryTotal();  
+        
+            
         }
 
+        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyElectionYearAsync(List<int> years)
+        {
+
+            List<CandidateHistoryTotal> outList = new();
+            //is there a better way then creating an in memory copy of entire partition?
+            if (!_inMemList.Any()) //check if in memory list has data, if not load from storage
+            {
+                AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
+                await foreach (var candidate in candidates)
+                {
+                    _inMemList.Add(candidate.TableEntityToModel<CandidateHistoryTotal>());
+                }
+            }
+
+
+            foreach (var year in years)
+            {
+
+                {
+                    outList.AddRange(from c in _inMemList where c.ElectionYears.Contains(year) select c);
+                }
+
+            }
+            return outList.AsReadOnly();
+        }
         public async Task UpdateAsync(IEnumerable<CandidateHistoryTotal> inEntity)
         {
             //this probably isn't correct either. REVIEW AND FIX

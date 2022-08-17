@@ -5,8 +5,9 @@ using MDWatch.Utilities;
 
 namespace RESTApi.Repositories
 {
-    public class ScheduleBDetailRepository : AzTable, IRepository<ScheduleBByRecipientID>
+    public class ScheduleBDetailRepository : AzTable, IRepository<ScheduleBByRecipientID>, IGetbyElectionYears<ScheduleBByRecipientID>
     {
+        private List<ScheduleBByRecipientID> _inMemList = new();
         public async Task AddAsync(IEnumerable<ScheduleBByRecipientID> inEntity)
         {
             try
@@ -40,9 +41,9 @@ namespace RESTApi.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<ScheduleBByRecipientID> GetbyKeyAsync(string key)
+        public async Task <IEnumerable<ScheduleBByRecipientID>> GetbyKeyAsync(string key)
         {
-            /*
+            
             List<ScheduleBByRecipientID> outList = new();
             TableEntity candidateScheduleBOverview = await _tableClient.GetEntityAsync<TableEntity>("ScheduleBOverview", key);
             AsyncPageable<TableEntity> scheduleBDetail = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{candidateScheduleBOverview.TableEntityToModel<ScheduleBCandidateOverview>().PrincipalCommitteeId}'");
@@ -51,10 +52,34 @@ namespace RESTApi.Repositories
                 outList.Add(disbursement.TableEntityToModel<ScheduleBByRecipientID>());
             }
             return outList.AsReadOnly();
-        */
-            return new ScheduleBByRecipientID();  
+        
         }
 
+        public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyElectionYearAsync(List<int> years)
+        {
+
+            List<ScheduleBByRecipientID> outList = new();
+            //is there a better way then creating an in memory copy of entire partition?
+            if (!_inMemList.Any()) //check if in memory list has data, if not load from storage
+            {
+                AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
+                await foreach (var candidate in candidates)
+                {
+                    _inMemList.Add(candidate.TableEntityToModel<ScheduleBByRecipientID>());
+                }
+            }
+
+
+            foreach (var year in years)
+            {
+
+                {
+                    outList.AddRange(from c in _inMemList where c.Cycle.Equals(year) select c);
+                }
+
+            }
+            return outList.AsReadOnly();
+        }
         public async Task UpdateAsync(IEnumerable<ScheduleBByRecipientID> inEntity)
         {
             foreach (var recipient in inEntity)

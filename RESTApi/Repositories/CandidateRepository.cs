@@ -11,9 +11,10 @@ using System.Reflection;
 
 namespace RESTApi.Repositories
 {
-    public class CandidateRepository :AzTable, ICandidateRepository<Candidate>
+    public class CandidateRepository :AzTable, IGetbyElectionYears<Candidate>
     {
 
+        List<Candidate> _inMemList = new List<Candidate>();
         public async Task  AddAsync(IEnumerable<Candidate> inEntity)
         {
             try
@@ -52,12 +53,12 @@ namespace RESTApi.Repositories
             return outList.AsReadOnly();
         }
 
-        public async Task<Candidate> GetbyKeyAsync(string key)
+        public async Task <IEnumerable<Candidate>> GetbyKeyAsync(string key)
         {
             try
             {
                 TableEntity candidate = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, key);
-                return candidate.TableEntityToModel<Candidate>();
+                return new List<Candidate> { candidate.TableEntityToModel<Candidate>() };
 
             }
             catch (Exception ex)
@@ -69,20 +70,24 @@ namespace RESTApi.Repositories
 
         public async Task<IEnumerable<Candidate>> GetbyElectionYearAsync(List<int> years)
         {
-            List<Candidate> inMemList = new List<Candidate>();
+            
             List<Candidate> outList = new List<Candidate>();
             //is there a better way then creating an in memory copy of entire partition?
-            AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
-            await foreach (var candidate in candidates)
+            if (!_inMemList.Any()) //check if in memory list has data, if not load from storage
             {
-                inMemList.Add(candidate.TableEntityToModel<Candidate>());
+                AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
+                await foreach (var candidate in candidates)
+                {
+                    _inMemList.Add(candidate.TableEntityToModel<Candidate>());
+                }
             }
+            
 
-            foreach (var cycle in years)
+            foreach (var year in years)
             {
 
                 {
-                    outList.AddRange(from c in inMemList where c.ElectionYears.Contains(cycle) select c);
+                    outList.AddRange(from c in _inMemList where c.ElectionYears.Contains(year) select c);
                 }
                 
             }

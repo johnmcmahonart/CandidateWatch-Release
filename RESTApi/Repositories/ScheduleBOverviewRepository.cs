@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace RESTApi.Repositories
 {
-    public class ScheduleBOverview : AzTable, IRepository<ScheduleBCandidateOverview>
+    public class ScheduleBOverviewRepository : AzTable, IRepository<ScheduleBCandidateOverview>
     {
         public async Task AddAsync(IEnumerable<ScheduleBCandidateOverview> inEntity)
         {
@@ -51,10 +51,10 @@ namespace RESTApi.Repositories
             return outList.AsReadOnly();
         }
 
-        public async Task<ScheduleBCandidateOverview> GetbyKeyAsync(string key)
+        public async Task <IEnumerable<ScheduleBCandidateOverview>> GetbyKeyAsync(string key)
         {
             TableEntity candidate = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, key);
-            return candidate.TableEntityToModel<ScheduleBCandidateOverview>();
+            return new List<ScheduleBCandidateOverview> { candidate.TableEntityToModel<ScheduleBCandidateOverview>() };
         }
 
         public async Task UpdateAsync(IEnumerable<ScheduleBCandidateOverview> inEntity)
@@ -68,7 +68,7 @@ namespace RESTApi.Repositories
             }
             
         }
-        public ScheduleBOverview()
+        public ScheduleBOverviewRepository()
         {
             _partitionKey = "ScheduleBOverview";
         }
