@@ -6,9 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddSingleton<IGetbyElectionYears<Candidate>, CandidateRepository>();
-builder.Services.AddSingleton<IGetbyElectionYears<CandidateHistoryTotal>, FinanceTotalsRepository>();
-builder.Services.AddSingleton<IGetbyElectionYears<ScheduleBByRecipientID>, ScheduleBDetailRepository>();
+builder.Services.AddSingleton<ICandidateRepository<Candidate>, CandidateRepository>();
+builder.Services.AddSingleton<IFinanceTotalsRepository<CandidateHistoryTotal>, FinanceTotalsRepository>();
+builder.Services.AddSingleton<IScheduleBDetailRepository<ScheduleBByRecipientID>, ScheduleBDetailRepository>();
 builder.Services.AddSingleton<IRepository<ScheduleBCandidateOverview>, ScheduleBOverviewRepository>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -5,7 +5,7 @@ using MDWatch.Utilities;
 
 namespace RESTApi.Repositories
 {
-    public class FinanceTotalsRepository : AzTable, IRepository<CandidateHistoryTotal>, IGetbyElectionYears<CandidateHistoryTotal>
+    public class FinanceTotalsRepository : AzTable, IFinanceTotalsRepository<CandidateHistoryTotal>
     {
         private List<CandidateHistoryTotal> _inMemList = new();
         public async Task AddAsync(IEnumerable<CandidateHistoryTotal> inEntity)
@@ -100,6 +100,16 @@ namespace RESTApi.Repositories
                 entity = inEntity.ModelToTableEntity(_tableClient, _partitionKey!, item.CandidateId);
                 await _tableClient.UpdateEntityAsync(entity, entity.ETag);
             }
+        }
+
+        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyCandidateandElectionYearsAsync(List<int> years, string key)
+        {
+            var candidateFinanceTotals = await GetbyKeyAsync(key);
+            List<CandidateHistoryTotal> outList = new();
+            outList.AddRange((IEnumerable<CandidateHistoryTotal>)(from c in candidateFinanceTotals where years.Contains(c.Cycle) select c));
+
+
+            return outList.AsReadOnly();
         }
 
         public FinanceTotalsRepository()

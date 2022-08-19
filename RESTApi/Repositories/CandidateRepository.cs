@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace RESTApi.Repositories
 {
-    public class CandidateRepository :AzTable, IGetbyElectionYears<Candidate>
+    public class CandidateRepository :AzTable, ICandidateRepository<Candidate>
     {
 
         List<Candidate> _inMemList = new List<Candidate>();

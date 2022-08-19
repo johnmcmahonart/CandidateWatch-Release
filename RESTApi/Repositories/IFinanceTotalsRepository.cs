@@ -1,10 +1,6 @@
-﻿using MDWatch.Model;
-namespace RESTApi.Repositories
-
+﻿namespace RESTApi.Repositories
 {
-    public interface IFinanceTotalsRepository<T>: IRepository<T> where T : class
+    public interface IFinanceTotalsRepository<T>: IRepository<T>, IGetbyElectionYears<T>, IGetbyCandidateandElectionYears<T> where T : class
     {
-        public Task<IEnumerable<T>> GetbyElectionYearAsync(List<int> years);
-
     }
 }

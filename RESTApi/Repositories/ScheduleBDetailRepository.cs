@@ -2,10 +2,10 @@
 using Azure.Data.Tables;
 using MDWatch.Model;
 using MDWatch.Utilities;
-
+using System.Linq;
 namespace RESTApi.Repositories
 {
-    public class ScheduleBDetailRepository : AzTable, IRepository<ScheduleBByRecipientID>, IGetbyElectionYears<ScheduleBByRecipientID>
+    public class ScheduleBDetailRepository : AzTable, IScheduleBDetailRepository<ScheduleBByRecipientID>
     {
         private List<ScheduleBByRecipientID> _inMemList = new();
         public async Task AddAsync(IEnumerable<ScheduleBByRecipientID> inEntity)
@@ -55,6 +55,7 @@ namespace RESTApi.Repositories
         
         }
 
+        
         public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyElectionYearAsync(List<int> years)
         {
 
@@ -80,6 +81,16 @@ namespace RESTApi.Repositories
             }
             return outList.AsReadOnly();
         }
+        public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyCandidateandElectionYearsAsync(List<int> years, string key)
+        {
+
+            var candidateScheduleB = await GetbyKeyAsync(key);
+            List<ScheduleBByRecipientID> outList = new();
+            outList.AddRange((IEnumerable<ScheduleBByRecipientID>)(from c in candidateScheduleB where years.Contains(c.Cycle) select c));
+
+
+            return outList.AsReadOnly();
+        }
         public async Task UpdateAsync(IEnumerable<ScheduleBByRecipientID> inEntity)
         {
             foreach (var recipient in inEntity)
@@ -94,6 +105,8 @@ namespace RESTApi.Repositories
                 }
             }
         }
+
+        
 
         public ScheduleBDetailRepository()
         {

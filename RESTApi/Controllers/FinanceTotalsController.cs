@@ -10,26 +10,33 @@ namespace RESTApi.Controllers
     [ApiController]
     public class FinanceTotalsController : ControllerBase
     {
-        private readonly IGetbyElectionYears<CandidateHistoryTotal> _FinanceTotalsRepository;
+        private readonly IFinanceTotalsRepository<CandidateHistoryTotal> _financeTotalsRepository;
         // GET: api/<CandidateController>
         [HttpGet("{key}")]
         public async Task <IEnumerable<CandidateHistoryTotal>> GetbyKeyAsync(string key)
 
         {
-            return await _FinanceTotalsRepository.GetbyKeyAsync(key);
+            return await _financeTotalsRepository.GetbyKeyAsync(key);
         }
 
 
+        [HttpGet("{key}/years/")]
+
+        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyCandidateandElectionYearsAsync([FromQuery] List<int> years, string key)
+        {
+
+            return await _financeTotalsRepository.GetbyCandidateandElectionYearsAsync(years, key);
+        }
         [HttpGet("years")]
         public async Task<IEnumerable<CandidateHistoryTotal>> GetbyElectionYearAsync([FromQuery] List<int> years)
         {
-            return await _FinanceTotalsRepository.GetbyElectionYearAsync(years);
+            return await _financeTotalsRepository.GetbyElectionYearAsync(years);
         }
 
 
-        public FinanceTotalsController(IGetbyElectionYears<CandidateHistoryTotal> financeTotalsRepository)
+        public FinanceTotalsController(IFinanceTotalsRepository<CandidateHistoryTotal> financeTotalsRepository)
         {
-            _FinanceTotalsRepository = financeTotalsRepository;
+            _financeTotalsRepository = financeTotalsRepository;
 
         }
 
