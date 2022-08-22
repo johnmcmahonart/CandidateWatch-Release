@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RESTApi.Repositories;
+using RESTApi.DTOs;
 using System.Collections.Generic;
+using AutoMapper;
 using MDWatch.Model;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -10,27 +12,35 @@ namespace RESTApi.Controllers
     [ApiController]
     public class CandidateController : ControllerBase
     {
+        private IMapper _mapper;
         private readonly ICandidateRepository<Candidate> _candidateRepository;
         // GET: api/<CandidateController>
         [HttpGet("{key}")]
-        public async Task<IEnumerable<Candidate>> GetbyKeyAsync(string key)
+        public async Task<IEnumerable<CandidateDTO>> GetbyKeyAsync(string key)
 
         {
-            return await _candidateRepository.GetbyKeyAsync(key);
+            return (IEnumerable<CandidateDTO>)_mapper.Map<CandidateDTO>(await _candidateRepository.GetbyKeyAsync(key));
         }
 
                 
         [HttpGet("years")]
-        public async Task<IEnumerable<Candidate>> GetbyElectionYearAsync([FromQuery]List<int> years)
+        public async Task<IEnumerable<CandidateDTO>> GetbyElectionYearAsync([FromQuery]List<int> years)
         {
-            return await _candidateRepository.GetbyElectionYearAsync(years);
+            IEnumerable<Candidate> modelOut = await _candidateRepository.GetbyElectionYearAsync(years);
+            List<CandidateDTO> dtoOut = new();
+            foreach (var item in modelOut)
+            {
+                dtoOut.Add(_mapper.Map<CandidateDTO>(item));
+            }
+            return dtoOut;
+
         }
 
         
-        public CandidateController(ICandidateRepository<Candidate> candidateRepository)
+        public CandidateController(ICandidateRepository<Candidate> candidateRepository,IMapper mapper )
         {
-            _candidateRepository=candidateRepository;        
-
+            _candidateRepository=candidateRepository;
+            _mapper = mapper;
         }
 
     }
