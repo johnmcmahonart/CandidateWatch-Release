@@ -75,7 +75,7 @@ namespace MDWatch.ScheduleBDisbursement
         public static async Task GenerateScheduleBDetailMessagesAsync(QueueClient scheduleBCandidateQueue, ScheduleBCandidateOverview scheduleBCandidateOverview, QueueMessage candidate, TableEntity candidateEntity)
         {
             QueueClient scheduleBPagesQueue = new QueueClient("UseDevelopmentStorage=true", "schedulebpageprocess");
-            dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommittees-json"));
+            dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommitteesJson"));
             string recipientId = principalCommittee[0]["committee_id"];
             for (int i = 1; i <= scheduleBCandidateOverview.TotalResultPages; i++)
             {

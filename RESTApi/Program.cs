@@ -1,7 +1,7 @@
 using RESTApi.Controllers;
 using RESTApi.Repositories;
 using MDWatch.Model;
-using RESTApi.AutoMapper;
+using RESTApi.MapperProfiles;
 using Microsoft.Extensions.Azure;
 var builder = WebApplication.CreateBuilder(args);
 
