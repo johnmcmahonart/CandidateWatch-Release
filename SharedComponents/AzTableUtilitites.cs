@@ -95,7 +95,7 @@ namespace MDWatch.Utilities
                     {
                         ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                     });
-                    tableEntity.Add(prop.Name + "Json", jsonString); //add -json to column name so when we read the data back out we know to deserialize the string to json
+                    tableEntity.Add(prop.Name + "-json", jsonString); //add -json to column name so when we read the data back out we know to deserialize the string to json
                 }
             }
             return tableEntity;
@@ -114,7 +114,7 @@ namespace MDWatch.Utilities
                 {
                     var json = new Object();
                     
-                    var hasValue = tableEntity.TryGetValue(property.Name + "Json", out json);
+                    var hasValue = tableEntity.TryGetValue(property.Name + "-json", out json);
                     if (hasValue)
                     {
                         var deserialized = JsonConvert.DeserializeObject((string)json, property.PropertyType);

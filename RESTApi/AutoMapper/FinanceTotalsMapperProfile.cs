@@ -2,7 +2,7 @@
 using MDWatch.Model;
 using RESTApi.DTOs;
 
-namespace RESTApi.MapperProfiles
+namespace RESTApi.AutoMapper
 {
     public class FinanceTotalsMapperProfile : Profile
     {

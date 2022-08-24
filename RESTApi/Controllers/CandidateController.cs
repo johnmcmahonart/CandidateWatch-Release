@@ -19,14 +19,7 @@ namespace RESTApi.Controllers
         public async Task<IEnumerable<CandidateDTO>> GetbyKeyAsync(string key)
 
         {
-            IEnumerable<Candidate> modelOut = await _candidateRepository.GetbyKeyAsync(key);
-            List<CandidateDTO> dtoOut = new();
-            foreach (var item in modelOut)
-            {
-                dtoOut.Add(_mapper.Map<CandidateDTO>(item));
-            }
-            return dtoOut;
-            
+            return (IEnumerable<CandidateDTO>)_mapper.Map<CandidateDTO>(await _candidateRepository.GetbyKeyAsync(key));
         }
 
                 

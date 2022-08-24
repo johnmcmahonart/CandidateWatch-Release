@@ -26,7 +26,7 @@ namespace MDWatch.ScheduleBDisbursement
         {
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
             TableEntity foundCandidate = await tableClient.GetEntityAsync<TableEntity>("Candidate", (string)entity[Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)]);
-            dynamic principalCommittee = JsonConvert.DeserializeObject(foundCandidate.GetString("PrincipalCommitteesJson"));
+            dynamic principalCommittee = JsonConvert.DeserializeObject(foundCandidate.GetString("PrincipalCommittees-json"));
 
             foreach (var cycle in principalCommittee[0]["cycles"][0])
 
@@ -44,7 +44,7 @@ namespace MDWatch.ScheduleBDisbursement
         {
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
             TableEntity foundCandidate = await tableClient.GetEntityAsync<TableEntity>("Candidate", (string)entity[Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)]);
-            dynamic principalCommittee = JsonConvert.DeserializeObject(foundCandidate.GetString("PrincipalCommitteesJson"));
+            dynamic principalCommittee = JsonConvert.DeserializeObject(foundCandidate.GetString("PrincipalCommittees-json"));
             return principalCommittee[0]["cycles"][0].Count();
 
         }

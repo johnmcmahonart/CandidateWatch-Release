@@ -32,7 +32,7 @@ namespace MDWatch
                 TableEntity candidateEntity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
                 //check for empty json string
 
-                dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommitteesJson"));
+                dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommittees-json"));
 
                 //logic is this. If the candidate has a principal committee, check if there is overview data for them, if they don't we dequeue the message and mark the candidate as processed. If there is, detail data was already written
                 //We create the overviewdata and then remove the from the queue so we don't redownload the detail data. If not check if the candidate has ScheduleB disbursements. If they do, write to storage, otherwise dequeue the message and mark as processed
