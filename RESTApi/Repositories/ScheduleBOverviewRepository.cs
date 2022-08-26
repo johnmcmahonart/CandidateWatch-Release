@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace RESTApi.Repositories
 {
-    public class ScheduleBOverviewRepository : AzTable, IRepository<ScheduleBCandidateOverview>
+    public class ScheduleBOverviewRepository : AzTableRepository, IRepository<ScheduleBCandidateOverview>
     {
         public async Task AddAsync(IEnumerable<ScheduleBCandidateOverview> inEntity)
         {

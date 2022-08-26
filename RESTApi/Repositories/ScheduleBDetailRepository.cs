@@ -5,7 +5,7 @@ using MDWatch.Utilities;
 using System.Linq;
 namespace RESTApi.Repositories
 {
-    public class ScheduleBDetailRepository : AzTable, IScheduleBDetailRepository<ScheduleBByRecipientID>
+    public class ScheduleBDetailRepository : AzTableRepository, IScheduleBDetailRepository<ScheduleBByRecipientID>
     {
         private List<ScheduleBByRecipientID> _inMemList = new();
         public async Task AddAsync(IEnumerable<ScheduleBByRecipientID> inEntity)
@@ -56,7 +56,7 @@ namespace RESTApi.Repositories
         }
 
         
-        public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyElectionYearAsync(List<int> years)
+        public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyElectionYearsAsync(List<int> years)
         {
 
             List<ScheduleBByRecipientID> outList = new();

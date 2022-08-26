@@ -5,7 +5,7 @@ using MDWatch.Utilities;
 
 namespace RESTApi.Repositories
 {
-    public class FinanceTotalsRepository : AzTable, IFinanceTotalsRepository<CandidateHistoryTotal>
+    public class FinanceTotalsRepository : AzTableRepository, IFinanceTotalsRepository<CandidateHistoryTotal>
     {
         private List<CandidateHistoryTotal> _inMemList = new();
         public async Task AddAsync(IEnumerable<CandidateHistoryTotal> inEntity)
@@ -66,7 +66,7 @@ namespace RESTApi.Repositories
             
         }
 
-        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyElectionYearAsync(List<int> years)
+        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyElectionYearsAsync(List<int> years)
         {
 
             List<CandidateHistoryTotal> outList = new();

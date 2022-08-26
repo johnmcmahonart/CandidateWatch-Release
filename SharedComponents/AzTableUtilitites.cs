@@ -95,10 +95,78 @@ namespace MDWatch.Utilities
                     {
                         ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                     });
-                    tableEntity.Add(prop.Name + "-json", jsonString); //add -json to column name so when we read the data back out we know to deserialize the string to json
+                    tableEntity.Add(prop.Name + "Json", jsonString); //add -json to column name so when we read the data back out we know to deserialize the string to json
                 }
             }
             return tableEntity;
+        }
+
+
+        public static T TableEntityToModel<T>(this TableEntity tableEntity, T inObj) where T : new()
+        {
+            
+            dynamic outObj = new T();
+            Type objType = inObj.GetType();
+            List<PropertyInfo> properties = new List<PropertyInfo>(objType.GetProperties());
+            foreach (var property in properties)
+            {
+
+                if (property.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)) && property.PropertyType != typeof(string))
+                //check if property is IENumerable and not a string, if so we need to deserialize from table storage to rehydrate
+                {
+                    var json = new Object();
+
+                    var hasValue = tableEntity.TryGetValue(property.Name + "Json", out json);
+                    if (hasValue)
+                    {
+                        var deserialized = JsonConvert.DeserializeObject((string)json, property.PropertyType);
+
+                        outObj.GetType().GetProperty(property.Name).SetValue(outObj, deserialized);
+
+
+
+                    }
+                }
+                else if (Nullable.GetUnderlyingType(property.PropertyType) == typeof(Decimal) | property.PropertyType == typeof(decimal)) //convert decimal to double since table storage only supports double
+                {
+                    object propertyValue = new();
+
+                    var hasValue = tableEntity.TryGetValue(property.Name, out propertyValue);
+                    if (hasValue)
+                    {
+                        outObj.GetType().GetProperty(property.Name).SetValue(outObj, Convert.ToDecimal(propertyValue), null);
+                    }
+                }
+                else if (Nullable.GetUnderlyingType(property.PropertyType) == typeof(DateTime) | property == typeof(DateTime)) //DateTime offset to DateTime conversion
+                {
+                    object propertyValue = new();
+
+                    var hasValue = tableEntity.TryGetValue(property.Name, out propertyValue);
+                    if (hasValue)
+                    {
+                        DateTimeOffset timeOffset = (DateTimeOffset)propertyValue;
+                        outObj.GetType().GetProperty(property.Name).SetValue(outObj, timeOffset.UtcDateTime, null);
+                    }
+                }
+                else
+                {
+                    object propertyValue = new();
+
+                    var hasValue = tableEntity.TryGetValue(property.Name, out propertyValue);
+                    if (hasValue)
+                    {
+                        outObj.GetType().GetProperty(property.Name).SetValue(outObj, propertyValue, null);
+                    }
+
+
+                }
+            }
+            
+
+            return outObj;
+
+
+
         }
 
         public static T TableEntityToModel<T>(this TableEntity tableEntity) where T : new()
@@ -114,7 +182,7 @@ namespace MDWatch.Utilities
                 {
                     var json = new Object();
                     
-                    var hasValue = tableEntity.TryGetValue(property.Name + "-json", out json);
+                    var hasValue = tableEntity.TryGetValue(property.Name + "Json", out json);
                     if (hasValue)
                     {
                         var deserialized = JsonConvert.DeserializeObject((string)json, property.PropertyType);

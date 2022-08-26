@@ -11,5 +11,6 @@ namespace MDWatch.Utilities
         {
             return ((MemberExpression)memberAccess.Body).Member.Name;
         }
+        
     }
 }

@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace RESTApi.Repositories
 {
-    public class FinanceOerviewRepository : AzTable, IRepository<CandidateFinanceOverview>
+    public class FinanceOerviewRepository : AzTableRepository, IRepository<CandidateFinanceOverview>
     {
         public async Task AddAsync(IEnumerable<CandidateFinanceOverview> inEntity)
         {

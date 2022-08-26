@@ -5,7 +5,7 @@ using MDWatch.Utilities;
 
 namespace RESTApi.Repositories
 {
-    public class CandidateStatusRepository : AzTable, IRepository<CandidateStatus>, ICandidateStatusRepository<CandidateStatus>
+    public class CandidateStatusRepository : AzTableRepository, IRepository<CandidateStatus>, ICandidateStatusRepository<CandidateStatus>
     {
         public async Task<IEnumerable<CandidateStatus>> GetAllAsync()
         {
@@ -18,9 +18,7 @@ namespace RESTApi.Repositories
             return outList.AsReadOnly();
         }
 
-        public async Task UpdateAsync(CandidateStatus inEntity)
-        {
-        }
+        
 
         public async Task<IEnumerable<CandidateStatus>> GetAllCandidateStatus(bool state)
         {

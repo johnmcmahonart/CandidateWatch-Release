@@ -12,7 +12,7 @@ namespace PurgeAllSolutionTables
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
             //dev stage only
-            string[] tableParittions = { "Candidate", "FinanceTotals", "ScheduleBOverview", "ScheduleBDetail","Committee" };
+            string[] tableParittions = { "Candidate", "FinanceTotals", "ScheduleBOverview", "ScheduleBDetail","Committee","CandidateStatus","FinanceOverview" };
             //string[] tableParittions = { "Candidate","ScheduleBOverview" };
             foreach (var partition in tableParittions)
             {

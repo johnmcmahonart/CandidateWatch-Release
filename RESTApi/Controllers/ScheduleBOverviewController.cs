@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using MDWatch.Model;
+using RESTApi.Mapper;
 using RESTApi.Repositories;
 namespace RESTApi.Controllers
 {

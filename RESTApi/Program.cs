@@ -1,8 +1,8 @@
 using RESTApi.Controllers;
-using RESTApi.Repositories;
+using RESTApi.Mapper;
 using MDWatch.Model;
-using RESTApi.AutoMapper;
 using Microsoft.Extensions.Azure;
+using RESTApi.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
