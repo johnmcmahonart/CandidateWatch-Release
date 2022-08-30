@@ -2,9 +2,9 @@
 namespace RESTApi.Repositories
 
 {
-    public static class RepositoryHelper
+    public static class CandidateSort
     {
-        public static CandidateByYear SortCandidatesByYear(List<Candidate> candidates)
+        public static CandidateByYear Year(IEnumerable<Candidate> candidates)
             {
             CandidateByYear sortedCandidates = new();
             sortedCandidates.year = new();

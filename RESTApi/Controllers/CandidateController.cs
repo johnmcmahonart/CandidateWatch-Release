@@ -30,7 +30,8 @@ namespace RESTApi.Controllers
         [HttpGet("years")]
         public async Task<IEnumerable<CandidateDTO>> GetbyElectionYearAsync([FromQuery]List<int> years)
         {
-            IEnumerable<Candidate> modelOut = await _candidateRepository.GetbyElectionYearsAsync(years);
+            IEnumerable<Candidate> candidates = await _candidateRepository.GetAllAsync();
+            IEnumerable<Candidate> modelOut = await _candidateRepository.GetbyElectionYearsAsync(years, candidates);
             return MapperHelper.MapIEnumerable<Candidate, CandidateDTO>(modelOut, _mapper);
             
         }

@@ -61,29 +61,23 @@ namespace RESTApi.Repositories
             
         }
 
-        public async Task<IEnumerable<Candidate>> GetbyElectionYearsAsync(List<int> years)
+        public async Task<IEnumerable<Candidate>> GetbyElectionYearsAsync(List<int> years, IEnumerable<Candidate> candidates)
         {
-            var watch = Stopwatch.StartNew();
             List<Candidate> outList = new();
-            if (!_inMemList.Any())
-            {
-                _inMemList.AddRange(await LoadPartitiontoMemory.Read<Candidate>(_tableClient, _partitionKey));
-            }
+            
 
             foreach (var year in years)
             {
                 
-                //repository helper may not be needed, this was to used to help reduce the time for the linq query to run but long
-                //query time may have been caused by an a different function
-                var candidatesbyYear = RepositoryHelper.SortCandidatesByYear(_inMemList);
+                var candidatesbyYear = CandidateSort.Year(candidates);
                 foreach (var item in candidatesbyYear.year[year] )
                 {
-                    outList.Add((from c in _inMemList where c.CandidateId.Equals(item) select c).First());
+                    outList.Add((from c in candidates where c.CandidateId.Equals(item) select c).First());
                 }
             }
-            watch.Stop();
+            
 
-            return outList;
+            return outList.AsReadOnly();
             
 
         }

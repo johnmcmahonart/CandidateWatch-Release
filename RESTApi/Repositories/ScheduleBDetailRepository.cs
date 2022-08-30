@@ -36,9 +36,15 @@ namespace RESTApi.Repositories
             }
         }
 
-        public Task<IEnumerable<ScheduleBByRecipientID>> GetAllAsync()
+        public async Task<IEnumerable<ScheduleBByRecipientID>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            List<ScheduleBByRecipientID> outList = new List<ScheduleBByRecipientID>();
+            AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
+            await foreach (var candidate in candidates)
+            {
+                outList.Add(candidate.TableEntityToModel<ScheduleBByRecipientID>());
+            }
+            return outList.AsReadOnly();
         }
 
         public async Task <IEnumerable<ScheduleBByRecipientID>> GetbyKeyAsync(string key)
@@ -56,37 +62,27 @@ namespace RESTApi.Repositories
         }
 
         
-        public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyElectionYearsAsync(List<int> years)
+        public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyElectionYearsAsync(List<int> years, IEnumerable<ScheduleBByRecipientID> recipients)
         {
-
             List<ScheduleBByRecipientID> outList = new();
-            //is there a better way then creating an in memory copy of entire partition?
-            if (!_inMemList.Any()) //check if in memory list has data, if not load from storage
-            {
-                AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
-                await foreach (var candidate in candidates)
-                {
-                    _inMemList.Add(candidate.TableEntityToModel<ScheduleBByRecipientID>());
-                }
-            }
-
 
             foreach (var year in years)
             {
-
-                {
-                    outList.AddRange(from c in _inMemList where c.Cycle.Equals(year) select c);
-                }
-
+                outList.AddRange((from c in recipients where c.Cycle.Equals(year) select c));
             }
+
             return outList.AsReadOnly();
-        }
+ }
         public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyCandidateandElectionYearsAsync(List<int> years, string key)
         {
-
-            var candidateScheduleB = await GetbyKeyAsync(key);
+            IEnumerable<ScheduleBByRecipientID> recipient = await GetbyKeyAsync(key);
+            
             List<ScheduleBByRecipientID> outList = new();
-            outList.AddRange((IEnumerable<ScheduleBByRecipientID>)(from c in candidateScheduleB where years.Contains(c.Cycle) select c));
+            foreach (var year in years)
+            {
+
+            }
+            outList.AddRange((IEnumerable<ScheduleBByRecipientID>)(from c in recipient where c.Cycle.Equals( years) select c));
 
 
             return outList.AsReadOnly();

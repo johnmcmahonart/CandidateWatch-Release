@@ -8,6 +8,7 @@ namespace RESTApi.Repositories
     public class FinanceTotalsRepository : AzTableRepository, IFinanceTotalsRepository<CandidateHistoryTotal>
     {
         private List<CandidateHistoryTotal> _inMemList = new();
+
         public async Task AddAsync(IEnumerable<CandidateHistoryTotal> inEntity)
         {
             foreach (var item in inEntity)
@@ -19,7 +20,6 @@ namespace RESTApi.Repositories
 
         public async Task DeleteAsync(IEnumerable<CandidateHistoryTotal> inEntity)
         {
-            
             try
             {
                 foreach (var item in inEntity)
@@ -28,10 +28,7 @@ namespace RESTApi.Repositories
                     await foreach (var row in financeRow)
                     {
                         await _tableClient.DeleteEntityAsync(row.PartitionKey, row.RowKey);
-                        
                     }
-                    
-
                 }
             }
             catch (Exception ex)
@@ -53,8 +50,7 @@ namespace RESTApi.Repositories
 
         public async Task<IEnumerable<CandidateHistoryTotal>> GetbyKeyAsync(string key)
         {
-            
-            List<CandidateHistoryTotal> outList 
+            List<CandidateHistoryTotal> outList
                 = new List<CandidateHistoryTotal>();
             AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateId)} eq '{key}'");
             await foreach (var historyRows in candidate)
@@ -62,35 +58,20 @@ namespace RESTApi.Repositories
                 outList.Add(historyRows.TableEntityToModel<CandidateHistoryTotal>());
             }
             return outList.AsReadOnly();
-        
-            
         }
 
-        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyElectionYearsAsync(List<int> years)
+        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyElectionYearsAsync(List<int> years, IEnumerable<CandidateHistoryTotal> candidates)
         {
-
             List<CandidateHistoryTotal> outList = new();
-            //is there a better way then creating an in memory copy of entire partition?
-            if (!_inMemList.Any()) //check if in memory list has data, if not load from storage
-            {
-                AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
-                await foreach (var candidate in candidates)
-                {
-                    _inMemList.Add(candidate.TableEntityToModel<CandidateHistoryTotal>());
-                }
-            }
-
 
             foreach (var year in years)
             {
-
-                {
-                    outList.AddRange(from c in _inMemList where c.ElectionYears.Contains(year) select c);
-                }
-
+                outList.AddRange((from c in candidates where c.CandidateElectionYear.Equals(year) select c));
             }
+
             return outList.AsReadOnly();
         }
+
         public async Task UpdateAsync(IEnumerable<CandidateHistoryTotal> inEntity)
         {
             //this probably isn't correct either. REVIEW AND FIX
@@ -104,10 +85,14 @@ namespace RESTApi.Repositories
 
         public async Task<IEnumerable<CandidateHistoryTotal>> GetbyCandidateandElectionYearsAsync(List<int> years, string key)
         {
-            var candidateFinanceTotals = await GetbyKeyAsync(key);
-            List<CandidateHistoryTotal> outList = new();
-            outList.AddRange((IEnumerable<CandidateHistoryTotal>)(from c in candidateFinanceTotals where years.Contains(c.Cycle) select c));
 
+            IEnumerable<CandidateHistoryTotal> candidate = await GetbyKeyAsync(key);
+            List<CandidateHistoryTotal> outList = new();
+            foreach (var year in years)
+            {
+                outList.AddRange((IEnumerable<CandidateHistoryTotal>)(from c in candidate where c.ElectionYears.Contains(year) select c));
+            }
+            
 
             return outList.AsReadOnly();
         }

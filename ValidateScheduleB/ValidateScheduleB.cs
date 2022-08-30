@@ -20,12 +20,14 @@ namespace MDWatch
             //If not, remove any previously downloaded disbursement entries
 
             int totalCorrect = 0;
+            int totalCandidatesNotProcessed = 0;
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
 
             Pageable<TableEntity> candidatesScheduleBNotProcessed = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'CandidateStatus' and {Utilities.General.GetMemberName((CandidateStatus c) => c.ScheduleBProcessed)} eq false");
 
             foreach (var candidate in candidatesScheduleBNotProcessed)
             {
+                totalCandidatesNotProcessed++;
                 string candidateId = (string)candidate[Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.CandidateId)];
                 TableEntity scheduleBOverview = await tableClient.GetEntityAsync<TableEntity>("ScheduleBOverview", candidateId);
                 string committeeId = (string)scheduleBOverview[Utilities.General.GetMemberName((ScheduleBCandidateOverview c) => c.PrincipalCommitteeId)];
@@ -54,7 +56,7 @@ namespace MDWatch
                 }
             }
 
-            log.LogInformation("Found {1} of {2} candidates that have correct amount of scheduleB disbursements recorded", totalCorrect, candidatesScheduleBNotProcessed.Count().ToString());
+            log.LogInformation("Found {1} of {2} candidates that have correct amount of scheduleB disbursements recorded", totalCorrect, totalCandidatesNotProcessed);
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
         }
     }

@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Remove="Repositories\GetbyElectionYears.cs" />
+    <Compile Remove="Repositories\LoadPartitiontoMemory.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -46,7 +46,8 @@ namespace RESTApi.Controllers
 
         public async Task<IEnumerable<ScheduleBDetailDTO>> GetbyElectionYearAsync([FromQuery] List<int> years)
         {
-            IEnumerable<ScheduleBByRecipientID> modelOut = await _scheduleBDetailRepository.GetbyElectionYearsAsync(years);
+            IEnumerable<ScheduleBByRecipientID> recpients = await _scheduleBDetailRepository.GetAllAsync();
+            IEnumerable<ScheduleBByRecipientID> modelOut = await _scheduleBDetailRepository.GetbyElectionYearsAsync(years, recpients);
             return MapperHelper.MapIEnumerable<ScheduleBByRecipientID, ScheduleBDetailDTO>(modelOut, _mapper);
             
         }

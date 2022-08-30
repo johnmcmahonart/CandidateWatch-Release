@@ -75,7 +75,7 @@ namespace MDWatch.ScheduleBDisbursement
         public static async Task GenerateScheduleBDetailMessagesAsync(QueueClient scheduleBCandidateQueue, ScheduleBCandidateOverview scheduleBCandidateOverview, QueueMessage candidate, TableEntity candidateEntity)
         {
             QueueClient scheduleBPagesQueue = new QueueClient("UseDevelopmentStorage=true", "schedulebpageprocess");
-            dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommittees-json"));
+            dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommitteesJson"));
             string recipientId = principalCommittee[0]["committee_id"];
             for (int i = 1; i <= scheduleBCandidateOverview.TotalResultPages; i++)
             {
@@ -86,7 +86,7 @@ namespace MDWatch.ScheduleBDisbursement
 
         public static async Task MarkProcessedandDequeueAsync(ILogger log, TableClient tableClient, QueueClient scheduleBCandidateQueue, QueueMessage candidate)
         {
-            TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("Candidate", candidate.Body.ToString());
+            TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("CandidateStatus", candidate.Body.ToString());
             entity["ScheduleBProcessed"] = true;
             log.LogInformation("Candidate: {1} No ScheduleB disbursements, will not be processed", candidate.Body.ToString());
             await tableClient.UpdateEntityAsync(entity, entity.ETag);

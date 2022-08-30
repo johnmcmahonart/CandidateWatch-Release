@@ -35,7 +35,9 @@ namespace RESTApi.Controllers
         [HttpGet("years")]
         public async Task<IEnumerable<CandidateHistoryTotal>> GetbyElectionYearAsync([FromQuery] List<int> years)
         {
-            return await _financeTotalsRepository.GetbyElectionYearsAsync(years);
+            IEnumerable<CandidateHistoryTotal> candidates = await _financeTotalsRepository.GetAllAsync();
+            IEnumerable<CandidateHistoryTotal> modelOut = await _financeTotalsRepository.GetbyElectionYearsAsync(years,candidates);
+            return modelOut;
         }
 
 
