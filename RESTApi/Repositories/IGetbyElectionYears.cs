@@ -5,7 +5,7 @@ namespace RESTApi.Repositories
 {
     public interface IGetbyElectionYears<T>where T : class
     {
-        Task<IEnumerable<T>> GetbyElectionYearsAsync(List<int> years, IEnumerable<T> candidates);
+        Task<IEnumerable<T>> GetbyElectionYearsAsync(List<int> years);
         
 
         

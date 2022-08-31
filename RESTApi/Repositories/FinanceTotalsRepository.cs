@@ -60,8 +60,9 @@ namespace RESTApi.Repositories
             return outList.AsReadOnly();
         }
 
-        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyElectionYearsAsync(List<int> years, IEnumerable<CandidateHistoryTotal> candidates)
+        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyElectionYearsAsync(List<int> years)
         {
+            IEnumerable<CandidateHistoryTotal> candidates = await GetAllAsync();
             List<CandidateHistoryTotal> outList = new();
 
             foreach (var year in years)
