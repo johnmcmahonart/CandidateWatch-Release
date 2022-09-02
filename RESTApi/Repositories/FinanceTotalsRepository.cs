@@ -1,4 +1,5 @@
-﻿using Azure;
+﻿using System.Diagnostics;
+using Azure;
 using Azure.Data.Tables;
 using MDWatch.Model;
 using MDWatch.Utilities;
@@ -7,8 +8,8 @@ namespace RESTApi.Repositories
 {
     public class FinanceTotalsRepository : AzTableRepository, IFinanceTotalsRepository<CandidateHistoryTotal>
     {
-        private List<CandidateHistoryTotal> _inMemList = new();
-
+        public string PartitionKey => _partitionKey;
+        public TableClient Client => _tableClient;
         public async Task AddAsync(IEnumerable<CandidateHistoryTotal> inEntity)
         {
             foreach (var item in inEntity)
@@ -60,18 +61,41 @@ namespace RESTApi.Repositories
             return outList.AsReadOnly();
         }
 
-        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyElectionYearsAsync(List<int> years)
+        public async Task<IEnumerable<CandidateHistoryTotal>> GetbyElectionYearsAsync(List<int> years) 
         {
-            IEnumerable<CandidateHistoryTotal> candidates = await GetAllAsync();
+            
             List<CandidateHistoryTotal> outList = new();
+            CandidatebyYear sortedCandidates = new();
+
+            //get candidates grouped by year
+            AsyncPageable<TableEntity> candidatebyYear = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'CandidatebyYear'");
+            await foreach (var item in candidatebyYear)
+            {
+                var model = item.TableEntityToModel<CandidatebyYear>();
+                sortedCandidates = model;
+            }
+            //get candidate finace records from table
 
             foreach (var year in years)
             {
-                outList.AddRange((from c in candidates where c.CandidateElectionYear.Equals(year) select c));
+                foreach (var candidateforYear in sortedCandidates.year[year])
+                {
+                    AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateId)}  eq '{candidateforYear}'");
+                    await foreach (var record in candidate)
+                    {
+                        outList.Add(record.TableEntityToModel<CandidateHistoryTotal>());
+                    }
+                }
             }
+
 
             return outList.AsReadOnly();
         }
+
+
+        
+        
+        
 
         public async Task UpdateAsync(IEnumerable<CandidateHistoryTotal> inEntity)
         {
@@ -86,14 +110,12 @@ namespace RESTApi.Repositories
 
         public async Task<IEnumerable<CandidateHistoryTotal>> GetbyCandidateandElectionYearsAsync(List<int> years, string key)
         {
-
             IEnumerable<CandidateHistoryTotal> candidate = await GetbyKeyAsync(key);
             List<CandidateHistoryTotal> outList = new();
             foreach (var year in years)
             {
                 outList.AddRange((IEnumerable<CandidateHistoryTotal>)(from c in candidate where c.ElectionYears.Contains(year) select c));
             }
-            
 
             return outList.AsReadOnly();
         }

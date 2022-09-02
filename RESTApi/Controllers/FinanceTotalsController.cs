@@ -37,6 +37,8 @@ namespace RESTApi.Controllers
         public async Task<IEnumerable<FinanceTotalsDTO>> GetbyElectionYearAsync([FromQuery] List<int> years)
         {
             
+            
+            
             IEnumerable<CandidateHistoryTotal> modelOut = await _financeTotalsRepository.GetbyElectionYearsAsync(years);
             return MapperHelper.MapIEnumerable<CandidateHistoryTotal, FinanceTotalsDTO>(modelOut, _mapper);
             

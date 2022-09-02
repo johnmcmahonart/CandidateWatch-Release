@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Repositories\CandidateSort.cs" />
     <Compile Remove="Repositories\GetbyElectionYears.cs" />
     <Compile Remove="Repositories\LoadPartitiontoMemory.cs" />
   </ItemGroup>

@@ -19,38 +19,32 @@ namespace MDWatch
         private const string apiKey = "xT2E5C0eUKvhVY74ylbGf4NWXz57XlxTkWV9pOwu";
         private const string _partitionKey = "CandidatebyYear";
         [FunctionName("BuildCandidatebyYearPartition")]
+        
+        //this function is used to optimize retrieval of candidates grouped by date for UI and repository
         public static async Task Run([TimerTrigger("0 */2 * * * *")]TimerInfo myTimer, ILogger log)
         {
             //clear table so data can be regenerated
             TablePurge.Purge(_partitionKey);
-
+            List < Candidate > allCandidatesModel = new();
 
             
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
-            List<Candidate> outList = new List<Candidate>();
+            
             AsyncPageable<TableEntity> candidates = tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'Candidate'");
+            
+            //convert table entity to model
             await foreach (var candidate in candidates)
             {
-                var candidateModel = candidate.TableEntityToModel<Candidate>();
-                foreach (var item in candidateModel.ElectionYears)
-                {
-                    if (outModel.year.ContainsKey(item))
-                    {
-                        outModel.year[item].Add(candidateModel.CandidateId);
-                    }
-                        else //it hasn't so initialize a new list for the year
-                        {
-                            outModel.year.Add(item, new List<string> { candidateModel.CandidateId });
-                        }
-                    
-                    
-                }
+                allCandidatesModel.Add(candidate.TableEntityToModel<Candidate>());
             }
+
+            //sort model
+             CandidatebyYear sortedCandidates = CandidateSort.Year((IEnumerable<Candidate>)allCandidatesModel);
+            
             //write to table storage
-            foreach (var item in outModel.year)
-            {
-                await tableClient.AddEntityAsync<TableEntity>( item.ModelToTableEntity(tableClient, _partitionKey, item.Key.ToString()));
-            }
+                 
+            await tableClient.AddEntityAsync<TableEntity>( sortedCandidates.ModelToTableEntity(tableClient, _partitionKey, Guid.NewGuid().ToString()));
+            
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
         
         }

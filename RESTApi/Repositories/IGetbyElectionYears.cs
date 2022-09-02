@@ -1,14 +1,8 @@
-﻿using Azure.Data.Tables;
-using MDWatch.Model;
-
-namespace RESTApi.Repositories
+﻿namespace RESTApi.Repositories
 {
-    public interface IGetbyElectionYears<T>where T : class
-    {
-        Task<IEnumerable<T>> GetbyElectionYearsAsync(List<int> years);
-        
+    public interface IGetbyElectionYears<T> where T : class, new()
 
-        
-        
+    {
+        public Task<IEnumerable<T>> GetbyElectionYearsAsync(List<int> years);
     }
 }

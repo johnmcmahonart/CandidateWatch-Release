@@ -2,12 +2,13 @@
 using Azure.Data.Tables;
 using MDWatch.Model;
 using MDWatch.Utilities;
-using System.Linq;
+
 namespace RESTApi.Repositories
 {
     public class ScheduleBDetailRepository : AzTableRepository, IScheduleBDetailRepository<ScheduleBByRecipientID>
     {
         private List<ScheduleBByRecipientID> _inMemList = new();
+
         public async Task AddAsync(IEnumerable<ScheduleBByRecipientID> inEntity)
         {
             try
@@ -47,9 +48,8 @@ namespace RESTApi.Repositories
             return outList.AsReadOnly();
         }
 
-        public async Task <IEnumerable<ScheduleBByRecipientID>> GetbyKeyAsync(string key)
+        public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyKeyAsync(string key)
         {
-            
             List<ScheduleBByRecipientID> outList = new();
             TableEntity candidateScheduleBOverview = await _tableClient.GetEntityAsync<TableEntity>("ScheduleBOverview", key);
             AsyncPageable<TableEntity> scheduleBDetail = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{candidateScheduleBOverview.TableEntityToModel<ScheduleBCandidateOverview>().PrincipalCommitteeId}'");
@@ -58,22 +58,46 @@ namespace RESTApi.Repositories
                 outList.Add(disbursement.TableEntityToModel<ScheduleBByRecipientID>());
             }
             return outList.AsReadOnly();
-        
         }
 
-        
         public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyElectionYearsAsync(List<int> years)
         {
-            IEnumerable<ScheduleBByRecipientID> recipients = await GetAllAsync();
             List<ScheduleBByRecipientID> outList = new();
+            CandidatebyYear sortedCandidates = new();
+
+            //get candidates grouped by year
+            AsyncPageable<TableEntity> candidatebyYear = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'CandidatebyYear'");
+            await foreach (var item in candidatebyYear)
+            {
+                var model = item.TableEntityToModel<CandidatebyYear>();
+                sortedCandidates = model;
+            }
+            //get candidate ScheduleB records from table
 
             foreach (var year in years)
             {
-                outList.AddRange((from c in recipients where c.Cycle.Equals(year) select c));
+                foreach (var candidateforYear in sortedCandidates.year[year])
+                {
+                    //get recipient ID that matches candidateID
+                    AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'ScheduleBOverview' and {General.GetMemberName((ScheduleBCandidateOverview c) => c.CandidateId)}  eq '{candidateforYear}'");
+                    await foreach (var record in candidate)
+                    {
+                        string committeeId = record.TableEntityToModel<ScheduleBCandidateOverview>().PrincipalCommitteeId;
+                        
+                        //get ScheduleBDetail data
+
+                        AsyncPageable<TableEntity> scheduleBDetails = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{committeeId}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.Cycle)} eq {year} ");
+                        await foreach (var row in scheduleBDetails)
+                        {
+                            outList.Add(row.TableEntityToModel<ScheduleBByRecipientID>());
+                        }
+                    }
+                }
             }
 
             return outList.AsReadOnly();
- }
+        }
+
         public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyCandidateandElectionYearsAsync(List<int> years, string key)
         {
             IEnumerable<ScheduleBByRecipientID> recipient = await GetbyKeyAsync(key);
@@ -81,13 +105,13 @@ namespace RESTApi.Repositories
             List<ScheduleBByRecipientID> outList = new();
             foreach (var year in years)
             {
-
+                outList.AddRange((IEnumerable<ScheduleBByRecipientID>)(from c in recipient where c.Cycle.Equals(years) select c));
             }
-            outList.AddRange((IEnumerable<ScheduleBByRecipientID>)(from c in recipient where c.Cycle.Equals( years) select c));
-
+            
 
             return outList.AsReadOnly();
         }
+
         public async Task UpdateAsync(IEnumerable<ScheduleBByRecipientID> inEntity)
         {
             foreach (var recipient in inEntity)
@@ -102,8 +126,6 @@ namespace RESTApi.Repositories
                 }
             }
         }
-
-        
 
         public ScheduleBDetailRepository()
         {

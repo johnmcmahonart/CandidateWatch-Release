@@ -63,24 +63,33 @@ namespace RESTApi.Repositories
 
         public async Task<IEnumerable<Candidate>> GetbyElectionYearsAsync(List<int> years)
         {
-            IEnumerable<Candidate> candidates = await GetAllAsync();
+
             List<Candidate> outList = new();
-            
+            CandidatebyYear sortedCandidates = new();
+
+            //get candidates grouped by year
+            AsyncPageable<TableEntity> candidatebyYear = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'CandidatebyYear'");
+            await foreach (var item in candidatebyYear)
+            {
+                var model = item.TableEntityToModel<CandidatebyYear>();
+                sortedCandidates = model;
+            }
+            //get candidate records from table
 
             foreach (var year in years)
             {
-                
-                var candidatesbyYear = CandidateSort.Year(candidates);
-                foreach (var item in candidatesbyYear.year[year] )
+                foreach (var candidateforYear in sortedCandidates.year[year])
                 {
-                    outList.Add((from c in candidates where c.CandidateId.Equals(item) select c).First());
+                    AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((Candidate c) => c.CandidateId)}  eq '{candidateforYear}'");
+                    await foreach (var record in candidate)
+                    {
+                        outList.Add(record.TableEntityToModel<Candidate>());
+                    }
                 }
             }
-            
+
 
             return outList.AsReadOnly();
-            
-
         }
 
         public Task UpdateAsync(IEnumerable<Candidate> inEntity)

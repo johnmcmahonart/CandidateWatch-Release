@@ -1,10 +1,11 @@
-﻿using MDWatch.Model;
+﻿using System.Collections.Generic;
+using MDWatch.Model;
 namespace MDWatch.Utilities
 
 {
     public static class CandidateSort
     {
-        public static CandidatebyYear Year(IEnumerable<Candidate> candidates)
+        public static CandidatebyYear Year(this IEnumerable<Candidate> candidates)
             {
             CandidatebyYear sortedCandidates = new();
             sortedCandidates.year = new();

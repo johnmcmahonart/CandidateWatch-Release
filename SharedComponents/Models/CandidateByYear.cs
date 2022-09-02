@@ -4,10 +4,10 @@ using System.Text;
 
 namespace MDWatch.Model
 {
-    public record CandidateByYear
+    public record class CandidatebyYear
     //used to build partition of candidates grouped by year, needed for efficient grouping of candidates by election year 
     {
-        public Dictionary<int, List<string>> year;
+        public Dictionary<int, List<string>> year { get; set; }
     
     }
 }
