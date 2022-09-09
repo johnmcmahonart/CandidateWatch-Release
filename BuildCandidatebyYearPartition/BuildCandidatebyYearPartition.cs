@@ -39,11 +39,15 @@ namespace MDWatch
             }
 
             //sort model
-             CandidatebyYear sortedCandidates = CandidateSort.Year((IEnumerable<Candidate>)allCandidatesModel);
-            
+             IEnumerable<CandidatebyYear> sortedCandidates = CandidateSort.Year((IEnumerable<Candidate>)allCandidatesModel);
+
             //write to table storage
-                 
-            await tableClient.AddEntityAsync<TableEntity>( sortedCandidates.ModelToTableEntity(tableClient, _partitionKey, Guid.NewGuid().ToString()));
+
+            foreach (var year in sortedCandidates)
+            {
+                await tableClient.AddEntityAsync<TableEntity>(year.ModelToTableEntity(tableClient, _partitionKey, year.Year.ToString()));
+            }
+            
             
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
         

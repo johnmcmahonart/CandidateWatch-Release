@@ -2,7 +2,7 @@
 
 namespace RESTApi.DTOs
 {
-    public class CandidateDTO
+    public record CandidateDTO
     {
         public string CandidateId { get; set; }
         public string CandidateStatus { get; set; }

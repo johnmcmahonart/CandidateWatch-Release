@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="APIResponse.cs" />
+    <Compile Remove="IAPIResponse.cs" />
     <Compile Remove="Repositories\CandidateSort.cs" />
     <Compile Remove="Repositories\GetbyElectionYears.cs" />
     <Compile Remove="Repositories\LoadPartitiontoMemory.cs" />

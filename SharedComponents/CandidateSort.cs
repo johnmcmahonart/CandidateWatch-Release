@@ -5,31 +5,30 @@ namespace MDWatch.Utilities
 {
     public static class CandidateSort
     {
-        public static CandidatebyYear Year(this IEnumerable<Candidate> candidates)
-            {
-            CandidatebyYear sortedCandidates = new();
-            sortedCandidates.year = new();
+        public static IEnumerable<CandidatebyYear> Year(this IEnumerable<Candidate> candidates)
+        {
+            List<CandidatebyYear> sortedCandidates = new();
+
             foreach (var candidate in candidates)
             {
-                foreach (var item in candidate.ElectionYears)
+                foreach (var item in candidate.Cycles)
                 {
-                    if (sortedCandidates.year.ContainsKey(item)) //check if the key already exists in the list, if not initialize
+                    try  //check if year exists in list, if not create new item in collection. If it does exist add candidate to the correct year
                     {
-                        sortedCandidates.year[item].Add(candidate.CandidateId);
+                        var i = sortedCandidates.FindIndex(x => x.Year.Equals(item));
+                        sortedCandidates[i].Candidates.Add(candidate.CandidateId);
                     }
-                    else 
+                    catch
                     {
-                        sortedCandidates.year.Add(item, new List<string> { candidate.CandidateId });
+                        sortedCandidates.Add(new CandidatebyYear()
+                        {
+                            Year = item,
+                            Candidates = new List<string>() { candidate.CandidateId }
+                        });
                     }
-
-
                 }
             }
             return sortedCandidates;
-
-
-
         }
-
     }
 }

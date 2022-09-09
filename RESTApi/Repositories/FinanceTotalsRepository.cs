@@ -65,20 +65,21 @@ namespace RESTApi.Repositories
         {
             
             List<CandidateHistoryTotal> outList = new();
-            CandidatebyYear sortedCandidates = new();
+            List<CandidatebyYear> sortedCandidates = new();
 
             //get candidates grouped by year
             AsyncPageable<TableEntity> candidatebyYear = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'CandidatebyYear'");
             await foreach (var item in candidatebyYear)
             {
-                var model = item.TableEntityToModel<CandidatebyYear>();
-                sortedCandidates = model;
+                sortedCandidates.Add( item.TableEntityToModel<CandidatebyYear>());
+                
             }
             //get candidate finace records from table
 
             foreach (var year in years)
             {
-                foreach (var candidateforYear in sortedCandidates.year[year])
+                var i = sortedCandidates.FindIndex(x => x.Year.Equals(year));
+                foreach (var candidateforYear in sortedCandidates[i].Candidates)
                 {
                     AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateId)}  eq '{candidateforYear}'");
                     await foreach (var record in candidate)

@@ -1,6 +1,6 @@
 ﻿namespace RESTApi.DTOs
 {
-    public class FinanceTotalsDTO
+    public record FinanceTotalsDTO
     {
         public int? ActiveThrough { get; set; }
         public string AddressState { get; set; }

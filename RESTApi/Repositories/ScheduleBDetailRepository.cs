@@ -63,20 +63,22 @@ namespace RESTApi.Repositories
         public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyElectionYearsAsync(List<int> years)
         {
             List<ScheduleBByRecipientID> outList = new();
-            CandidatebyYear sortedCandidates = new();
+            List<CandidatebyYear> sortedCandidates = new();
 
             //get candidates grouped by year
             AsyncPageable<TableEntity> candidatebyYear = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'CandidatebyYear'");
             await foreach (var item in candidatebyYear)
             {
-                var model = item.TableEntityToModel<CandidatebyYear>();
-                sortedCandidates = model;
+                sortedCandidates.Add(item.TableEntityToModel<CandidatebyYear>());
+                
             }
             //get candidate ScheduleB records from table
 
             foreach (var year in years)
             {
-                foreach (var candidateforYear in sortedCandidates.year[year])
+                var i = sortedCandidates.FindIndex(x => x.Year.Equals(year));
+
+                foreach (var candidateforYear in sortedCandidates[i].Candidates)
                 {
                     //get recipient ID that matches candidateID
                     AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'ScheduleBOverview' and {General.GetMemberName((ScheduleBCandidateOverview c) => c.CandidateId)}  eq '{candidateforYear}'");

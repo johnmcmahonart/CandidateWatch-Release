@@ -1,6 +1,6 @@
 ﻿namespace RESTApi.DTOs
 {
-    public class ScheduleBDetailDTO
+    public record ScheduleBDetailDTO
     {
         public string CommitteeId { get; set; }
         public string CommitteeName { get; set; }

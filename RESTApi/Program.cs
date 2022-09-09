@@ -9,12 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 //AutoMapper configuration
 builder.Services.AddAutoMapper(typeof(CandidateMapperProfile));
-
+builder.Services.AddAutoMapper(typeof(FinanceTotalsMapperProfile));
+builder.Services.AddAutoMapper(typeof(ScheduleBDetailMapperProfile));
 //Repository configuration
 builder.Services.AddSingleton<ICandidateRepository<Candidate>, CandidateRepository>();
 builder.Services.AddSingleton<IFinanceTotalsRepository<CandidateHistoryTotal>, FinanceTotalsRepository>();
 builder.Services.AddSingleton<IScheduleBDetailRepository<ScheduleBByRecipientID>, ScheduleBDetailRepository>();
 builder.Services.AddSingleton<IRepository<ScheduleBCandidateOverview>, ScheduleBOverviewRepository>();
+builder.Services.AddSingleton<IUINavRepository, UINavRepository>();
 builder.Services.AddControllers();
 
 
