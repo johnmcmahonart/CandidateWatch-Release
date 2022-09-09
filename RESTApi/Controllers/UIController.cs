@@ -12,14 +12,14 @@ namespace RESTApi.Controllers
     {
         private readonly IUINavRepository _UIRepository;
 
-        [HttpGet("candidatesbyyear/{year}")]
+        [HttpGet("CandidatesbyYear/{year}")]
         public async Task<IEnumerable<CandidateUIDTO>> GetCandidates([FromQuery] bool wasElected, int year)
 
         {
             return await _UIRepository.GetCandidates(year, wasElected);
         }
 
-        [HttpGet("electionyears")]
+        [HttpGet("ElectionYears")]
         public async Task<IEnumerable<int>> GetElectionYearsAsync()
         {
             return await _UIRepository.GetElectionYears();
