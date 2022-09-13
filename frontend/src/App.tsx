@@ -5,6 +5,7 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
+import InitUIState from './InitUIState';
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -15,11 +16,13 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 function App() {
+    console.log(InitUIState());
     return (
         <Container className="master" maxWidth="xl">
             <Grid container spacing={1} columns={10}>
                 <Grid className="navigation" xs={2}>
-                    <Item>side bar test</Item>
+                    
+                    <Item>Sidebar test</Item>
 
                 </Grid>
                 <Grid className="mainContent" xs={8}>
