@@ -12,9 +12,14 @@ namespace RESTApi.Repositories
         private string _electionYearsPartition = "CandidatebyYear";
         private string _candidatePartition = "Candidate";
         private TableClient _tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
-
+        private bool CurrentlyElected(Candidate candidate)
+        {
+            //candidatestatus c = current candidate, candidatestatus f = future candidate
+            return candidate.IncumbentChallenge == "I" && (candidate.CandidateStatus == "C" | candidate.CandidateStatus == "F") ? true : false;
+        }
         public async Task<IEnumerable<CandidateUIDTO>> GetCandidates(int year, bool wasElected)
         {
+            
             {
                 List<CandidateUIDTO> outDTO = new();
                 List<Candidate> candidates = new();
@@ -39,7 +44,7 @@ namespace RESTApi.Repositories
                         var candidateModel = record.TableEntityToModel<Candidate>();
                         if (wasElected) //filters only elected candidates
                         {
-                            if (candidateModel.IncumbentChallenge== "I" && candidateModel.CandidateStatus != "P")
+                            if (CurrentlyElected(candidateModel))
                             {
                                 candidates.Add(candidateModel);
                             }
@@ -63,7 +68,7 @@ namespace RESTApi.Repositories
                             LastName = names[1],
                             Party = candidate.Party,
                             District = candidate.District,
-                            WasElected = candidate.IncumbentChallenge == "I" && candidate.CandidateStatus !="P" ? true : false
+                            WasElected = CurrentlyElected(candidate)
                         });
                     }
                     else
@@ -75,7 +80,7 @@ namespace RESTApi.Repositories
                             LastName = "n/a",
                             Party = candidate.Party,
                             District= candidate.District,
-                            WasElected = candidate.IncumbentChallenge == "I" && candidate.CandidateStatus !="P" ? true : false
+                            WasElected = CurrentlyElected(candidate)
                         });
                     }
                 }
@@ -84,64 +89,7 @@ namespace RESTApi.Repositories
             }
         }
 
-        public async Task<IEnumerable<CandidateUIDTO>> GetCandidates(int year)
-        {
-            {
-                List<CandidateUIDTO> outDTO = new();
-                List<Candidate> candidates = new();
-                List<CandidatebyYear> sortedCandidates = new();
-
-                //get candidates grouped by year
-                AsyncPageable<TableEntity> candidatebyYear = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_electionYearsPartition}'");
-                await foreach (var item in candidatebyYear)
-                {
-                    sortedCandidates.Add(item.TableEntityToModel<CandidatebyYear>());
-                    
-                }
-                //get candidate records from table
-
-                var i = sortedCandidates.FindIndex(x => x.Year.Equals(year));
-                foreach (var candidateforYear in sortedCandidates[i].Candidates)
-                {
-                    AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_candidatePartition}' and {General.GetMemberName((Candidate c) => c.CandidateId)}  eq '{candidateforYear}'");
-                    await foreach (var record in candidate)
-                    {
-                        candidates.Add(record.TableEntityToModel<Candidate>());
-                    }
-                }
-                //build DTO
-                foreach (var candidate in candidates)
-                {
-                    List<string> names = candidate.Name.FixCandidateName().ToList();
-                    if (names.Count > 1)
-                    {
-                        outDTO.Add(new CandidateUIDTO
-                        {
-                            CandidateId = candidate.CandidateId,
-                            FirstName = names[0],
-                            LastName = names[1],
-                            Party = candidate.Party,
-                            District = candidate.District,
-                            WasElected = candidate.IncumbentChallenge == "I" && candidate.CandidateStatus != "P" ? true : false
-                        });
-                    }
-                    else
-                    {
-                        outDTO.Add(new CandidateUIDTO
-                        {
-                            CandidateId = candidate.CandidateId,
-                            FirstName = names[0],
-                            LastName = "n/a",
-                            Party = candidate.Party,
-                            District= candidate.District,
-                            WasElected = candidate.IncumbentChallenge == "I" && candidate.CandidateStatus != "P" ? true : false
-                        });
-                    }
-                }
-
-                return outDTO.AsReadOnly();
-            }
-        }
+        
 
         public async Task<IEnumerable<int>> GetElectionYears()
         {
