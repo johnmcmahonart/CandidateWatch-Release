@@ -1,8 +1,8 @@
-using RESTApi.Controllers;
-using RESTApi.Mapper;
 using MDWatch.Model;
 using Microsoft.Extensions.Azure;
+using RESTApi.Mapper;
 using RESTApi.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,11 +17,15 @@ builder.Services.AddSingleton<IFinanceTotalsRepository<CandidateHistoryTotal>, F
 builder.Services.AddSingleton<IScheduleBDetailRepository<ScheduleBByRecipientID>, ScheduleBDetailRepository>();
 builder.Services.AddSingleton<IRepository<ScheduleBCandidateOverview>, ScheduleBOverviewRepository>();
 builder.Services.AddSingleton<IUINavRepository, UINavRepository>();
+//cors configuration
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        {
+            policy.AllowAnyOrigin().AllowAnyHeader();
+        });
+});
 builder.Services.AddControllers();
-
-
-
-
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -43,6 +47,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -1,30 +1,21 @@
-﻿import React from 'react';
-import Get from 'axios';
+﻿import React, { useState } from 'react';
+//import axios from 'axios';
+import * as MDWatchAPI from './MDWatchAPI'
 
-
-
-const apiBase = 'http://localhost:5018/api'
-export default  async function InitUIState() {
-  //set initial app state by retriving UI and card data from API  
+export default function InitUIState() {
+    //set initial app state by retriving UI and card data from API
     
-    const axios = require('axios');
-    await React.useEffect(() => {
-        axios({
-            method: 'get',
-            url: apiBase+'/UI/CandidatesbyYear/2022',
-            data: {
-                wasElected: true
-            }
-
-        });
-        axios.get().then(Response);
-
-
-    })
+    const clientConfig = new MDWatchAPI.Configuration()
+    clientConfig.basePath = "http://localhost:4998";
+    const client = new MDWatchAPI.UIApi(clientConfig);
+    const [uiResult, setUIResult] = React.useState<MDWatchAPI.CandidateUIDTO[]>([]);
     
-
-    return (axios.Response.data); 
-        
-    
+    const getData = async () => {
+        setUIResult((await client.apiUICandidatesbyYearYearGet(2022, true)).data);
+    }
+    React.useEffect(() => {
+        getData();
+    }, );
+    console.log(uiResult);
+    return uiResult;   
 }
-

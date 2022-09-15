@@ -5,6 +5,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText'
 
 function NavElement(element: INavElement) {
+    
     return (
         //<ListItemButton onClick="">
         <ListItemButton key={element.label}>

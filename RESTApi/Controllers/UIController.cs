@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using RESTApi.DTOs;
 using RESTApi.Repositories;
 
@@ -6,6 +7,7 @@ using RESTApi.Repositories;
 
 namespace RESTApi.Controllers
 {
+    
     [Route("api/UI")]
     [ApiController]
     public class UIController : ControllerBase

@@ -4,3 +4,6 @@
     onClick: boolean;
 
 }
+export interface ICandidateMinimized {
+
+}
