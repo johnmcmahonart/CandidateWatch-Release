@@ -1,6 +1,6 @@
 ﻿import React, { useState } from 'react';
 //import axios from 'axios';
-import * as MDWatchAPI from './MDWatchAPI'
+import * as MDWatchAPI from '../MDWatchAPI'
 
 export default function InitUIState() {
     //set initial app state by retrieving UI and card data from API

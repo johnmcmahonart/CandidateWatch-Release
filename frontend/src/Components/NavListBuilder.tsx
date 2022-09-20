@@ -1,25 +1,29 @@
 ﻿import React, { Fragment } from 'react';
 import List from '@mui/material/List';
-import { INavElement } from '../Interfaces/UI';
-import * as MDWatchAPI from './MDWatchAPI'
+import { INavElement } from '../Interfaces/Menu';
+
+import * as MDWatchAPI from '../MDWatchAPI'
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText'
 import { forEachChild } from 'typescript';
 import { element, string } from 'prop-types';
+import { StringEmpty } from '../Utilities';
 import NavElement from './NavElement';
 
+//maps DTO to react component
 export default function NavListBuilder(props: MDWatchAPI.CandidateUIDTO[]) {
-    const navElements: Array<INavElement> = [];
+    const builtNavElements: Array<JSX.Element> = [];
+    
     props.forEach(element => {
-        const t = {
-            label: element.candidateId ? (element.candidateId) : "",
+        let builtElement:INavElement= {
+            label: element.candidateId,
             text: element.firstName + " " + element.lastName,
             onClick: false
         };
-        navElements.push(t);
+        builtNavElements.push(NavElement(builtElement));
     });
     
-    const builtElements: Array<JSX.Element> = [];
-    navElements.forEach(item => builtElements.push(NavElement(item)));
-    return builtElements
+    
+    
+    return builtNavElements
 }
