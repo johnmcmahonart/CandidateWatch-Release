@@ -1,0 +1,23 @@
+﻿import React, { Children } from 'react';
+import * as MDWatchAPI from '../MDWatchAPI'
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText'
+import { forEachChild } from 'typescript';
+import { element, string } from 'prop-types';
+import { StringEmpty } from '../Utilities';
+import NavElement from './NavElement';
+import { Grid } from '@mui/material';
+import { DefaultComponentProps } from '@mui/material/OverridableComponent';
+
+//wraps cards with Grid components
+export default function CandidateCardPageBuilder({ children }: { children: React.ReactNode | React.ReactNode[] }) {
+    const builtPage: React.ReactNode = new();
+    const childrenArray = Children.toArray(children);
+    childrenArray.map(child => {
+        let wrappedElement= React.createElement(Grid,null,child);
+        builtPage.push(wrappedElement);
+
+    })
+    const { children } = builtPage;  
+    return { builtPage }
+}

@@ -4,7 +4,7 @@ import { INavElement } from '../Interfaces/Menu';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText'
 
-function NavElement(element: INavElement) {
+export default function NavElement(element: INavElement) {
     
     return (
         //<ListItemButton onClick="">
@@ -16,4 +16,3 @@ function NavElement(element: INavElement) {
     );
 }
 
-export default NavElement;

@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import logo from './logo.svg';
-import './App.css';
+import '../App.css';
 import List from '@mui/material/List';
 import InboxIcon from '@mui/icons-material/MoveToInbox'
 import NavElement from './NavElement'
@@ -8,7 +8,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import Collapse from '@mui/material/Collapse/Collapse';
-function NavList({ children }: { children: React.ReactNode | React.ReactNode[] } ) {
+export default function NavList({ children }: { children: React.ReactNode | React.ReactNode[] } ) {
     const [open, setOpen] = React.useState(false);
 
     const handleClick = () => {
@@ -34,4 +34,3 @@ function NavList({ children }: { children: React.ReactNode | React.ReactNode[] }
         );
 }
 
-export default NavList;

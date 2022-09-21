@@ -6,35 +6,41 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import  Grid2  from '@mui/material/Unstable_Grid2';
 
 function CandidateCard(element: ICandidateCard) {
     return (
         //<ListItemButton onClick="">
-        <Card sx={{ minWidth: '2' }}>
-            
-            <CardContent>
-                <Typography sx={{ fontSize: 14 }}>
-                    {element.fullName}
-                </Typography>
+        <Grid2 xs={8} sm="auto">
+            <Card sx={{ minWidth: '2%', maxWidth: '100%' }}>
 
-                <Typography sx={{ fontSize: 14 }}>
-                    {element.district}
-                </Typography>
+                <CardContent>
+                    <Typography sx={{ fontSize: 14 }}>
+                        {element.fullName}
+                    </Typography>
 
-                <Typography sx={{ fontSize: 14 }}>
-                    {element.party}
-                </Typography>
+                    <Typography sx={{ fontSize: 14 }}>
+                        {element.district}
+                    </Typography>
 
-                <Typography sx={{ fontSize: 14 }}>
-                    {element.electionYear}
-                </Typography>
+                    <Typography sx={{ fontSize: 14 }}>
+                        {element.party}
+                    </Typography>
 
-                <CardActions>
-                    <Button>More Details
-                    </Button>
-                </CardActions>
-            </CardContent>
-        </Card>
+                    <Typography sx={{ fontSize: 14 }}>
+                        {element.electionYear}
+                    </Typography>
+
+                    <CardActions>
+                        <Button>More Details
+                        </Button>
+                    </CardActions>
+                </CardContent>
+            </Card>
+
+
+        </Grid2>
+        
 
     );
 }

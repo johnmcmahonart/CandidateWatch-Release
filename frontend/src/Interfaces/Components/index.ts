@@ -1,9 +1,9 @@
 ﻿export interface ICandidateCard {
-    fullName: string;
-    district: string;
-    party: string;
+    fullName: string|null|undefined;
+    district: string | null |undefined;
+    party: string | null | undefined;
     electionYear: number;
-    moreDetail: string;
+    moreDetail: string | null | undefined;
 
 
 }

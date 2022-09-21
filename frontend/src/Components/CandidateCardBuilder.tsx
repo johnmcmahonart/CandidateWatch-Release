@@ -7,22 +7,23 @@ import { ICandidateCard } from '../Interfaces/Components';
 import CandidateCard from './CandidateCard';
 
 //maps DTO to react component
-export default function CandidateCardBuilder(candidateProp: MDWatchAPI.CandidateUIDTO[], yearProp:number) {
+export default function CandidateCardBuilder(candidateProp: MDWatchAPI.CandidateUIDTO[], yearProp: number) {
     const builtNavElements: Array<JSX.Element> = [];
 
     candidateProp.forEach(element => {
         let builtElement: ICandidateCard = {
-            
-                fullName: element.firstName+" "+element.lastName,
-            district: typeof(string)element.district,
+
+            fullName: element.firstName + " " + element.lastName,
+            district: element.district,
             party: element.party,
-            electionYear:yearProp,
+            electionYear: yearProp,
             moreDetail: ""
-            
+
         };
         builtNavElements.push(CandidateCard(builtElement));
     });
-
+    
 
 
     return builtNavElements
+}

@@ -1,5 +1,5 @@
 ﻿export interface INavElement {
-    label: string;
+    label: string|undefined|null;
     text: string;
     onClick: boolean;
 

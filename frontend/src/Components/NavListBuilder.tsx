@@ -7,7 +7,6 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText'
 import { forEachChild } from 'typescript';
 import { element, string } from 'prop-types';
-import { StringEmpty } from '../Utilities';
 import NavElement from './NavElement';
 
 //maps DTO to react component
