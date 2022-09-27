@@ -1,7 +1,6 @@
 ﻿export interface INavElement {
-    label: string|undefined|null;
     text: string;
-    onClick: boolean;
+    candidateId: string | undefined | null;
 
 }
 export interface ICandidateMinimized {

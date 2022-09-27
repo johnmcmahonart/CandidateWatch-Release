@@ -2,8 +2,6 @@
 import logo from './logo.svg';
 import '../App.css';
 import List from '@mui/material/List';
-import InboxIcon from '@mui/icons-material/MoveToInbox'
-import NavElement from './NavElement'
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';

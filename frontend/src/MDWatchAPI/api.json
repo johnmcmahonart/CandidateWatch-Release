@@ -1,0 +1,925 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "RESTApi",
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/Candidate/{key}": {
+      "get": {
+        "tags": ["Candidate"],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Candidate/years": {
+      "get": {
+        "tags": ["Candidate"],
+        "parameters": [
+          {
+            "name": "years",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/FinanceTotals/{key}": {
+      "get": {
+        "tags": ["FinanceTotals"],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FinanceTotalsDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FinanceTotalsDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FinanceTotalsDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/FinanceTotals/{key}/years": {
+      "get": {
+        "tags": ["FinanceTotals"],
+        "parameters": [
+          {
+            "name": "years",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FinanceTotalsDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FinanceTotalsDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FinanceTotalsDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/FinanceTotals/years": {
+      "get": {
+        "tags": ["FinanceTotals"],
+        "parameters": [
+          {
+            "name": "years",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FinanceTotalsDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FinanceTotalsDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FinanceTotalsDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ScheduleBDetail/{key}": {
+      "get": {
+        "tags": ["ScheduleBDetail"],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleBDetailDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleBDetailDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleBDetailDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ScheduleBDetail/{key}/years": {
+      "get": {
+        "tags": ["ScheduleBDetail"],
+        "parameters": [
+          {
+            "name": "years",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleBDetailDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleBDetailDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleBDetailDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ScheduleBDetail/years": {
+      "get": {
+        "tags": ["ScheduleBDetail"],
+        "parameters": [
+          {
+            "name": "years",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleBDetailDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleBDetailDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleBDetailDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ScheduleBOverview/{key}": {
+      "get": {
+        "tags": ["ScheduleBOverview"],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleBCandidateOverview"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleBCandidateOverview"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleBCandidateOverview"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/UI/CandidatesbyYear/{year}": {
+      "get": {
+        "tags": ["UI"],
+        "parameters": [
+          {
+            "name": "wasElected",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateUIDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateUIDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateUIDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/UI/ElectionYears": {
+      "get": {
+        "tags": ["UI"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CandidateDTO": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "nullable": true
+          },
+          "candidateStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "cycles": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "district": {
+            "type": "string",
+            "nullable": true
+          },
+          "electionYears": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "hasRaisedFunds": {
+            "type": "boolean"
+          },
+          "inactiveElectionYears": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "lastF2Date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastFileDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "office": {
+            "type": "string",
+            "nullable": true
+          },
+          "officeFull": {
+            "type": "string",
+            "nullable": true
+          },
+          "party": {
+            "type": "string",
+            "nullable": true
+          },
+          "partyFull": {
+            "type": "string",
+            "nullable": true
+          },
+          "principalCommittees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidatePrincipalCommittees"
+            },
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CandidatePrincipalCommittees": {
+        "type": "object",
+        "properties": {
+          "affiliatedCommitteeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "candidateIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "committeeId": {
+            "type": "string",
+            "nullable": true
+          },
+          "committeeType": {
+            "type": "string",
+            "nullable": true
+          },
+          "committeeTypeFull": {
+            "type": "string",
+            "nullable": true
+          },
+          "cycles": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "designation": {
+            "type": "string",
+            "nullable": true
+          },
+          "designationFull": {
+            "type": "string",
+            "nullable": true
+          },
+          "filingFrequency": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstF1Date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "firstFileDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastF1Date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastFileDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "organizationType": {
+            "type": "string",
+            "nullable": true
+          },
+          "organizationTypeFull": {
+            "type": "string",
+            "nullable": true
+          },
+          "party": {
+            "type": "string",
+            "nullable": true
+          },
+          "partyFull": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "treasurerName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CandidateUIDTO": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "party": {
+            "type": "string",
+            "nullable": true
+          },
+          "wasElected": {
+            "type": "boolean"
+          },
+          "district": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FinanceTotalsDTO": {
+        "type": "object",
+        "properties": {
+          "activeThrough": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "addressState": {
+            "type": "string",
+            "nullable": true
+          },
+          "candidateElectionYear": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "candidateId": {
+            "type": "string",
+            "nullable": true
+          },
+          "candidateStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "cashOnHandEndPeriod": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "cycle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cycles": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "debtsOwedByCommittee": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "disbursements": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "electionYear": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "electionYears": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "federalFundsFlag": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "hasRaisedFunds": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "individualItemizedContributions": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "lastF2Date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "office": {
+            "type": "string",
+            "nullable": true
+          },
+          "officeFull": {
+            "type": "string",
+            "nullable": true
+          },
+          "otherPoliticalCommitteeContributions": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "party": {
+            "type": "string",
+            "nullable": true
+          },
+          "partyFull": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ScheduleBCandidateOverview": {
+        "type": "object",
+        "properties": {
+          "totalDisbursements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalResultPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "candidateId": {
+            "type": "string",
+            "nullable": true
+          },
+          "principalCommitteeId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ScheduleBDetailDTO": {
+        "type": "object",
+        "properties": {
+          "committeeId": {
+            "type": "string",
+            "nullable": true
+          },
+          "committeeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "cycle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "recipientId": {
+            "type": "string",
+            "nullable": true
+          },
+          "recipientName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

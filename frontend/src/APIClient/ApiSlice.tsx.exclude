@@ -1,12 +1,24 @@
 ﻿import React, { useState } from 'react';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 //import axios from 'axios';
 import * as MDWatchAPI from '../MDWatchAPI'
+import { build } from '@reduxjs/toolkit/dist/query/core/buildMiddleware/queryLifecycle';
 
-export default function InitUIState() {
+export default function ApiSlice = createApi({
     //set initial app state by retrieving UI and card data from API
+    reducerPath: 'api',
+    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4998' }),
+    endpoints: builder => ({
+        getUIData: builder.query({
+            query:()=> MDwatchAPI.UIApi()
 
-    const clientConfig = new MDWatchAPI.Configuration()
-    clientConfig.basePath = "http://localhost:4998";
+
+        })
+
+
+
+    })
+    
     const client = new MDWatchAPI.UIApi(clientConfig);
     const [uiResult, setUIResult] = React.useState<MDWatchAPI.CandidateUIDTO[]>([]);
 
