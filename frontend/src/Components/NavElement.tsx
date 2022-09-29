@@ -5,17 +5,18 @@ import ListItemText from '@mui/material/ListItemText';
 import {nanoid } from 'nanoid'
 import { useDispatch } from 'react-redux';
 import { update } from '../Redux/UISelection';
-export default function NavElement(element: INavElement) {
+import {CallerTypes } from '../Enums'
+export default function NavElement(props: INavElement) {
     const dispatch = useDispatch();
 
     const setCandidateId= () => {
-        dispatch(update([element.candidateId,"caller was candidate selector"]))
+        dispatch(update([props.candidateId,CallerTypes.Candidate]))
         
     };
     
     return (
         <ListItemButton key={nanoid()} onClick={setCandidateId} >
-            <ListItemText primary={element.text} />
+            <ListItemText primary={props.text} />
 
         </ListItemButton>
 

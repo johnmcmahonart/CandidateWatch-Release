@@ -8,27 +8,27 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import  Grid2  from '@mui/material/Unstable_Grid2';
 
-function CandidateCard(element: ICandidateCard) {
+function CandidateCard(props: ICandidateCard) {
     return (
         //<ListItemButton onClick="">
         <Grid2 xs={8} sm="auto">
-            <Card sx={{ minWidth: '2%', maxWidth: '100%' }}>
+            <Card sx={{ minWidth: '2%', maxWidth:'100%'}}>
 
                 <CardContent>
                     <Typography sx={{ fontSize: 14 }}>
-                        {element.fullName}
+                        {props.fullName}
                     </Typography>
 
                     <Typography sx={{ fontSize: 14 }}>
-                        {element.district}
+                        {props.district}
                     </Typography>
 
                     <Typography sx={{ fontSize: 14 }}>
-                        {element.party}
+                        {props.party}
                     </Typography>
 
                     <Typography sx={{ fontSize: 14 }}>
-                        {element.electionYear}
+                        {props.electionYear}
                     </Typography>
 
                     <CardActions>

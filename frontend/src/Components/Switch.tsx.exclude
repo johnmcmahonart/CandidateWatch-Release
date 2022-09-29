@@ -1,0 +1,9 @@
+﻿import {ISwitch } from '../Interfaces/Components'
+export default function Switch(props: ISwitch) {
+    props.children.map((children:JSX.Element[]) => {
+        children.find((child) => child.props['value'] ===props.condition))
+    }))
+    return props.children.find(child => {
+        return child.props.value===props.condition
+    })
+}

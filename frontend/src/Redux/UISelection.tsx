@@ -1,10 +1,12 @@
-﻿import { createSlice } from '@reduxjs/toolkit'
+﻿import {CallerTypes } from '../Enums'
+import { createSlice } from '@reduxjs/toolkit'
+import { RootState } from './store';
 
 export const uiSelectionSlice = createSlice({
     name: 'selection',
     initialState: {
         data: "none",
-        callerType:"none"
+        callerType:CallerTypes.CardOverview
     },
     reducers: {
         update: (state, action) => {
@@ -18,8 +20,8 @@ export const uiSelectionSlice = createSlice({
 })
 
 
-export const selectData = (state: { data: string; }) => state.data;
-export const selectCaller = (state: { callerType: string; }) => state.callerType;
+export const selectData = (state:RootState) => state.uiSelection.data;
+export const selectCaller = (state:RootState) => state.uiSelection.callerType;
 export const { update } = uiSelectionSlice.actions
 
 export default uiSelectionSlice.reducer

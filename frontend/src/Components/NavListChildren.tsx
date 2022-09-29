@@ -1,7 +1,7 @@
 ﻿import React, { Component } from 'react';
-import { INavElement } from '../Interfaces/Menu';
 
-//import * as MDWatchAPI from '../MDWatchAPI'
+
+
 import NavElement from './NavElement';
 
 import { useGetApiUiCandidatesbyYearByYearQuery } from '../APIClient/MDWatch';

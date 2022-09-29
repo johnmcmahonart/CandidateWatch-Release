@@ -1,4 +1,8 @@
-﻿export interface ICandidateCard {
+﻿import React from "react";
+import { CandidateUidto } from "../../APIClient/MDWatch";
+
+
+export interface ICandidateCard {
     fullName: string|null|undefined;
     district: string | null |undefined;
     party: string | null | undefined;
@@ -6,4 +10,11 @@
     moreDetail: string | null | undefined;
 
 
+}
+export interface ISwitch {
+    condition: string;
+    children: typeof React.Children;
+}
+export interface ICardLoader {
+    uiData: CandidateUidto;
 }

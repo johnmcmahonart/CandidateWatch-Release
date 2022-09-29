@@ -2,29 +2,68 @@
 import { useSelector } from 'react-redux';
 import logo from './logo.svg';
 import '../App.css';
-import List from '@mui/material/List';
-import InboxIcon from '@mui/icons-material/MoveToInbox'
-import NavElement from './NavElement'
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import Collapse from '@mui/material/Collapse/Collapse';
 import Grid2 from '@mui/material/Unstable_Grid2';
 import { selectData, selectCaller } from '../Redux/UISelection';
-function MainContentContainer({ children }: { children: React.ReactNode | React.ReactNode[] }) {
-    
+import { CallerTypes } from '../Enums';
+import CandidateDetail from './CandidateDetail';
+import type { RootState, AppDispatch } from '../Redux/store'
+import CandidateCardLoader from './CandidateCardLoader';
+import CandidateCardLoaderParent from './CandidateCardLoaderParent';
+import CandidateCardLoaderChild from './CandidateCardLoaderChild';
+
+export default function MainContentContainer() {
     const [open, setOpen] = React.useState(false);
-    const uiSelectionData = useSelector(selectData);
+
     const uiSelectionCaller = useSelector(selectCaller);
-    //console.log(candidateId);
+
     //wrapper for MainContent area, so the children can be swapped out when the user selects a navigation item
     return (
-        
-        <Grid2 container spacing={2}>
-            {uiSelectionCaller}
-            {uiSelectionData }
+        <Grid2 container spacing={1} columns={8}>
+            <Grid2 xs={8} key="gridSwitch">
+
+                {(function () {
+                    switch (uiSelectionCaller) {
+                        case CallerTypes.Candidate:
+                            {
+                                return (
+
+                                    <CandidateDetail key="candidateDetailsCharts" />
+
+                                )
+                                break;
+                            }
+
+                        case CallerTypes.CardOverview:
+                            {
+                                return (
+
+                                    <Grid2 container key="cardLoaderGrid">
+                                        <CandidateCardLoaderParent key="cardLoaderParent">
+
+                                            <Grid2 container>
+                                                <CandidateCardLoaderChild />
+                                            </Grid2>
+
+                                        </CandidateCardLoaderParent>
+                                    </Grid2>
+
+                                )
+
+                                break;
+                            }
+                        default:
+                            {
+                                return (
+                                    <p>Content Loading. Please Wait
+                                    </p>
+                                );
+                                break;
+                            }
+                    }
+                })()}
+
+            </Grid2>
+
         </Grid2>
     );
 }
-
-export default MainContentContainer
