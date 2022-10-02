@@ -1,8 +1,11 @@
-﻿export interface INavElement {
+﻿import {CallerTypes } from '../../Enums'
+export interface INavElement {
     text: string;
     candidateId: string | undefined | null;
 
 }
-export interface ICandidateMinimized {
-
+export interface IUIData {
+    electionYear: number;
+    candidateId?: string;
+    
 }

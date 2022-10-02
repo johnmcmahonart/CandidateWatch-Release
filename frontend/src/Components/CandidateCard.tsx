@@ -10,7 +10,7 @@ import  Grid2  from '@mui/material/Unstable_Grid2';
 
 function CandidateCard(props: ICandidateCard) {
     return (
-        //<ListItemButton onClick="">
+        //overview cards for candidate
         <Grid2 xs={8} sm="auto">
             <Card sx={{ minWidth: '2%', maxWidth:'100%'}}>
 

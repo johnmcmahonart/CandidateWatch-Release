@@ -107,7 +107,7 @@ namespace RESTApi.Repositories
             List<ScheduleBByRecipientID> outList = new();
             foreach (var year in years)
             {
-                outList.AddRange((IEnumerable<ScheduleBByRecipientID>)(from c in recipient where c.Cycle.Equals(years) select c));
+                outList.AddRange((IEnumerable<ScheduleBByRecipientID>)(from c in recipient where c.Cycle.Equals(year) select c));
             }
             
 

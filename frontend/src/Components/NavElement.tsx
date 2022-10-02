@@ -10,7 +10,7 @@ export default function NavElement(props: INavElement) {
     const dispatch = useDispatch();
 
     const setCandidateId= () => {
-        dispatch(update([props.candidateId,CallerTypes.Candidate]))
+        dispatch(update([{ electionYear: 2022,candidateId:props.candidateId },CallerTypes.Candidate]))
         
     };
     

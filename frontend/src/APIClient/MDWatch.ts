@@ -216,6 +216,7 @@ export type ScheduleBDetailDto = {
   cycle?: number;
   recipientId?: string | null;
   recipientName?: string | null;
+  total?: number;
 };
 export type ScheduleBCandidateOverview = {
   totalDisbursements?: number;

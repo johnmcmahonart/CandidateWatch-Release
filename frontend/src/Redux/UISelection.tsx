@@ -1,12 +1,13 @@
 ﻿import {CallerTypes } from '../Enums'
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from './store';
-
+import {IUIData } from '../Interfaces/Menu'
 export const uiSelectionSlice = createSlice({
     name: 'selection',
-    initialState: {
-        data: "none",
-        callerType:CallerTypes.CardOverview
+    initialState:  {
+        data: {electionYear:2022, candidateId:""},
+        callerType:CallerTypes.CardOverview 
+
     },
     reducers: {
         update: (state, action) => {

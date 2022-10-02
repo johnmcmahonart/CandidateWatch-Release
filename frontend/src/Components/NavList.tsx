@@ -9,19 +9,22 @@ import Collapse from '@mui/material/Collapse/Collapse';
 import { CallerTypes } from '../Enums';
 import { update } from '../Redux/UISelection';
 import { useDispatch } from 'react-redux';
+//displays collapsable list of nav items
 export default function NavList({ children }: { children: React.ReactNode | React.ReactNode[] }) {
     const [open, setOpen] = React.useState(false);
 
     const multiEvent = () => {
         setCallerType();
-        handleClick();
+        toggleOpenState();
     }
     const dispatch = useDispatch();
+
+    //when list is opened or closed, set the CallerType to card overview so overview cards are rendered
     const setCallerType = () => {
-        dispatch(update(["", CallerTypes.CardOverview]))
+        dispatch(update([, CallerTypes.CardOverview]))
 
     };
-    const handleClick = () => {
+    const toggleOpenState = () => {
         setOpen(!open);
     };
     return (

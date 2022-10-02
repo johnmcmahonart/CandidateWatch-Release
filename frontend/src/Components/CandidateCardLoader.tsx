@@ -4,8 +4,10 @@ import { ICardLoader } from "../Interfaces/Components";
 import CandidateCard from "./CandidateCard";
 
 
-//loads card detail data for candidate as provided from CandidateCardBuilder. this is needed since endpoint queries need to be chained
+//loads card detail data for candidate as provided from CandidateCardLoaderChild. this is needed since endpoint queries need to be chained
 export default function CandidateCardLoaderInner(props: ICardLoader) {
+
+    //dto allows null and undefined for candidateId which isn't allowed for key value
     let key = ""
     if (props.uiData.candidateId) {
         key = props.uiData.candidateId;

@@ -11,10 +11,13 @@ export interface ICandidateCard {
 
 
 }
-export interface ISwitch {
-    condition: string;
-    children: typeof React.Children;
-}
+
 export interface ICardLoader {
     uiData: CandidateUidto;
+}
+export interface ILineChartData {
+    
+    xAxisLabel: string | null | undefined;
+    dataKey:any;
+
 }

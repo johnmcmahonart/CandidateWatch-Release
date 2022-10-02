@@ -6,10 +6,11 @@ import NavElement from './NavElement';
 
 import { useGetApiUiCandidatesbyYearByYearQuery } from '../APIClient/MDWatch';
 
+//build NavElements from data from ui endpoint
 export default function NavListChildren(): JSX.Element {
     const uiData = useGetApiUiCandidatesbyYearByYearQuery({ year: 2022, wasElected: true });
 
-    //maps INav to react component
+    //return react fragments once data is loaded
     if (uiData.isSuccess) {
         return <>
             {

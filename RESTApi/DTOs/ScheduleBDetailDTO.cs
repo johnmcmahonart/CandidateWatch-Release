@@ -7,6 +7,6 @@
         public int Cycle { get; set; }
         public string RecipientId { get; set; }
         public string RecipientName { get; set; }
-
+        public int Total { get; set; }
     }
 }

@@ -5,18 +5,17 @@ import '../App.css';
 import Grid2 from '@mui/material/Unstable_Grid2';
 import { selectData, selectCaller } from '../Redux/UISelection';
 import { CallerTypes } from '../Enums';
-import CandidateDetail from './CandidateDetail';
+import CandidateDetail from './CandidateDetailCharts';
 import type { RootState, AppDispatch } from '../Redux/store'
 import CandidateCardLoader from './CandidateCardLoader';
 import CandidateCardLoaderParent from './CandidateCardLoaderParent';
 import CandidateCardLoaderChild from './CandidateCardLoaderChild';
-
+//wrapper for MainContent area, so the children can be swapped out when the user selects a navigation item
 export default function MainContentContainer() {
     const [open, setOpen] = React.useState(false);
 
     const uiSelectionCaller = useSelector(selectCaller);
 
-    //wrapper for MainContent area, so the children can be swapped out when the user selects a navigation item
     return (
         <Grid2 container spacing={1} columns={8}>
             <Grid2 xs={8} key="gridSwitch">
