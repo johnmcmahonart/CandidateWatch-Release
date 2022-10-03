@@ -16,7 +16,8 @@ namespace MDWatch
     public class GetScheduleBDisbursementsDetail
     {
         //this class retrieves detailed (aggregate) ScheduleB data, such as amount of disbursements by a committee towards the candidate total number of disbursements, and number of result pages
-        private const string apiKey = "xT2E5C0eUKvhVY74ylbGf4NWXz57XlxTkWV9pOwu";
+        private static string apiKey { get => General.GetFECAPIKey(); }
+        
 
         [FunctionName("GetScheduleBDisbursementsDetail")]
         public async Task Run([TimerTrigger("0 */3 * * * *")] TimerInfo myTimer, ILogger log)

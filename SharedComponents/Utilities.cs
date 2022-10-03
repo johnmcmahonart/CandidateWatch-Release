@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Identity;
+
 namespace MDWatch.Utilities
 {
     public static class General
@@ -36,5 +39,13 @@ namespace MDWatch.Utilities
             
 
         }
+        public static string GetFECAPIKey()
+        {
+            var keyVaultURL = "https://secvaultprimary.vault.azure.net/";
+            var client = new SecretClient(new Uri (keyVaultURL), new DefaultAzureCredential());
+            return client.GetSecret("FECAPISecret").Value.Value;
+        }
+    
+    
     }
 }
