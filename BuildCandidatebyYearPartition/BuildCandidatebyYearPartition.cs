@@ -10,13 +10,14 @@ using MDWatch.Utilities;
 using System.Threading.Tasks;
 using Polly;
 using System.Collections.Concurrent;
-
+using Azure.Identity;
 namespace MDWatch
 {
     public class BuildCandidatebyYearPartition
     {
         //builds partition of candidates grouped by year
-        private const string apiKey = "xT2E5C0eUKvhVY74ylbGf4NWXz57XlxTkWV9pOwu";
+        private static string apiKey { get => General.GetFECAPIKey(); }
+        
         private const string _partitionKey = "CandidatebyYear";
         [FunctionName("BuildCandidatebyYearPartition")]
         

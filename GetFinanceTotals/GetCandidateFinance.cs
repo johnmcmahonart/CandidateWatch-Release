@@ -15,7 +15,8 @@ namespace MDWatch
 {
     public class CandidateFinance
     {
-        private const string apiKey = "xT2E5C0eUKvhVY74ylbGf4NWXz57XlxTkWV9pOwu";
+        private static string apiKey { get => General.GetFECAPIKey(); }
+        
 
         [FunctionName("FinanceTotals")]
         public async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)

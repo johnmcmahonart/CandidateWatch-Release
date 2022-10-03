@@ -17,8 +17,8 @@ namespace MDWatch
     //this is used to generate queue messages to be processed by downstream worker
     //this is necessary because some candidates have hundreds of pages of ScheduleB data that can't be retrieved quickly within API rate limit and non-durable function lifetime
     {
-        private const string apiKey = "xT2E5C0eUKvhVY74ylbGf4NWXz57XlxTkWV9pOwu";
-
+        
+        private static string apiKey { get => General.GetFECAPIKey(); }
         [FunctionName("GetScheduleBDisbursementsOverview")]
         public async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)
         {

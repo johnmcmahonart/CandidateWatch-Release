@@ -6,12 +6,12 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-
 namespace MDWatch
+
 {
     public class GetCandidateData
     {
-        private const string apiKey = "xT2E5C0eUKvhVY74ylbGf4NWXz57XlxTkWV9pOwu";
+        private static string apiKey { get => General.GetFECAPIKey(); }
 
         [FunctionName("GetCandidateData")]
         public static async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)
@@ -27,10 +27,10 @@ namespace MDWatch
 
             foreach (var candidate in mdCandidates.Candidates)
             {
-                                
+
                 TableEntity candidateEntity = candidate.ModelToTableEntity(tableClient, "Candidate", candidate.CandidateId);
-                CandidateStatus candidateStatus = new CandidateStatus(){ CandidateId = candidate.CandidateId };
-                TableEntity candidateStatusEntity = candidateStatus.ModelToTableEntity(tableClient,"CandidateStatus", candidate.CandidateId);
+                CandidateStatus candidateStatus = new CandidateStatus() { CandidateId = candidate.CandidateId };
+                TableEntity candidateStatusEntity = candidateStatus.ModelToTableEntity(tableClient, "CandidateStatus", candidate.CandidateId);
                 try
                 {
                     await tableClient.AddEntityAsync(candidateEntity);
@@ -44,3 +44,4 @@ namespace MDWatch
         }
     }
 }
+
