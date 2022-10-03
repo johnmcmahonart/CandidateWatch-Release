@@ -26,8 +26,9 @@ export default function MainContentContainer() {
                             {
                                 return (
 
+                                    
                                     <CandidateDetail key="candidateDetailsCharts" />
-
+                                
                                 )
                                 break;
                             }
