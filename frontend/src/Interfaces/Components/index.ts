@@ -16,8 +16,7 @@ export interface ICardLoader {
     uiData: CandidateUidto;
 }
 export interface ILineChartData {
-    
-    xAxisLabel: string | null | undefined;
+    label: string;
     dataKey:any;
 
 }
