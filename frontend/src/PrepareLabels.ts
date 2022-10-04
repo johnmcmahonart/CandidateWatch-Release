@@ -1,27 +1,42 @@
 ﻿import { Input } from '@mui/material';
-import { ILineChartData } from './Interfaces/Components';
+import { IChartData } from './Interfaces/Components';
 
 //because label names are to long from the DB we need to format them so they can be displayed
-export default function PrepareLabelsforDisplay(inputData: ILineChartData[], fixLength:boolean=false): ILineChartData[] {
-    const maxLength = 10;
-    const outData: ILineChartData[] = [];
-    //convert label names from all cap to first letter of word capitialized, make label not longer then
-    //10 characters, after char 10 replace with ...
+export default function PrepareLabelsforDisplay(inputData: IChartData[], fixLength:boolean=false, maxLength:number=20): IChartData[] {
+    
+    const outData: IChartData[] = [];
+    //convert label names from all cap to first letter of word capitialized, make label not longer then maxLength
+    
     inputData.forEach(element => {
         
         let lower = element.label.toLowerCase();
         let labelSubString = lower
+        const words: string[] = labelSubString.split(" ");
+        const label: string = words.map((word) => (word.charAt(0).toUpperCase() + word.slice(1))).join(" ")
         if (fixLength) {
-            labelSubString = lower.substring(0, maxLength);
-            if (lower.length > maxLength) {
-                labelSubString += "...";
+            let labelShort = label
+            labelShort = label.substring(0, maxLength);
+            if (label.length > maxLength) {
+                labelShort += "...";
             }
+            outData.push({
+                dataKey: element.dataKey,
+                label: label,
+                labelShort: labelShort,
+                yAxisLabel: element.yAxisLabel,
+                xAxisLabel: element.xAxisLabel
+            });
+            return outData;
         }
         
         
-        const words: string[] = labelSubString.split(" ");
-        let label: string = words.map((word) => (word.charAt(0).toUpperCase() + word.slice(1))).join(" ")
-        outData.push({ dataKey: element.dataKey, label: label });
+        
+        outData.push({
+            dataKey: element.dataKey,
+            label: label,
+            labelShort: label,
+            yAxisLabel: element.yAxisLabel,
+            xAxisLabel: element.xAxisLabel  });
     });
         
         
