@@ -5,7 +5,7 @@ import '../App.css';
 import Grid2 from '@mui/material/Unstable_Grid2';
 import { selectData, selectCaller } from '../Redux/UISelection';
 import { CallerTypes } from '../Enums';
-import CandidateDetail from './CandidateDetailCharts';
+import CandidateDetailCharts from './CandidateDetailCharts';
 import type { RootState, AppDispatch } from '../Redux/store'
 import CandidateCardLoader from './CandidateCardLoader';
 import CandidateCardLoaderParent from './CandidateCardLoaderParent';
@@ -18,7 +18,7 @@ export default function MainContentContainer() {
 
     return (
         <Grid2 container spacing={1} columns={8}>
-            <Grid2 xs={8} key="gridSwitch">
+            <Grid2 xs={8} key="gridSwitch" padding={2 }>
 
                 {(function () {
                     switch (uiSelectionCaller) {
@@ -26,9 +26,9 @@ export default function MainContentContainer() {
                             {
                                 return (
 
-                                    
-                                    <CandidateDetail key="candidateDetailsCharts" />
-                                
+                                    <Grid2 container>
+                                    <CandidateDetailCharts key="candidateDetailsCharts" />
+                                </Grid2>
                                 )
                                 break;
                             }

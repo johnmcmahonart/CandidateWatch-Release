@@ -12,10 +12,10 @@ import { StringNotEmpty } from '../Utilities';
 import PrepareLabelsforDisplay from '../PrepareLabels';
 import Grid2 from '@mui/material/Unstable_Grid2';
 import ChartToolTip from './ChartToolTip';
-export default function Top5PACChart () {
+export default function Top5CandidateDonationChart() {
     const uiSelectionData = useSelector(selectData);
     const scheduleBData = useGetApiScheduleBDetailByKeyYearsQuery({ key: uiSelectionData.candidateId, years: [uiSelectionData.electionYear] });
-    const buildTop5ChartData = (source: any): IChartData[]  => {
+    const buildTop5ChartData = (source: any): IChartData[] => {
         const mappedData: Array<IChartData> = [];
 
         source.data.map((element: ScheduleBDetailDto) => (
@@ -24,12 +24,12 @@ export default function Top5PACChart () {
                 dataKey: element.total,
                 labelShort: StringNotEmpty(element.committeeName),
                 xAxisLabel: "Dollars",
-                yAxisLabel:"PAC Name"
+                yAxisLabel: "PAC Name"
             })
         ))
 
-        const chartData: Array<IChartData> = PrepareLabelsforDisplay(mappedData.orderBy((x => x.dataKey)).reverse().take(5).toArray(), true,10);
-        
+        const chartData: Array<IChartData> = PrepareLabelsforDisplay(mappedData.orderBy((x => x.dataKey)).reverse().take(5).toArray(), true, 10);
+
         return chartData;
     }
     if (scheduleBData.isSuccess) {
@@ -37,12 +37,12 @@ export default function Top5PACChart () {
 
         return (
 
+
             
             
-                
                 <ResponsiveContainer width="100%" height={200}>
-                
-                <BarChart data={chartData} layout="vertical" margin={{
+
+                    <BarChart data={chartData} layout="vertical" margin={{
                         top: 10,
                         right: 30,
                         left: 50,
@@ -58,14 +58,15 @@ export default function Top5PACChart () {
                         <Bar dataKey="dataKey" fill="#444444" />
 
                     </BarChart>
-                
-            </ResponsiveContainer>
-            
-            
 
+                </ResponsiveContainer>
+            
                 
             
                 
+                
+
+            
             
 
 

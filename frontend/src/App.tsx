@@ -10,6 +10,7 @@ import NavListChildren from './Components/NavListChildren'
 import NavList from './Components/NavList';
 import MainContentContainer from './Components/MainContentContainer';
 import { IEnumerable, initializeLinq } from 'linq-to-typescript';
+import AppBar from '@mui/material/AppBar';
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -50,8 +51,11 @@ function App() {
                 </NavList>
 
             </Grid2>
+            
             <Grid2 xs={10} sm={8}>
-
+                <AppBar position="static">
+                    <p style={{ textAlign: 'center' }}>Breadcrumb and filter</p>
+                </AppBar>
                 <MainContentContainer />
 
             </Grid2>
