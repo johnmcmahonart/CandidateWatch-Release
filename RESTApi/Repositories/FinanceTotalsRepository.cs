@@ -115,7 +115,7 @@ namespace RESTApi.Repositories
             List<CandidateHistoryTotal> outList = new();
             foreach (var year in years)
             {
-                outList.AddRange((IEnumerable<CandidateHistoryTotal>)(from c in candidate where c.ElectionYears.Contains(year) select c));
+                outList.AddRange((IEnumerable<CandidateHistoryTotal>)(from c in candidate where c.Cycle.Equals(year) select c));
             }
 
             return outList.AsReadOnly();

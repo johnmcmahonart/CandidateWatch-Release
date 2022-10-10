@@ -21,7 +21,8 @@ namespace RESTApi.Controllers
 
         {
             IEnumerable<CandidateHistoryTotal> modelOut = await _financeTotalsRepository.GetbyKeyAsync(key);
-            return MapperHelper.MapIEnumerable<CandidateHistoryTotal, FinanceTotalsDTO>(modelOut, _mapper);
+            return _mapper.Map<IEnumerable<CandidateHistoryTotal>, IEnumerable<FinanceTotalsDTO>>(modelOut);
+            
         }
 
 
@@ -31,7 +32,8 @@ namespace RESTApi.Controllers
         {
 
             IEnumerable<CandidateHistoryTotal> modelOut =await _financeTotalsRepository.GetbyCandidateandElectionYearsAsync(years, key);
-            return MapperHelper.MapIEnumerable<CandidateHistoryTotal, FinanceTotalsDTO>(modelOut, _mapper);
+            return _mapper.Map<IEnumerable<CandidateHistoryTotal>, IEnumerable<FinanceTotalsDTO>>(modelOut);
+            
         }
         [HttpGet("years")]
         public async Task<IEnumerable<FinanceTotalsDTO>> GetbyElectionYearAsync([FromQuery] List<int> years)
@@ -40,7 +42,8 @@ namespace RESTApi.Controllers
             
             
             IEnumerable<CandidateHistoryTotal> modelOut = await _financeTotalsRepository.GetbyElectionYearsAsync(years);
-            return MapperHelper.MapIEnumerable<CandidateHistoryTotal, FinanceTotalsDTO>(modelOut, _mapper);
+            return _mapper.Map<IEnumerable<CandidateHistoryTotal>, IEnumerable<FinanceTotalsDTO>>(modelOut);
+            
             
         }
 

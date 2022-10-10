@@ -1,0 +1,22 @@
+﻿import React from 'react';
+import { useSelector } from 'react-redux';
+import { useGetApiScheduleBDetailByKeyYearsQuery, ScheduleBDetailDto, useGetApiScheduleBOverviewByKeyQuery, useGetApiUiCandidatesbyYearByYearQuery } from '../APIClient/MDWatch';
+//import { RootState } from '../Redux/store';
+import { selectData } from '../Redux/UISelection';
+import CircularProgress from '@mui/material/CircularProgress';
+import { IChartToolTip, IChartData, ILineChart } from '../Interfaces/Components';
+import { nanoid } from '@reduxjs/toolkit';
+import { from, IEnumerable, initializeLinq } from 'linq-to-typescript';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Text, LabelList, ResponsiveContainer, Tooltip } from 'recharts';
+import { ValidateToken } from '../Utilities';
+import PrepareLabelsforDisplay from '../PrepareLabels';
+import Grid2 from '@mui/material/Unstable_Grid2';
+import ChartToolTip from './ChartToolTip';
+import { selectChildren } from '../Redux/UIContainer';
+
+    
+
+    return (
+        <CircularProgress />
+    )
+}

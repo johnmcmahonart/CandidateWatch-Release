@@ -10,7 +10,7 @@ namespace RESTApi.Controllers
     [ApiController]
     public class ScheduleBOverviewController : ControllerBase
     {
-        private readonly IRepository<ScheduleBCandidateOverview> _scheduleBOverviewRepository;
+        private readonly IScheduleBOverviewRepository<ScheduleBCandidateOverview> _scheduleBOverviewRepository;
         // GET: api/<CandidateController>
         [HttpGet("{key}")]
         public async Task<IEnumerable<ScheduleBCandidateOverview>> GetbyKeyAsync(string key)
@@ -19,9 +19,15 @@ namespace RESTApi.Controllers
             return await _scheduleBOverviewRepository.GetbyKeyAsync(key);
         }
 
+        //https://stackoverflow.com/questions/9508265/how-do-i-accept-an-array-as-an-asp-net-mvc-controller-action-parameter
+        [HttpGet("keys")]
+        public async Task<IEnumerable<IEnumerable<ScheduleBCandidateOverview>>> GetbyKeysAsync([StringArrayBinder]List<string> keys)
 
-        
-        public ScheduleBOverviewController(IRepository<ScheduleBCandidateOverview> scheduleBOverviewRepository)
+        {
+            return await _scheduleBOverviewRepository.GetbyKeysAsync(keys);
+        }
+
+        public ScheduleBOverviewController(IScheduleBOverviewRepository<ScheduleBCandidateOverview> scheduleBOverviewRepository)
         {
             _scheduleBOverviewRepository = scheduleBOverviewRepository;
 

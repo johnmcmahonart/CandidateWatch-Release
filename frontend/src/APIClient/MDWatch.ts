@@ -46,6 +46,24 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({ url: `/api/ScheduleBDetail/${queryArg.key}` }),
     }),
+    getApiScheduleBDetailByYearKeys: build.query<
+      GetApiScheduleBDetailByYearKeysApiResponse,
+      GetApiScheduleBDetailByYearKeysApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/ScheduleBDetail/${queryArg.year}/keys`,
+        params: { keys: queryArg.keys },
+      }),
+    }),
+    getApiScheduleBDetailKeys: build.query<
+      GetApiScheduleBDetailKeysApiResponse,
+      GetApiScheduleBDetailKeysApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/ScheduleBDetail/keys`,
+        params: { keys: queryArg.keys },
+      }),
+    }),
     getApiScheduleBDetailByKeyYears: build.query<
       GetApiScheduleBDetailByKeyYearsApiResponse,
       GetApiScheduleBDetailByKeyYearsApiArg
@@ -69,6 +87,15 @@ const injectedRtkApi = api.injectEndpoints({
       GetApiScheduleBOverviewByKeyApiArg
     >({
       query: (queryArg) => ({ url: `/api/ScheduleBOverview/${queryArg.key}` }),
+    }),
+    getApiScheduleBOverviewKeys: build.query<
+      GetApiScheduleBOverviewKeysApiResponse,
+      GetApiScheduleBOverviewKeysApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/ScheduleBOverview/keys`,
+        params: { keys: queryArg.keys },
+      }),
     }),
     getApiUiCandidatesbyYearByYear: build.query<
       GetApiUiCandidatesbyYearByYearApiResponse,
@@ -120,6 +147,17 @@ export type GetApiScheduleBDetailByKeyApiResponse =
 export type GetApiScheduleBDetailByKeyApiArg = {
   key: string;
 };
+export type GetApiScheduleBDetailByYearKeysApiResponse =
+  /** status 200 Success */ ScheduleBDetailDto[][];
+export type GetApiScheduleBDetailByYearKeysApiArg = {
+  keys?: string[];
+  year: number;
+};
+export type GetApiScheduleBDetailKeysApiResponse =
+  /** status 200 Success */ ScheduleBDetailDto[][];
+export type GetApiScheduleBDetailKeysApiArg = {
+  keys?: string[];
+};
 export type GetApiScheduleBDetailByKeyYearsApiResponse =
   /** status 200 Success */ ScheduleBDetailDto[];
 export type GetApiScheduleBDetailByKeyYearsApiArg = {
@@ -135,6 +173,11 @@ export type GetApiScheduleBOverviewByKeyApiResponse =
   /** status 200 Success */ ScheduleBCandidateOverview[];
 export type GetApiScheduleBOverviewByKeyApiArg = {
   key: string;
+};
+export type GetApiScheduleBOverviewKeysApiResponse =
+  /** status 200 Success */ ScheduleBCandidateOverview[][];
+export type GetApiScheduleBOverviewKeysApiArg = {
+  keys?: string[];
 };
 export type GetApiUiCandidatesbyYearByYearApiResponse =
   /** status 200 Success */ CandidateUidto[];
@@ -239,9 +282,12 @@ export const {
   useGetApiFinanceTotalsByKeyYearsQuery,
   useGetApiFinanceTotalsYearsQuery,
   useGetApiScheduleBDetailByKeyQuery,
+  useGetApiScheduleBDetailByYearKeysQuery,
+  useGetApiScheduleBDetailKeysQuery,
   useGetApiScheduleBDetailByKeyYearsQuery,
   useGetApiScheduleBDetailYearsQuery,
   useGetApiScheduleBOverviewByKeyQuery,
+  useGetApiScheduleBOverviewKeysQuery,
   useGetApiUiCandidatesbyYearByYearQuery,
   useGetApiUiElectionYearsQuery,
 } = injectedRtkApi;

@@ -16,8 +16,8 @@ export interface IChartData {
     label: string;
     labelShort: string;
     dataKey: any;
-    xAxisLabel: string
-    yAxisLabel: string
+    toolTipItemLabel: string
+    toolTipItemValueLabel: string
 }
 export interface ILineChart {
     xAxisLabel: string
@@ -30,4 +30,20 @@ export interface IChartToolTip {
     xAxisValue: string
     yAxisLabelFull: string
     yAxisValue: string
+}
+export interface IChartMargin {
+    top: number,
+    right:number,
+    left: number,
+    bottom: number
+}
+export interface IBarChartProps {
+    chartData: IChartData[]
+    isVertical: boolean
+    margin:IChartMargin
+}
+
+export interface IPieChartProps {
+    chartData: IChartData[]
+    margin: IChartMargin
 }

@@ -15,7 +15,7 @@ builder.Services.AddAutoMapper(typeof(ScheduleBDetailMapperProfile));
 builder.Services.AddSingleton<ICandidateRepository<Candidate>, CandidateRepository>();
 builder.Services.AddSingleton<IFinanceTotalsRepository<CandidateHistoryTotal>, FinanceTotalsRepository>();
 builder.Services.AddSingleton<IScheduleBDetailRepository<ScheduleBByRecipientID>, ScheduleBDetailRepository>();
-builder.Services.AddSingleton<IRepository<ScheduleBCandidateOverview>, ScheduleBOverviewRepository>();
+builder.Services.AddSingleton<IScheduleBOverviewRepository<ScheduleBCandidateOverview>, ScheduleBOverviewRepository>();
 builder.Services.AddSingleton<IUINavRepository, UINavRepository>();
 //cors configuration
 builder.Services.AddCors(options =>
@@ -28,6 +28,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAzureClients(clientBuilder =>

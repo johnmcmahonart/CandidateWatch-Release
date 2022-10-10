@@ -1,10 +1,12 @@
 ﻿import { configureStore } from '@reduxjs/toolkit';
 import { uiSelectionSlice } from './UISelection';
 import { MDWatchAPI } from '../APIClient/MDWatch'
+import { uiContainerSlice } from './UIContainer';
 export const store = configureStore({
     reducer: {
         uiSelection: uiSelectionSlice.reducer,
-        [MDWatchAPI.reducerPath]:MDWatchAPI.reducer
+        uiContainer:uiContainerSlice.reducer,
+        [MDWatchAPI.reducerPath]: MDWatchAPI.reducer
     },
     middleware:getDefaultMiddleware => getDefaultMiddleware().concat(MDWatchAPI.middleware)
 })

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿ using Microsoft.AspNetCore.Mvc;
 using RESTApi.Mapper;
 using RESTApi.DTOs;
 using System.Collections.Generic;
@@ -21,7 +21,8 @@ namespace RESTApi.Controllers
 
         {
             IEnumerable<Candidate> modelOut = await _candidateRepository.GetbyKeyAsync(key);
-            return MapperHelper.MapIEnumerable<Candidate,CandidateDTO>(modelOut, _mapper);
+            return _mapper.Map<IEnumerable<Candidate>, IEnumerable<CandidateDTO>>(modelOut);
+                
             
             
         }
@@ -31,8 +32,9 @@ namespace RESTApi.Controllers
         public async Task<IEnumerable<CandidateDTO>> GetbyElectionYearAsync([FromQuery]List<int> years)
         {
             IEnumerable<Candidate> modelOut = await _candidateRepository.GetbyElectionYearsAsync(years);
-            return MapperHelper.MapIEnumerable<Candidate, CandidateDTO>(modelOut, _mapper);
-            
+            return _mapper.Map<IEnumerable<Candidate>, IEnumerable<CandidateDTO>>(modelOut);
+
+
         }
 
         

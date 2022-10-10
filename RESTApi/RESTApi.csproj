@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Remove="APIResponse.cs" />
     <Compile Remove="IAPIResponse.cs" />
+    <Compile Remove="Mapper\MapperHelper.cs" />
     <Compile Remove="Repositories\CandidateSort.cs" />
     <Compile Remove="Repositories\GetbyElectionYears.cs" />
     <Compile Remove="Repositories\LoadPartitiontoMemory.cs" />
@@ -31,6 +32,7 @@
     <PackageReference Include="Polly" Version="7.2.3" />
     <PackageReference Include="RestSharp" Version="106.12.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 
   <Import Project="..\SharedComponents\SharedComponents.projitems" Label="Shared" />

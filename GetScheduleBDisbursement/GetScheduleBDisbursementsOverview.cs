@@ -44,6 +44,8 @@ namespace MDWatch
                     if (ScheduleBHelper.CommitteeExistsinOverview(tableClient, committeeId))
                     {
                         //create candidateOverview but don't generate detail messages since they already exist
+                        //this can occur when a candidate changed Ids because they switched from senate to house, or vice versa
+                        //in this situation the candidateId is changed, but the committee Id (aka recipientId) is unchanged
 
                         var candidateOverview = await ScheduleBHelper.GenerateScheduleBOverviewAsync(log, tableClient, scheduleBCandidateQueue, scheduleBDisbursement, candidate, committeeId);
                         await scheduleBCandidateQueue.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);

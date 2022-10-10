@@ -12,7 +12,9 @@ export default function PrepareLabelsforDisplay(inputData: IChartData[], fixLeng
         let lower = element.label.toLowerCase();
         let labelSubString = lower
         const words: string[] = labelSubString.split(" ");
+        
         const label: string = words.map((word) => (word.charAt(0).toUpperCase() + word.slice(1))).join(" ")
+        
         if (fixLength) {
             let labelShort = label
             labelShort = label.substring(0, maxLength);
@@ -23,8 +25,8 @@ export default function PrepareLabelsforDisplay(inputData: IChartData[], fixLeng
                 dataKey: element.dataKey,
                 label: label,
                 labelShort: labelShort,
-                yAxisLabel: element.yAxisLabel,
-                xAxisLabel: element.xAxisLabel
+                toolTipItemLabel: element.toolTipItemLabel,
+                toolTipItemValueLabel: element.toolTipItemValueLabel
             });
             return outData;
         }
@@ -35,8 +37,8 @@ export default function PrepareLabelsforDisplay(inputData: IChartData[], fixLeng
             dataKey: element.dataKey,
             label: label,
             labelShort: label,
-            yAxisLabel: element.yAxisLabel,
-            xAxisLabel: element.xAxisLabel  });
+            toolTipItemLabel: element.toolTipItemLabel, 
+            toolTipItemValueLabel: element.toolTipItemValueLabel  });
     });
         
         

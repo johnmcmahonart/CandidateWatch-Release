@@ -5,7 +5,8 @@ import ListItemText from '@mui/material/ListItemText';
 import {nanoid } from 'nanoid'
 import { useDispatch } from 'react-redux';
 import { update } from '../Redux/UISelection';
-import {CallerTypes } from '../Enums'
+
+import { CallerTypes } from '../Enums'
 export default function NavElement(props: INavElement) {
     const dispatch = useDispatch();
 
