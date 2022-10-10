@@ -38,8 +38,8 @@ export default function useTop5CandidateDonationDataBuilder(): IChartData[] | JS
     }
 
     //issue in rtk query where request can be shown as success, but status=pending or not fulfilled
-    //&& financeDataCycleB.status == "fulfilled"
-    if (financeDataCycleA.isSuccess && financeDataCycleB.isSuccess) {
+    //
+    if (financeDataCycleA.isSuccess && financeDataCycleB.isSuccess && financeDataCycleB.status == "fulfilled") {
 
             console.log("cycleB Data=");
             console.log(financeDataCycleB);

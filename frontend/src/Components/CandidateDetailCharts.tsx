@@ -32,6 +32,17 @@ export default function CandidateDetailCharts() {
                     </Item>
 
                 </Grid2>
+                <Grid2 xs={8} sm={4}>
+                    <Item>
+                        <DefaultPieChart chartData={individualVsPACData} margin={{
+                            top: 10,
+                            right: 30,
+                            left: 50,
+                            bottom: 0
+                        }} />
+                    </Item>
+
+                </Grid2>
                 <Grid2 xs={8} sm={6}>
                     <Item>
                         <DefaultBarChart chartData={top5CandidateDonationData} isVertical={false} margin={{
@@ -43,17 +54,7 @@ export default function CandidateDetailCharts() {
                     </Item>
 
                 </Grid2>
-                <Grid2 xs={8} sm={6}>
-                    <Item>
-                        <DefaultPieChart chartData={individualVsPACData} margin={{
-                            top: 10,
-                            right: 30,
-                            left: 50,
-                            bottom: 0
-                        }} />
-                    </Item>
-
-                </Grid2>
+                
             </>
 
         )
