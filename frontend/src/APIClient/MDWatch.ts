@@ -22,6 +22,24 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({ url: `/api/FinanceTotals/${queryArg.key}` }),
     }),
+    getApiFinanceTotalsKeys: build.query<
+      GetApiFinanceTotalsKeysApiResponse,
+      GetApiFinanceTotalsKeysApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/FinanceTotals/keys`,
+        params: { keys: queryArg.keys },
+      }),
+    }),
+    getApiFinanceTotalsByYearKeys: build.query<
+      GetApiFinanceTotalsByYearKeysApiResponse,
+      GetApiFinanceTotalsByYearKeysApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/FinanceTotals/${queryArg.year}/keys`,
+        params: { keys: queryArg.keys },
+      }),
+    }),
     getApiFinanceTotalsByKeyYears: build.query<
       GetApiFinanceTotalsByKeyYearsApiResponse,
       GetApiFinanceTotalsByKeyYearsApiArg
@@ -130,6 +148,17 @@ export type GetApiFinanceTotalsByKeyApiResponse =
   /** status 200 Success */ FinanceTotalsDto[];
 export type GetApiFinanceTotalsByKeyApiArg = {
   key: string;
+};
+export type GetApiFinanceTotalsKeysApiResponse =
+  /** status 200 Success */ FinanceTotalsDto[][];
+export type GetApiFinanceTotalsKeysApiArg = {
+  keys?: string[];
+};
+export type GetApiFinanceTotalsByYearKeysApiResponse =
+  /** status 200 Success */ FinanceTotalsDto[][];
+export type GetApiFinanceTotalsByYearKeysApiArg = {
+  keys?: string[];
+  year: number;
 };
 export type GetApiFinanceTotalsByKeyYearsApiResponse =
   /** status 200 Success */ FinanceTotalsDto[];
@@ -279,6 +308,8 @@ export const {
   useGetApiCandidateByKeyQuery,
   useGetApiCandidateYearsQuery,
   useGetApiFinanceTotalsByKeyQuery,
+  useGetApiFinanceTotalsKeysQuery,
+  useGetApiFinanceTotalsByYearKeysQuery,
   useGetApiFinanceTotalsByKeyYearsQuery,
   useGetApiFinanceTotalsYearsQuery,
   useGetApiScheduleBDetailByKeyQuery,

@@ -15,7 +15,7 @@ export interface ICardLoader {
 export interface IChartData {
     label: string;
     labelShort: string;
-    dataKey: any;
+    dataKey: number;
     toolTipItemLabel: string
     toolTipItemValueLabel: string
 }

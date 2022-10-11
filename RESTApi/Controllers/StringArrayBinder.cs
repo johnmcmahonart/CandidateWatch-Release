@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel;
+using System.Text.Json;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace RESTApi.Controllers
@@ -26,13 +28,17 @@ namespace RESTApi.Controllers
             {
                 List<string> result = value.Split(',').ToList();
                 List<string> resultTrimmed = new();
-                foreach (var candidate in result)
+                //List<T> resultParsed = new();
+                foreach (string element in result)
                 {
-                    resultTrimmed.Add(candidate.Trim('"'));
+                    resultTrimmed.Add(element.Trim('"'));
+                    
                 }
-                //var deserializedJson = JsonSerializer.Deserialize(value, bindingContext.ModelType, new JsonSerializerOptions(JsonSerializerDefaults.Web)
+                
+                
+                
 
-                bindingContext.Result = ModelBindingResult.Success(result);
+                bindingContext.Result = ModelBindingResult.Success(resultTrimmed);
             }
             catch (Exception ex)
             {

@@ -25,16 +25,34 @@ namespace RESTApi.Controllers
             
         }
 
+        [HttpGet("keys")]
+        public async Task<IEnumerable<IEnumerable<FinanceTotalsDTO>>> GetbyKeysAsync([StringArrayBinder] List<string> keys)
+
+        {
+            IEnumerable<IEnumerable<CandidateHistoryTotal>> modelOut = await _financeTotalsRepository.GetbyKeysAsync(keys);
+            return _mapper.Map<IEnumerable<IEnumerable<CandidateHistoryTotal>>, IEnumerable<IEnumerable<FinanceTotalsDTO>>>(modelOut);
+
+        }
+        [HttpGet("{year}/keys")]
+        public async Task<IEnumerable<IEnumerable<FinanceTotalsDTO>>> GetbyKeysandElectionYearAsync([StringArrayBinder] List<string> keys, int year)
+
+        {
+            IEnumerable<IEnumerable<CandidateHistoryTotal>> modelOut = await _financeTotalsRepository.GetbyKeysandElectionYearAsync(keys, year);
+            List<List<ScheduleBDetailDTO>> outlist = new();
+            return _mapper.Map<IEnumerable<IEnumerable<CandidateHistoryTotal>>, IEnumerable<IEnumerable<FinanceTotalsDTO>>>(modelOut);
+
+        }
 
         [HttpGet("{key}/years/")]
-
         public async Task<IEnumerable<FinanceTotalsDTO>> GetbyCandidateandElectionYearsAsync([FromQuery] List<int> years, string key)
         {
-
-            IEnumerable<CandidateHistoryTotal> modelOut =await _financeTotalsRepository.GetbyCandidateandElectionYearsAsync(years, key);
+            IEnumerable<CandidateHistoryTotal> modelOut = await _financeTotalsRepository.GetbyCandidateandElectionYearsAsync(years, key);
             return _mapper.Map<IEnumerable<CandidateHistoryTotal>, IEnumerable<FinanceTotalsDTO>>(modelOut);
-            
+
+
         }
+
+        
         [HttpGet("years")]
         public async Task<IEnumerable<FinanceTotalsDTO>> GetbyElectionYearAsync([FromQuery] List<int> years)
         {

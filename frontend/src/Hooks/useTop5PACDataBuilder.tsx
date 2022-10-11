@@ -6,6 +6,7 @@ import { IChartData } from "../Interfaces/Components";
 import PrepareLabelsforDisplay from "../PrepareLabels";
 import { selectData } from "../Redux/UISelection";
 import { ValidateToken } from "../Utilities";
+import { NumberComparer } from "linq-to-typescript";
 export default function useTop5PACDataBuilder() :IChartData[]|JSX.Element
     {
     const uiSelectionData = useSelector(selectData);
@@ -16,16 +17,16 @@ export default function useTop5PACDataBuilder() :IChartData[]|JSX.Element
         source.data.map((element: ScheduleBDetailDto) => (
             mappedData.push({
                 label: ValidateToken<string>(element.committeeName||""),
-                dataKey: element.total,
+                dataKey: ValidateToken<number>(element.total||0),
                 labelShort: ValidateToken<string>(element.committeeName||""),
                 toolTipItemLabel: "PAC Name",
                 toolTipItemValueLabel: "Dollars"
             })
         ))
 
-        const chartData: Array<IChartData> = PrepareLabelsforDisplay(mappedData.orderBy((x => x.dataKey)).reverse().take(5).toArray(), true, 10);
+        
 
-        return chartData;
+        return PrepareLabelsforDisplay(mappedData.orderBy((x: IChartData) => x.dataKey, NumberComparer).reverse().take(5).toArray(),true, 10);
     }
     if (scheduleBData.isSuccess) {
         return buildTop5ChartData(scheduleBData);

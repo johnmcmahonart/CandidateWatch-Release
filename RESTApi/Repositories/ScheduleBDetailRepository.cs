@@ -68,7 +68,7 @@ namespace RESTApi.Repositories
 
         public async Task<IEnumerable<IEnumerable<ScheduleBByRecipientID>>> GetbyKeysandElectionYearAsync(List<string> keys, int year)
         {
-            //IEnumerable<ScheduleBByRecipientID> recipient = await GetbyKeyAsync(key);
+            
             List<List<ScheduleBByRecipientID>> outList = new();
             foreach (var candidate in keys)
             {
