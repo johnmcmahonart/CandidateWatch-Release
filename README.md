@@ -8,5 +8,5 @@ Infrastructure - Azure (see terraform folder)
   - Azure Functions
   - Azure Keyvault
 
-Backend - .Net core MVC - Controller / Repository pattern
-Frontend - React+Typescript+Redux+Material UI
+Backend - .Net core MVC - Controller / Repository pattern  
+Frontend - React+Typescript+Redux+Material UI  
