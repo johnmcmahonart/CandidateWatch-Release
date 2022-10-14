@@ -55,7 +55,7 @@ resource "azurerm_role_assignment" "tableaccessfunctions" {
 }
 resource "azurerm_role_assignment" "storageaccountfunctions" {
   scope              = data.azurerm_subscription.current.id
-  role_definition_name = "Storage Account Data Contributor"
+  role_definition_name = "Storage Account Contributor"
   principal_id       = azurerm_user_assigned_identity.solution_worker.principal_id
 }
 
@@ -73,7 +73,7 @@ resource "azurerm_role_assignment" "tableaccessapim" {
 
 resource "azurerm_role_assignment" "storageaccountapim" {
   scope              = data.azurerm_subscription.current.id
-  role_definition_name = "Storage Account Data Contributor"
+  role_definition_name = "Storage Account Contributor"
   principal_id       = azurerm_user_assigned_identity.apim_worker.principal_id
 }
 
@@ -130,7 +130,9 @@ resource "azurerm_api_management" "restapi" {
   resource "azurerm_static_site" "frontend" {
   name                = "frontend"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
-  location            = azurerm_resource_group.CandidateWatchRG.location
+  location            = "eastus2"
+sku_tier = "Standard"
+sku_size = "Standard"
   identity {
     type = "UserAssigned"
     identity_ids = ["${azurerm_user_assigned_identity.solution_worker.id}"]
@@ -142,7 +144,7 @@ resource "azurerm_service_plan" "appserviceplan" {
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
   location            = azurerm_resource_group.CandidateWatchRG.location
   os_type             = "Windows"
-  sku_name            = "B1"
+  sku_name            = "Y1"
 }
 
 resource "azurerm_windows_function_app" "functionworkers" {
