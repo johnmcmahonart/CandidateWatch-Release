@@ -3,6 +3,7 @@ using MDWatch.SolutionClients;
 using MDWatch.Utilities;
 using MDWatch.Model;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;

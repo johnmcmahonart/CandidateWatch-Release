@@ -30,6 +30,7 @@ resource "azurerm_storage_account" "SolutionStorageAccount" {
  location = azurerm_resource_group.CandidateWatchRG.location
   account_replication_type = "LRS"
   account_tier = "Standard"
+
 }
 
 ### USER AND ROLE DEFINITIONS
@@ -53,6 +54,13 @@ resource "azurerm_role_assignment" "tableaccessfunctions" {
   role_definition_name = "Storage Table Data Contributor"
   principal_id       = azurerm_user_assigned_identity.solution_worker.principal_id
 }
+
+resource "azurerm_role_assignment" "blobaccessfunctions" {
+  scope              = data.azurerm_subscription.current.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id       = azurerm_user_assigned_identity.solution_worker.principal_id
+}
+
 resource "azurerm_role_assignment" "storageaccountfunctions" {
   scope              = data.azurerm_subscription.current.id
   role_definition_name = "Storage Account Contributor"
@@ -117,6 +125,15 @@ resource "azurerm_app_configuration" "solutionConf" {
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
   location = azurerm_resource_group.CandidateWatchRG.location
 }
+
+resource "azurerm_service_plan" "appserviceplan" {
+  name                = "defaultserviceplan"
+  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+  location            = azurerm_resource_group.CandidateWatchRG.location
+  os_type             = "Windows"
+  sku_name            = "Y1"
+}
+
 resource "azurerm_api_management" "restapi" {
   name                = "${var.solution_prefix}apim"
   location            = azurerm_resource_group.CandidateWatchRG.location
@@ -125,8 +142,22 @@ resource "azurerm_api_management" "restapi" {
   publisher_email     = "john@johnmcmahonart.com"
 
   sku_name = "Consumption_0"
+  identity {
+    type = "UserAssigned"
+    identity_ids = ["${azurerm_user_assigned_identity.apim_worker.id}"]
+  }
   }
 
+/*
+resource "azurerm_windows_web_app" "restapiapp" {
+  name                = "restapiapp"
+  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+  location            = azurerm_resource_group.CandidateWatchRG.location
+  service_plan_id     = azurerm_service_plan.appserviceplan.id
+
+  site_config {}
+}
+*/
   resource "azurerm_static_site" "frontend" {
   name                = "frontend"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
@@ -139,13 +170,6 @@ sku_size = "Standard"
   }
 
 }
-resource "azurerm_service_plan" "appserviceplan" {
-  name                = "defaultserviceplan"
-  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
-  location            = azurerm_resource_group.CandidateWatchRG.location
-  os_type             = "Windows"
-  sku_name            = "Y1"
-}
 
 resource "azurerm_windows_function_app" "functionworkers" {
   for_each = toset(var.functions)
@@ -156,12 +180,25 @@ resource "azurerm_windows_function_app" "functionworkers" {
   storage_account_name       = azurerm_storage_account.SolutionStorageAccount.name
   storage_uses_managed_identity = true
   service_plan_id            = azurerm_service_plan.appserviceplan.id
+functions_extension_version = "~4"
 identity {
     type = "UserAssigned"
     identity_ids = ["${azurerm_user_assigned_identity.solution_worker.id}"]
   }
 
-  site_config {}
+  site_config {
+worker_count = "1"
+app_scale_limit = "1"
+
+
+  }
+
+#https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference?tabs=azurewebjobsstorage#common-properties-for-identity-based-connections
+app_settings = {
+  "AzureWebJobsStorage__credential" = "managedidentity"
+  "AzureWebJobsStorage__clientId" = "${azurerm_user_assigned_identity.solution_worker.id}"
+  
+}
 }
 
 resource "azurerm_public_ip" "frontendip" {
