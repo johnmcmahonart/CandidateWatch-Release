@@ -196,7 +196,7 @@ app_scale_limit = "1"
 #https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference?tabs=azurewebjobsstorage#common-properties-for-identity-based-connections
 app_settings = {
   "AzureWebJobsStorage__credential" = "managedidentity"
-  "AzureWebJobsStorage__clientId" = "${azurerm_user_assigned_identity.solution_worker.id}"
+  "AzureWebJobsStorage__clientId" = "${azurerm_user_assigned_identity.solution_worker.client_id}"
   
 }
 }
