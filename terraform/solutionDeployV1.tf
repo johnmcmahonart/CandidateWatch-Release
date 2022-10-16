@@ -9,15 +9,19 @@ variable "rg_name" {
   
 }
 variable "solution_prefix" {}
-variable "keyvault" {}
+variable "keyvault_name" {}
 variable "fec_access_key"{}
 variable "table_affix" {}
 variable "process_queues" {}
 variable "functions" {}
 variable "state_twoletter" {}
-
+variable "keyvault_id" {}
 data azurerm_client_config "current" { }
 data azurerm_subscription "current" {}
+data "azurerm_key_vault" "keyvault" {
+  name                = "${var.keyvault_name}"
+  resource_group_name = "BatchRendering"
+}
 resource "azurerm_resource_group" "CandidateWatchRG" {
   name     = var.rg_name
   location = "eastus"
@@ -86,7 +90,7 @@ resource "azurerm_role_assignment" "storageaccountapim" {
 }
 
 resource "azurerm_key_vault_access_policy" "candidatewatchaccess" {
-  key_vault_id = "/subscriptions/782918b5-c24a-4ef2-8042-1b90bf912ae3/resourceGroups/BatchRendering/providers/Microsoft.KeyVault/vaults/SecVaultPrimary"
+  key_vault_id = var.keyvault_id
   tenant_id    = "${data.azurerm_client_config.current.tenant_id}"
   object_id    = "${azurerm_user_assigned_identity.solution_worker.principal_id}"
 
@@ -171,6 +175,37 @@ sku_size = "Standard"
 
 }
 
+resource "azurerm_log_analytics_workspace" "solutionlogs" {
+  name                = "cwlogs01"
+  location            = azurerm_resource_group.CandidateWatchRG.location
+  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 45
+}
+
+resource "azurerm_application_insights" "functionappinsights" {
+  name                = "cwfunctioninsights"
+  location            = azurerm_resource_group.CandidateWatchRG.location
+  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+  workspace_id = azurerm_log_analytics_workspace.solutionlogs.id
+  application_type    = "other"
+}
+
+resource "azurerm_key_vault_secret" "applicationInsights_ConnectionString" {
+  name         = "applicationinsightsConnectionString"
+  value        = "${azurerm_application_insights.functionappinsights.connection_string}"
+  key_vault_id = var.keyvault_id
+    
+}
+
+data "azurerm_key_vault_secret" "appinsightcs" {
+  name         = "applicationinsightsConnectionString"
+  key_vault_id = "${data.azurerm_key_vault.keyvault.id}"
+depends_on = [
+  azurerm_key_vault_secret.applicationInsights_ConnectionString
+]
+}
+
 resource "azurerm_windows_function_app" "functionworkers" {
   for_each = toset(var.functions)
   name = each.key
@@ -180,6 +215,7 @@ resource "azurerm_windows_function_app" "functionworkers" {
   storage_account_name       = azurerm_storage_account.SolutionStorageAccount.name
   storage_uses_managed_identity = true
   service_plan_id            = azurerm_service_plan.appserviceplan.id
+  
 functions_extension_version = "~4"
 identity {
     type = "UserAssigned"
@@ -188,7 +224,7 @@ identity {
 
   site_config {
 worker_count = "1"
-app_scale_limit = "1"
+app_scale_limit = "2"
 
 
   }
@@ -197,6 +233,7 @@ app_scale_limit = "1"
 app_settings = {
   "AzureWebJobsStorage__credential" = "managedidentity"
   "AzureWebJobsStorage__clientId" = "${azurerm_user_assigned_identity.solution_worker.client_id}"
+  "APPLICATIONINSIGHTS_CONNECTION_STRING" = "${data.azurerm_key_vault_secret.appinsightcs.value}"
   
 }
 }
@@ -211,3 +248,4 @@ resource "azurerm_public_ip" "frontendip" {
     environment = "Production"
   }
 }
+
