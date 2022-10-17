@@ -1,0 +1,64 @@
+{
+	"confsettings": [
+		{
+			"key": "dev_table_affix",
+			"value": "WatchDEV"
+		},
+		{
+			"key": "production_table_affix",
+			"value": "Table"
+		},
+		{
+			"key": "partition_candidate",
+			"value": "Candidate"
+		},
+		{
+			"key": "partition_candidate_status",
+			"value": "CandidateStatus"
+		},
+		{
+			"key": "partition_committee",
+			"value": "Committee"
+		},
+		{
+			"key": "partition_finance_overview",
+			"value": "FinanceOverview"
+		},
+		{
+			"key": "partition_finance_totals",
+			"value": "FinanceTotals"
+		},
+		{
+			"key": "table_storage_affix_json",
+			"value": "Json"
+		},
+		{
+			"key": "partition_scheduleB_overview",
+			"value": "ScheduleBOverview"
+		},
+		{
+			"key": "partition_scheduleB_detail",
+			"value": "ScheduleBDetail"
+		},
+		{
+			"key": "partition_candidate_by_year",
+			"value": "CandidateByYear"
+		},
+		{
+			"key": "queue_committee",
+			"value": "committeeprocess"
+		},
+		{
+			"key": "queue_finance_totals",
+			"value": "financetotalsprocess"
+		},
+		{
+			"key": "queue_scheduleb_candidate",
+			"value": "schedulebcandidateprocess"
+		},
+		{
+			"key": "scheduleb_page",
+			"value": "schedulebpageprocess"
+		}
+	]
+}

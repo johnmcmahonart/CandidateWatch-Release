@@ -1,0 +1,10 @@
+{
+	"confsettings": [
+		{
+			"dev_table_affix": "WatchDEV"
+		},
+		{
+			"production_table_affix": "Table"
+		}
+	]
+}

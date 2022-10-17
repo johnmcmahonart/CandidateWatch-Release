@@ -22,11 +22,17 @@ data "azurerm_key_vault" "keyvault" {
   name                = "${var.keyvault_name}"
   resource_group_name = "BatchRendering"
 }
+locals{
+appconfigkeys = jsondecode(file("appconfigurationsettingsv1.json"))
+}
+
+#appconfigarray = [for k,v in appconfigkeys: k.key,v.value]
 resource "azurerm_resource_group" "CandidateWatchRG" {
   name     = var.rg_name
   location = "eastus"
 }
 
+output "clientblock" {value = data.azurerm_client_config.current}
 
 resource "azurerm_storage_account" "SolutionStorageAccount" {
   name="st${var.solution_prefix}data01"
@@ -103,6 +109,22 @@ resource "azurerm_key_vault_access_policy" "candidatewatchaccess" {
   ]
 }
 
+#terraform worker service principal id
+resource "azurerm_key_vault_access_policy" "terraformaccess" {
+  key_vault_id = var.keyvault_id
+  tenant_id    = "${data.azurerm_client_config.current.tenant_id}"
+  object_id    = "bcfa59e0-364b-450d-ae1b-a04ee5ae5a89"
+
+  key_permissions = [
+    "Get",
+  ]
+
+  secret_permissions = [
+    "Get",
+  ]
+}
+
+
 ### END SECURITY
 
 #tables for solution
@@ -128,6 +150,28 @@ resource "azurerm_app_configuration" "solutionConf" {
   name = "conf${var.solution_prefix}"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
   location = azurerm_resource_group.CandidateWatchRG.location
+}
+
+/*
+resource "azurerm_role_assignment" "appconf_dataowner" {
+  scope                = azurerm_app_configuration.solutionConf.id
+  role_definition_name = "App Configuration Data Owner"
+  principal_id         = "${data.azurerm_client_config.current.object_id}"
+depends_on = [
+  azurerm_app_configuration.solutionConf
+]
+}
+*/
+#add key/value pairs used internally in app code to configuration store
+
+resource "azurerm_app_configuration_key" "configkeys" {
+  configuration_store_id = azurerm_app_configuration.solutionConf.id
+  for_each = {for kvpair in local.appconfigkeys.confsettings:kvpair.key => kvpair}
+  type = "kv"
+  key                    = each.key
+  label                  = each.key
+  value                  = each.value.value
+
 }
 
 resource "azurerm_service_plan" "appserviceplan" {
@@ -196,13 +240,17 @@ resource "azurerm_key_vault_secret" "applicationInsights_ConnectionString" {
   value        = "${azurerm_application_insights.functionappinsights.connection_string}"
   key_vault_id = var.keyvault_id
     
+depends_on = [
+  azurerm_key_vault_access_policy.terraformaccess
+]
 }
 
 data "azurerm_key_vault_secret" "appinsightcs" {
   name         = "applicationinsightsConnectionString"
   key_vault_id = "${data.azurerm_key_vault.keyvault.id}"
 depends_on = [
-  azurerm_key_vault_secret.applicationInsights_ConnectionString
+  azurerm_key_vault_secret.applicationInsights_ConnectionString,
+azurerm_key_vault_access_policy.terraformaccess
 ]
 }
 
