@@ -23,16 +23,32 @@ data "azurerm_key_vault" "keyvault" {
   resource_group_name = "BatchRendering"
 }
 locals{
-appconfigkeys = jsondecode(file("appconfigurationsettingsv1.json"))
-}
+  appconfigkeys = jsondecode(file("./appconfigurationsettingsv1.json"))    
 
-#appconfigarray = [for k,v in appconfigkeys: k.key,v.value]
+configkeys = {for kvpair in local.appconfigkeys.confsettings:kvpair.key => kvpair}
+confreferences =flatten([for ref, value in local.appconfigkeys: flatten([for data in value:{
+"${data.key}"="@Microsoft.AppConfiguration(Endpoint=${azurerm_app_configuration.solutionConf.endpoint}; Key=${data.key}"
+
+
+}])])
+
+
+functionappsettingsbase = tomap({
+"AzureWebJobsStorage__credential":"managedidentity",
+  "AzureWebJobsStorage__clientId":"${azurerm_user_assigned_identity.solution_worker.client_id}",
+  "APPLICATIONINSIGHTS_CONNECTION_STRING":"${data.azurerm_key_vault_secret.appinsightcs.value}",
+}) 
+#application settings for functions include references to app config settings in app configuration store
+#each function gets this block of settings when built, as well as base settings so the function can connect to application insights using shared user created managed id
+functionappsettingflat = {for setting in local.confreferences: keys(setting)[0] =>values(setting)[0]}
+mergedappsettings = merge(local.functionappsettingsbase,local.functionappsettingflat)
+} 
+
+  
 resource "azurerm_resource_group" "CandidateWatchRG" {
   name     = var.rg_name
   location = "eastus"
 }
-
-output "clientblock" {value = data.azurerm_client_config.current}
 
 resource "azurerm_storage_account" "SolutionStorageAccount" {
   name="st${var.solution_prefix}data01"
@@ -56,6 +72,20 @@ resource "azurerm_user_assigned_identity" "apim_worker" {
   location            = azurerm_resource_group.CandidateWatchRG.location
   name                = "apim_worker"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+}
+
+#access to app configuration store
+resource "azurerm_role_assignment" "appconfigfunctionaccess" {
+  scope              = data.azurerm_subscription.current.id
+  role_definition_name = "App Configuration Data Reader"
+  principal_id       = azurerm_user_assigned_identity.solution_worker.principal_id
+}
+
+
+resource "azurerm_role_assignment" "appconfigapimaccess" {
+  scope              = data.azurerm_subscription.current.id
+  role_definition_name = "App Configuration Data Reader"
+  principal_id       = azurerm_user_assigned_identity.apim_worker.principal_id
 }
 
 #roles necessary for data storage access
@@ -152,16 +182,6 @@ resource "azurerm_app_configuration" "solutionConf" {
   location = azurerm_resource_group.CandidateWatchRG.location
 }
 
-/*
-resource "azurerm_role_assignment" "appconf_dataowner" {
-  scope                = azurerm_app_configuration.solutionConf.id
-  role_definition_name = "App Configuration Data Owner"
-  principal_id         = "${data.azurerm_client_config.current.object_id}"
-depends_on = [
-  azurerm_app_configuration.solutionConf
-]
-}
-*/
 #add key/value pairs used internally in app code to configuration store
 
 resource "azurerm_app_configuration_key" "configkeys" {
@@ -254,9 +274,15 @@ azurerm_key_vault_access_policy.terraformaccess
 ]
 }
 
+
+
 resource "azurerm_windows_function_app" "functionworkers" {
-  for_each = toset(var.functions)
-  name = each.key
+for_each = toset(var.functions)
+#output "test" {value=each.value[0]}
+#for_each = var.functions
+
+
+  name = "${each.key}"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
   location            = azurerm_resource_group.CandidateWatchRG.location
 
@@ -276,15 +302,11 @@ app_scale_limit = "2"
 
 
   }
-
 #https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference?tabs=azurewebjobsstorage#common-properties-for-identity-based-connections
-app_settings = {
-  "AzureWebJobsStorage__credential" = "managedidentity"
-  "AzureWebJobsStorage__clientId" = "${azurerm_user_assigned_identity.solution_worker.client_id}"
-  "APPLICATIONINSIGHTS_CONNECTION_STRING" = "${data.azurerm_key_vault_secret.appinsightcs.value}"
+app_settings = local.mergedappsettings
   
 }
-}
+
 
 resource "azurerm_public_ip" "frontendip" {
   name                = "frontendip"
