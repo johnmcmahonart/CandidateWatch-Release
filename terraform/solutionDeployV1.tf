@@ -27,7 +27,7 @@ locals{
 
 configkeys = {for kvpair in local.appconfigkeys.confsettings:kvpair.key => kvpair}
 confreferences =flatten([for ref, value in local.appconfigkeys: flatten([for data in value:{
-"${data.key}"="@Microsoft.AppConfiguration(Endpoint=${azurerm_app_configuration.solutionConf.endpoint}; Key=${data.key}"
+"${data.key}"="@Microsoft.AppConfiguration(Endpoint=${azurerm_app_configuration.solutionConf.endpoint}; Key=${data.key}; Label=${data.key})"
 
 
 }])])
@@ -37,6 +37,8 @@ functionappsettingsbase = tomap({
 "AzureWebJobsStorage__credential":"managedidentity",
   "AzureWebJobsStorage__clientId":"${azurerm_user_assigned_identity.solution_worker.client_id}",
   "APPLICATIONINSIGHTS_CONNECTION_STRING":"${data.azurerm_key_vault_secret.appinsightcs.value}",
+  "AZURE_CLIENT_ID":"${azurerm_user_assigned_identity.solution_worker.client_id}"
+  "keyVaultReferenceIdentity":"${azurerm_user_assigned_identity.solution_worker.principal_id}"
 }) 
 #application settings for functions include references to app config settings in app configuration store
 #each function gets this block of settings when built, as well as base settings so the function can connect to application insights using shared user created managed id
@@ -115,7 +117,7 @@ resource "azurerm_role_assignment" "queueaccessfunctions" {
 
 resource "azurerm_role_assignment" "tableaccessapim" {
   scope              = data.azurerm_subscription.current.id
-  role_definition_name = "Storage Table Data Reader"
+  role_definition_name = "Storage Table Data Contributor"
   principal_id       = azurerm_user_assigned_identity.apim_worker.principal_id
 }
 
@@ -133,13 +135,10 @@ resource "azurerm_key_vault_access_policy" "candidatewatchaccess" {
   key_permissions = [
     "Get",
   ]
-
-  secret_permissions = [
+secret_permissions = [
     "Get",
   ]
 }
-
-#terraform worker service principal id
 resource "azurerm_key_vault_access_policy" "terraformaccess" {
   key_vault_id = var.keyvault_id
   tenant_id    = "${data.azurerm_client_config.current.tenant_id}"

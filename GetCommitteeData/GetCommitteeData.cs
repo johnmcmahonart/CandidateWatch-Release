@@ -22,6 +22,8 @@ namespace MDWatch
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
+            
+            
             QueueClient queueClient = new QueueClient("UseDevelopmentStorage=true", "committeeprocess");
             TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
             QueueMessage[] candidateIDs = await queueClient.ReceiveMessagesAsync(32);

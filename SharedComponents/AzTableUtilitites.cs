@@ -6,12 +6,31 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Azure.Data.Tables;
+using Azure.Identity;
 using Newtonsoft.Json;
 
 namespace MDWatch.Utilities
 {
     public static class AzTableUtilitites
     {
+        public static TableClient GetTableClient(string state)
+        {
+            if (String.Equals(General.GetBuildEnv(), "Debug"))
+            {
+                TableClient tableClient = new TableClient("UseDevelopmentStorage=true", state + General.GetConfigurationValue("dev_table_affix"));
+                return tableClient;
+                // TableClient tableClient = new TableClient(new Uri("https://stcandidatewatchdata01.table.core.windows.net/" + state + General.GetConfigurationValue("production_table_affix")),
+                //state + General.GetConfigurationValue("production_table_affix"), new DefaultAzureCredential());
+                //return tableClient;
+
+            }
+            else
+            {
+                TableClient tableClient = new TableClient(new Uri("https://stcandidatewatchdata01.table.core.windows.net/" + state + General.GetConfigurationValue("production_table_affix")),
+                    state + General.GetConfigurationValue("production_table_affix"), new DefaultAzureCredential());
+                return tableClient;
+            }
+        }
         public static object AddUTC(this object inputObj)
         {
             var obj = inputObj;

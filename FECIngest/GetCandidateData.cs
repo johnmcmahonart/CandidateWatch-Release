@@ -1,12 +1,15 @@
-using Azure.Data.Tables;
-using MDWatch.SolutionClients;
-using MDWatch.Utilities;
-using MDWatch.Model;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
+using MDWatch.Model;
+using MDWatch.SolutionClients;
+using MDWatch.Utilities;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Extensions.Logging;
+
 namespace MDWatch
 
 {
@@ -15,23 +18,27 @@ namespace MDWatch
         private static string apiKey { get => General.GetFECAPIKey(); }
 
         [FunctionName("GetCandidateData")]
-        public static async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+            ILogger log)
+
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+            string state = req.Query["state"];
 
-            //find all candidates for MD
-            CandidateSearchClient mdCandidates = new CandidateSearchClient(apiKey, "MD");
-            await mdCandidates.SubmitAsync();
-            log.LogInformation("Found {1} candidates.", mdCandidates.Candidates.Count);
+            TableClient tableClient = AzTableUtilitites.GetTableClient(state);
+
+            //find all candidates for state
+            CandidateSearchClient stateCandidates = new CandidateSearchClient(apiKey, state);
+            await stateCandidates.SubmitAsync();
+            log.LogInformation("Found {1} candidates.", stateCandidates.Candidates.Count);
+
             //save candidate data to table storage
-            TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
-
-            foreach (var candidate in mdCandidates.Candidates)
+            foreach (var candidate in stateCandidates.Candidates)
             {
-
-                TableEntity candidateEntity = candidate.ModelToTableEntity(tableClient, "Candidate", candidate.CandidateId);
+                TableEntity candidateEntity = candidate.ModelToTableEntity(tableClient, General.GetConfigurationValue("partition_candidate"), candidate.CandidateId);
                 CandidateStatus candidateStatus = new CandidateStatus() { CandidateId = candidate.CandidateId };
-                TableEntity candidateStatusEntity = candidateStatus.ModelToTableEntity(tableClient, "CandidateStatus", candidate.CandidateId);
+                TableEntity candidateStatusEntity = candidateStatus.ModelToTableEntity(tableClient, General.GetConfigurationValue("partition_candidate_status"), candidate.CandidateId);
                 try
                 {
                     await tableClient.AddEntityAsync(candidateEntity);
@@ -42,7 +49,8 @@ namespace MDWatch
                     log.LogInformation("Problem writing candidate to table:{1}", candidate.Name);
                 }
             }
+
+            return new OkResult();
         }
     }
 }
-

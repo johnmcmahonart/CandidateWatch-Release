@@ -1,0 +1,24 @@
+{
+  "profiles": {
+    "GetCandidateData": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "dev_table_affix": "WatchDEV",
+        "production_table_affix": "Table",
+        "partition_candidate": "Candidate",
+        "partition_candidate_status": "CandidateStatus",
+        "partition_committee": "Committee",
+        "partition_finance_overview": "FinannceOverview",
+        "partition_finance_totals": "FinanceTotals",
+        "table_storage_affix_json": "Json",
+        "partition_scheduleB_overview": "ScheduleBOverview",
+        "partition_scheduleB_detail": "ScheduleBDetail",
+        "partition_candidate_by_year": "CandidateByYear",
+        "queue_committee": "committeeprocess",
+        "queue_finance_totals": "financetotalsprocess",
+       "queue_scheduleb_candidate":"schedulebcandidateprocess",
+       "scheduleb_page": "schedulebpageprocess"
+      }
+    }
+  }
+}

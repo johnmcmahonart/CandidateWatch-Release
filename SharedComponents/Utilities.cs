@@ -3,12 +3,30 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Identity;
+using System.Reflection;
+using Azure.Data.AppConfiguration;
 
 namespace MDWatch.Utilities
 {
     public static class General
 
     {
+        public static string GetConfigurationValue(string keyName)
+        //check if this is debug version, if so return value from local appsettings, otherwise return value from Azure App Configuration service
+        {
+            if (String.Equals(General.GetBuildEnv(), "Debug"))
+                {
+                return (string)General.EnvVars[keyName.ToString()];
+            }
+            else
+            {
+                string endpoint = "https://confcandidatewatch.azconfig.io";
+                var confClient = new ConfigurationClient(new Uri(endpoint), new DefaultAzureCredential());
+                ConfigurationSetting setting = confClient.GetConfigurationSetting(keyName, keyName);
+                return setting.Value.ToString();
+            }
+            
+        }
         public static string GetMemberName<T, TValue>(Expression<Func<T, TValue>> memberAccess)
         //https://stackoverflow.com/questions/7598968/getting-the-name-of-a-property-in-c-sharp
 
@@ -46,6 +64,12 @@ namespace MDWatch.Utilities
             return client.GetSecret("FECAPISecret").Value.Value;
         }
     
-    
+        public static string GetBuildEnv()
+        {
+            var assemblyConfigurationAttribute = typeof(Utilities.General).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
+            return assemblyConfigurationAttribute?.Configuration;
+        }
+        public static System.Collections.IDictionary EnvVars => Environment.GetEnvironmentVariables();
+        
     }
 }
