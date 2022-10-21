@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
+using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 using MDWatch.Model;
 using MDWatch.SolutionClients;
 using MDWatch.Utilities;
@@ -9,7 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-
+using SharedComponents.Models;
+using Polly;
 namespace MDWatch
 
 {
@@ -18,39 +21,53 @@ namespace MDWatch
         private static string apiKey { get => General.GetFECAPIKey(); }
 
         [FunctionName("GetCandidateData")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
-            ILogger log)
+        
+        public static async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)
 
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-            string state = req.Query["state"];
+            
 
-            TableClient tableClient = AzTableUtilitites.GetTableClient(state);
 
-            //find all candidates for state
-            CandidateSearchClient stateCandidates = new CandidateSearchClient(apiKey, state);
-            await stateCandidates.SubmitAsync();
-            log.LogInformation("Found {1} candidates.", stateCandidates.Candidates.Count);
-
-            //save candidate data to table storage
-            foreach (var candidate in stateCandidates.Candidates)
+            QueueClient candidateQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_candidate"].ToString());
+            
+            QueueMessage[] candidatePages = await candidateQueueClient.ReceiveMessagesAsync(32);
+            var totalCandidates = 0;
+            var totalFailures = 0;
+            //process each page from queue to retrieve candidate data, write to table storage, and create candidate status entry
+            foreach (var page in candidatePages)
             {
-                TableEntity candidateEntity = candidate.ModelToTableEntity(tableClient, General.GetConfigurationValue("partition_candidate"), candidate.CandidateId);
-                CandidateStatus candidateStatus = new CandidateStatus() { CandidateId = candidate.CandidateId };
-                TableEntity candidateStatusEntity = candidateStatus.ModelToTableEntity(tableClient, General.GetConfigurationValue("partition_candidate_status"), candidate.CandidateId);
-                try
+                StateCandidatesQueueMessage messageData = AzureUtilities.ParseStateCandidatesQueueMessage(page.Body.ToString());
+                //find all candidates for state
+                CandidateSearchClient stateCandidates = new CandidateSearchClient(apiKey, messageData.State);
+                
+                TableClient tableClient = AzureUtilities.GetTableClient(messageData.State);
+                stateCandidates.SetPage(messageData.Page);
+                await stateCandidates.SubmitAsync();
+                
+                foreach (var candidate in stateCandidates.Candidates)
                 {
-                    await tableClient.AddEntityAsync(candidateEntity);
-                    await tableClient.AddEntityAsync(candidateStatusEntity);
+                    totalCandidates++;
+                    TableEntity candidateEntity = candidate.ModelToTableEntity(tableClient, General.EnvVars["partition_candidate"].ToString(), candidate.CandidateId);
+                    CandidateStatus candidateStatus = new CandidateStatus() { CandidateId = candidate.CandidateId };
+                    TableEntity candidateStatusEntity = candidateStatus.ModelToTableEntity(tableClient, General.EnvVars["partition_candidate_status"].ToString(), candidate.CandidateId);
+                    try
+                    {
+                        await tableClient.AddEntityAsync(candidateEntity);
+                        //await queueClient.SendMessageAsync(AzureUtilities.MakeCandidateQueueMessage(candidate.CandidateId, state));
+                        await tableClient.AddEntityAsync(candidateStatusEntity);
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogInformation("Problem writing candidate to table:{1}", candidate.Name);
+                        totalFailures++;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    log.LogInformation("Problem writing candidate to table:{1}", candidate.Name);
-                }
+
+                log.LogInformation("Processed {1} candidates for {2}, out of {3} possible", totalCandidates-totalFailures, messageData.State, totalCandidates);
             }
 
-            return new OkResult();
+            
         }
     }
 }

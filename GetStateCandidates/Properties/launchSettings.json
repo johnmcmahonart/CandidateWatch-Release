@@ -1,7 +1,9 @@
 {
   "profiles": {
-    "GetCandidateData": {
+    "GetStateCandidates": {
       "commandName": "Project",
+      "commandLineArgs": "--port 7288",
+      "launchBrowser": false,
       "environmentVariables": {
         "dev_table_affix": "WatchDEV",
         "production_table_affix": "Table",
@@ -16,7 +18,7 @@
         "partition_candidate_by_year": "CandidateByYear",
         "queue_committee": "committeeprocess",
         "queue_finance_totals": "financetotalsprocess",
-       "queue_scheduleb_candidate":"schedulebcandidateprocess",
+        "queue_scheduleb_candidate": "schedulebcandidateprocess",
         "queue_scheduleb_page": "schedulebpageprocess",
         "queue_candidate": "candidateprocess"
       }
