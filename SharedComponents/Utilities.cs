@@ -5,12 +5,14 @@ using Azure.Security.KeyVault.Secrets;
 using Azure.Identity;
 using System.Reflection;
 using Azure.Data.AppConfiguration;
+using MDWatch.Model;
 
 namespace MDWatch.Utilities
 {
     public static class General
 
     {
+        
         public static string GetConfigurationValue(string keyName)
         //check if this is debug version, if so return value from local appsettings, otherwise return value from Azure App Configuration service
         {

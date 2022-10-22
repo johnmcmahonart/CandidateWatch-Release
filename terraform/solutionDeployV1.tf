@@ -27,7 +27,7 @@ locals{
 
 configkeys = {for kvpair in local.appconfigkeys.confsettings:kvpair.key => kvpair}
 confreferences =flatten([for ref, value in local.appconfigkeys: flatten([for data in value:{
-"${data.key}"="@Microsoft.AppConfiguration(Endpoint=${azurerm_app_configuration.solutionConf.endpoint}; Key=${data.key}; Label=${data.key})"
+"${data.key}"="${data.value}"
 
 
 }])])
@@ -37,8 +37,10 @@ functionappsettingsbase = tomap({
 "AzureWebJobsStorage__credential":"managedidentity",
   "AzureWebJobsStorage__clientId":"${azurerm_user_assigned_identity.solution_worker.client_id}",
   "APPLICATIONINSIGHTS_CONNECTION_STRING":"${data.azurerm_key_vault_secret.appinsightcs.value}",
-  "AZURE_CLIENT_ID":"${azurerm_user_assigned_identity.solution_worker.client_id}"
-  "keyVaultReferenceIdentity":"${azurerm_user_assigned_identity.solution_worker.principal_id}"
+  "AZURE_CLIENT_ID":"${azurerm_user_assigned_identity.solution_worker.client_id}",
+  "netFrameworkVersion":"6.0",
+  "FUNCTIONS_WORKER_RUNTIME":"dotnet"
+
 }) 
 #application settings for functions include references to app config settings in app configuration store
 #each function gets this block of settings when built, as well as base settings so the function can connect to application insights using shared user created managed id
@@ -75,6 +77,7 @@ resource "azurerm_user_assigned_identity" "apim_worker" {
   name                = "apim_worker"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
 }
+
 
 #access to app configuration store
 resource "azurerm_role_assignment" "appconfigfunctionaccess" {
@@ -176,10 +179,15 @@ resource "azurerm_storage_queue" "committeeprocess" {
 
 #central app settings, used by solution code to reference certain exteral resources such as table and queue names
 resource "azurerm_app_configuration" "solutionConf" {
-  name = "conf${var.solution_prefix}"
+  name = "conffree${var.solution_prefix}"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
   location = azurerm_resource_group.CandidateWatchRG.location
+  #sku = "free"
 }
+
+/*
+due to the design of the app, there are a lot of hits to the configuration store, so it does not make sense from a cost perspective to store commonly used
+config values in the conf store
 
 #add key/value pairs used internally in app code to configuration store
 
@@ -192,7 +200,7 @@ resource "azurerm_app_configuration_key" "configkeys" {
   value                  = each.value.value
 
 }
-
+*/
 resource "azurerm_service_plan" "appserviceplan" {
   name                = "defaultserviceplan"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
@@ -300,7 +308,8 @@ worker_count = "1"
 app_scale_limit = "2"
 
 
-  }
+
+}
 #https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference?tabs=azurewebjobsstorage#common-properties-for-identity-based-connections
 app_settings = local.mergedappsettings
   

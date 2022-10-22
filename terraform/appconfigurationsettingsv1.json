@@ -57,8 +57,12 @@
 			"value": "schedulebcandidateprocess"
 		},
 		{
-			"key": "scheduleb_page",
+			"key": "queue_scheduleb_page",
 			"value": "schedulebpageprocess"
+		},
+		{
+			"key": "queue_candidate",
+			"value": "candidateprocess"
 		}
 	]
 }

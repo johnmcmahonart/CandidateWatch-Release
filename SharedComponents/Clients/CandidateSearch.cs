@@ -7,15 +7,19 @@ using MDWatch.Model;
 
 namespace MDWatch.SolutionClients
 {
+    //some states like CA have so many candidates, we need to write each page to retrieve to a queue so the pages can be retrived aync
+    //function worker timeout can occur if we don't do this
     public class CandidateSearchClient : FECClient
 
     {
         public List<Candidate> Candidates => _candidates;
         private CandidateApi _apiClient;
-
+        private readonly string apiKey;
         private string _state;
+        private int _pageNumber;
         private List<Candidate> _candidates = new List<Candidate>();
-
+        private int _totalCandidatePages;
+        public int TotalPages => _totalCandidatePages;
         private protected override void ConfigureEndPoint()
         {
             _config = new Configuration();
@@ -32,27 +36,23 @@ namespace MDWatch.SolutionClients
             _apiClient = new CandidateApi(_config);
         }
 
+        public void SetPage(int pageNumber)
+        {
+            _pageNumber = pageNumber;
+        }
         public override async Task<bool> SubmitAsync()
         {
+            _candidates = new();
             //get all MD candidates
-            CandidatePage page = await _apiClient.CandidatesSearchGetAsync(apiKey: _apiKey, state: new List<string> { _state });
-
+            
+            CandidatePage page = await SharedComponents.PollyPolicy.GetDefault.ExecuteAsync(() =>_apiClient.CandidatesSearchGetAsync(apiKey: _apiKey, state: new List<string> { _state }, page:_pageNumber));
+            _totalCandidatePages = page.Pagination.Pages;
             foreach (var candidate in page.Results)
             {
                 _candidates.Add(candidate);
             }
-
-            //check if there is more then a single page of results and if so loop through all pages
-            if (page.Pagination.Pages > 1)
-            {
-                var currentPage = page.Pagination.Page;
-                while (page.Pagination.Page <= page.Pagination.Pages)
-                {
-                    currentPage++;
-                    page = await _apiClient.CandidatesSearchGetAsync(apiKey: _apiKey, state: new List<string> { _state }, page: currentPage);
-                    _candidates.AddRange(page.Results);
-                }
-            }
+            
+            
 
             return true;
         }
@@ -60,7 +60,9 @@ namespace MDWatch.SolutionClients
         public CandidateSearchClient(string apiKey, string state)
         {
             _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
+            
             _state = state ?? throw new ArgumentNullException(nameof(state));
+            
             ConfigureEndPoint();
         }
     }
