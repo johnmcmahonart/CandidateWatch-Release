@@ -37,8 +37,10 @@ functionappsettingsbase = tomap({
 "AzureWebJobsStorage__credential":"managedidentity",
   "AzureWebJobsStorage__clientId":"${azurerm_user_assigned_identity.solution_worker.client_id}",
   "APPLICATIONINSIGHTS_CONNECTION_STRING":"${data.azurerm_key_vault_secret.appinsightcs.value}",
-  "AZURE_CLIENT_ID":"${azurerm_user_assigned_identity.solution_worker.client_id}"
-  "keyVaultReferenceIdentity":"${azurerm_user_assigned_identity.solution_worker.principal_id}"
+  "AZURE_CLIENT_ID":"${azurerm_user_assigned_identity.solution_worker.client_id}",
+  "netFrameworkVersion":"6.0",
+  "FUNCTIONS_WORKER_RUNTIME":"dotnet"
+
 }) 
 #application settings for functions include references to app config settings in app configuration store
 #each function gets this block of settings when built, as well as base settings so the function can connect to application insights using shared user created managed id
@@ -75,6 +77,7 @@ resource "azurerm_user_assigned_identity" "apim_worker" {
   name                = "apim_worker"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
 }
+
 
 #access to app configuration store
 resource "azurerm_role_assignment" "appconfigfunctionaccess" {
@@ -305,7 +308,8 @@ worker_count = "1"
 app_scale_limit = "2"
 
 
-  }
+
+}
 #https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference?tabs=azurewebjobsstorage#common-properties-for-identity-based-connections
 app_settings = local.mergedappsettings
   
