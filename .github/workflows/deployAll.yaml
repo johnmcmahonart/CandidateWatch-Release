@@ -1,5 +1,5 @@
 name: Deploy DotNet project to Azure Function App
-
+with: credentials:${{ secrets.FUNCTIONDEPLOYER} }
 on: workflow_dispatch
 
 # CONFIGURATION
@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: "Login via Azure CLI"
-        uses: azure/login@v1
+        uses: azure/actions/login@v1
         with:
           creds: ${{ secrets.FUNCTIONDEPLOYER }}
 
