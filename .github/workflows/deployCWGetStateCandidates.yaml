@@ -1,4 +1,4 @@
-name: Deploy DotNet project to Azure Function App
+name: Deploy CW-GetStatesCandidates
 
 on: workflow_dispatch
 
