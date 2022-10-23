@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValidateScheduleB", "Valida
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RESTApi", "RESTApi\RESTApi.csproj", "{98EECF3C-5E41-41AD-8BF5-0C5CEA6E063F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PurgeAllSolutionTables", "PurgeAllSolutionTables\PurgeAllSolutionTables.csproj", "{55FFD790-9C01-43C1-9B7D-14C500658A19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PurgeAllTablePartitions", "PurgeAllSolutionTables\PurgeAllTablePartitions.csproj", "{55FFD790-9C01-43C1-9B7D-14C500658A19}"
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "frontend", "frontend\", "{15A4948D-AEEB-46A3-8C0C-BD847FDE46E3}"
 	ProjectSection(WebsiteProperties) = preProject
