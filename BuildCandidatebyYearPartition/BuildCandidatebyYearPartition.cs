@@ -11,6 +11,10 @@ using System.Threading.Tasks;
 using Polly;
 using System.Collections.Concurrent;
 using Azure.Identity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+
 namespace MDWatch
 {
     public class BuildCandidatebyYearPartition
@@ -20,12 +24,14 @@ namespace MDWatch
         
         private const string _partitionKey = "CandidatebyYear";
         [FunctionName("BuildCandidatebyYearPartition")]
-        
+
         //this function is used to optimize retrieval of candidates grouped by date for UI and repository
-        public static async Task Run([TimerTrigger("0 */2 * * * *")]TimerInfo myTimer, ILogger log)
+        public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+            ILogger log)
         {
+            string state = req.Query["state"];
             //clear table so data can be regenerated
-            TablePurge.Purge(_partitionKey);
+            TablePurge.Purge(_partitionKey, state);
             List < Candidate > allCandidatesModel = new();
 
             
@@ -51,7 +57,7 @@ namespace MDWatch
             
             
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-        
+            return new OkResult();
         }
     }
 }
