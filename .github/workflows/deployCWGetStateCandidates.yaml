@@ -1,4 +1,4 @@
-name: Deploy CW-GetStatesCandidates
+name: Deploy CW-GetStateCandidates
 
 on: workflow_dispatch
 

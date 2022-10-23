@@ -1,4 +1,4 @@
-name: Deploy CW-GetStateCandidates
+name: Deploy All Azure functions for solution
 
 on: workflow_dispatch
 
