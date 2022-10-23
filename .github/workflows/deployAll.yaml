@@ -1,5 +1,5 @@
 name: Deploy DotNet project to Azure Function App
-with: credentials:${{ secrets.FUNCTIONDEPLOYER} }
+
 on: workflow_dispatch
 
 # CONFIGURATION
