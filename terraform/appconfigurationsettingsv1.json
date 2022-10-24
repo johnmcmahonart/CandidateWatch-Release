@@ -5,6 +5,14 @@
 			"value": "WatchDEV"
 		},
 		{
+			"key": "table_update_log",
+			"value": "UpdateLog"
+		},
+		{
+			"key": "partition_update_log",
+			"value": "log"
+		},
+		{
 			"key": "production_table_affix",
 			"value": "Table"
 		},

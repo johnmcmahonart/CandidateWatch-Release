@@ -60,11 +60,11 @@ namespace MDWatch.Utilities
                 return queueClient;
             }
         }
-        public static TableClient GetTableClient(string state)
+        public static TableClient GetTableClient(string nameBase)
         {
             if (String.Equals(General.GetBuildEnv(), "Debug"))
             {
-                TableClient tableClient = new TableClient("UseDevelopmentStorage=true", state + General.EnvVars["dev_table_affix"].ToString());
+                TableClient tableClient = new TableClient("UseDevelopmentStorage=true", nameBase + General.EnvVars["dev_table_affix"].ToString());
                 return tableClient;
                 // TableClient tableClient = new TableClient(new Uri("https://stcandidatewatchdata01.table.core.windows.net/" + state + General.GetConfigurationValue("production_table_affix")),
                 //state + General.GetConfigurationValue("production_table_affix"), new DefaultAzureCredential());
@@ -72,8 +72,8 @@ namespace MDWatch.Utilities
             }
             else
             {
-                TableClient tableClient = new TableClient(new Uri("https://stcandidatewatchdata01.table.core.windows.net/" + state + General.EnvVars["production_table_affix"].ToString()),
-                    state + General.EnvVars["production_table_affix"].ToString(), new DefaultAzureCredential());
+                TableClient tableClient = new TableClient(new Uri("https://stcandidatewatchdata01.table.core.windows.net/" + nameBase + General.EnvVars["production_table_affix"].ToString()),
+                    nameBase + General.EnvVars["production_table_affix"].ToString(), new DefaultAzureCredential());
                 return tableClient;
             }
         }

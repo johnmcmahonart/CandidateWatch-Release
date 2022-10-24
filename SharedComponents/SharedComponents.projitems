@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Clients\ScheduleBDisbursement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clients\CandidateFinance.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\StateCandidatesQueueMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\StateUpdateLog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TablePurge.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clients\CandidateSearch.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clients\CommitteeSearch.cs" />

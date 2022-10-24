@@ -170,6 +170,17 @@ resource "azurerm_storage_table" "defaulttables" {
   
 }
 
+resource "azurerm_storage_table" "updatelog" {
+  
+
+  
+  name= "UpdateLog${var.table_affix}"
+  
+  storage_account_name = azurerm_storage_account.SolutionStorageAccount.name
+  
+}
+
+
 #queues for data ingestion process
 resource "azurerm_storage_queue" "committeeprocess" {
  for_each = toset(var.process_queues)
