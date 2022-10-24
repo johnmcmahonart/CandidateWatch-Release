@@ -1,6 +1,0 @@
-locals{
-appconfigkeys = jsondecode(file("apptest.json"))
-#confsettings = [for setting in local.appconfigkeys: setting.confsettings]
-}
-
-output "keys" {value=local.appconfigkeys.confsettings}

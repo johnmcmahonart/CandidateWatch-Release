@@ -16,9 +16,11 @@
         "partition_candidate_by_year": "CandidateByYear",
         "queue_committee": "committeeprocess",
         "queue_finance_totals": "financetotalsprocess",
-       "queue_scheduleb_candidate":"schedulebcandidateprocess",
+        "queue_scheduleb_candidate": "schedulebcandidateprocess",
         "queue_scheduleb_page": "schedulebpageprocess",
-        "queue_candidate": "candidateprocess"
+        "queue_candidate": "candidateprocess",
+        "table_update_log": "UpdateLog",
+        "partition_update_log": "log"
       }
     }
   }
