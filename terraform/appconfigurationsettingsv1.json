@@ -53,6 +53,15 @@
 			"value": "CandidateByYear"
 		},
 		{
+			"key": "queue_state_candidate",
+			"value": "statecandidateprocess"
+		},
+		{
+			"key": "queue_update_log",
+			"value": "updateprocess"
+		},
+
+		{
 			"key": "queue_committee",
 			"value": "committeeprocess"
 		},
@@ -71,6 +80,10 @@
 		{
 			"key": "queue_candidate",
 			"value": "candidateprocess"
+		},
+		{
+			"key": "queue_data_load",
+			"value": "dataloadprocess"
 		}
 	]
 }

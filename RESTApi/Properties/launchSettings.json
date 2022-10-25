@@ -4,18 +4,58 @@
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7018;http://localhost:5018"
+      "applicationUrl": "https://localhost:7018;http://localhost:5018",
+      "environmentVariables": {
+        "dev_table_affix": "WatchDEV",
+        "table_update_log": "UpdateLog",
+        "partition_update_log": "log",
+        "production_table_affix": "Table",
+        "partition_candidate": "Candidate",
+        "partition_candidate_status": "CandidateStatus",
+        "partition_committee": "Committee",
+        "partition_finance_overview": "FinanceOverview",
+        "partition_finance_totals": "FinanceTotals",
+        "table_storage_affix_json": "Json",
+        "partition_scheduleB_overview": "ScheduleBOverview",
+        "partition_scheduleB_detail": "ScheduleBDetail",
+        "partition_candidate_by_year": "CandidateByYear",
+        "queue_state_candidate": "statecandidateprocess",
+        "queue_update_log": "updateprocess",
+        "queue_committee": "committeeprocess",
+        "queue_finance_totals": "financetotalsprocess",
+        "queue_scheduleb_candidate": "schedulebcandidateprocess",
+        "queue_scheduleb_page": "schedulebpageprocess",
+        "queue_candidate": "candidateprocess",
+        "queue_data_load": "dataloadprocess"
+      }
     },
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "dev_table_affix": "WatchDEV",
+        "table_update_log": "UpdateLog",
+        "partition_update_log": "log",
+        "production_table_affix": "Table",
+        "partition_candidate": "Candidate",
+        "partition_candidate_status": "CandidateStatus",
+        "partition_committee": "Committee",
+        "partition_finance_overview": "FinanceOverview",
+        "partition_finance_totals": "FinanceTotals",
+        "table_storage_affix_json": "Json",
+        "partition_scheduleB_overview": "ScheduleBOverview",
+        "partition_scheduleB_detail": "ScheduleBDetail",
+        "partition_candidate_by_year": "CandidateByYear",
+        "queue_state_candidate": "statecandidateprocess",
+        "queue_update_log": "updateprocess",
+        "queue_committee": "committeeprocess",
+        "queue_finance_totals": "financetotalsprocess",
+        "queue_scheduleb_candidate": "schedulebcandidateprocess",
+        "queue_scheduleb_page": "schedulebpageprocess",
+        "queue_candidate": "candidateprocess",
+        "queue_data_load": "dataloadprocess"
       }
     }
   },
