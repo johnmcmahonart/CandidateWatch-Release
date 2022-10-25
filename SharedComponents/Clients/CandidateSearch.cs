@@ -14,7 +14,7 @@ namespace MDWatch.SolutionClients
     {
         public List<Candidate> Candidates => _candidates;
         private CandidateApi _apiClient;
-        private readonly string apiKey;
+        
         private string _state;
         private int _pageNumber;
         private List<Candidate> _candidates = new List<Candidate>();

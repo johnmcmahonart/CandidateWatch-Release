@@ -36,4 +36,9 @@
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Clients\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)states.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
