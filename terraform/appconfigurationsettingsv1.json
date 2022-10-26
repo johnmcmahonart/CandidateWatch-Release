@@ -84,6 +84,10 @@
 		{
 			"key": "queue_data_load",
 			"value": "dataloadprocess"
+		},
+		{
+			"key": "queue_ui_build",
+			"value": "uibuildprocess"
 		}
 	]
 }

@@ -13,6 +13,7 @@ using MDWatch.SolutionClients;
 using MDWatch.Utilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using SharedComponents.Models;
 
 namespace MDWatch.ScheduleBDisbursement
 {
@@ -32,6 +33,7 @@ namespace MDWatch.ScheduleBDisbursement
 
         public static async Task<ScheduleBCandidateOverview> GenerateScheduleBOverviewAsync(ILogger log, TableClient tableClient, QueueClient scheduleBCandidateQueue, ScheduleBDisbursementClient scheduleBDisbursement, QueueMessage candidate, string committeeId)
         {
+            CandidateQueueMessage candidateMessage = AzureUtilities.ParseCandidateQueueMessage(candidate.Body.ToString());
             //write overview data to table, for validation worker to use
             //get overview data for candidate by asking for first page of results
             scheduleBDisbursement.SetQuery(new FECQueryParms
@@ -47,18 +49,18 @@ namespace MDWatch.ScheduleBDisbursement
             catch (Exception ex)
             {
                 log.LogInformation(ex.ToString());
-                log.LogInformation("Problem retrieving scheduleB information for candidate:{1}", candidate.Body.ToString());
+                log.LogInformation("Problem retrieving scheduleB information for candidate:{1}", candidateMessage.CandidateId);
             }
-            log.LogInformation("Total result pages for candidate: {1}={2}", candidate.Body.ToString(), scheduleBDisbursement.TotalPages);
-            log.LogInformation("Total disbursements for candidate: {1}={2}", candidate.Body.ToString(), scheduleBDisbursement.TotalDisbursementsforCandidate);
+            log.LogInformation("Total result pages for candidate: {1}={2}", candidateMessage.CandidateId, scheduleBDisbursement.TotalPages);
+            log.LogInformation("Total disbursements for candidate: {1}={2}", candidateMessage.CandidateId, scheduleBDisbursement.TotalDisbursementsforCandidate);
             ScheduleBCandidateOverview scheduleBCandidateOverview = new ScheduleBCandidateOverview
             {
-                CandidateId = candidate.Body.ToString(),
+                CandidateId = candidateMessage.CandidateId,
                 TotalDisbursements = scheduleBDisbursement.TotalDisbursementsforCandidate,
                 TotalResultPages = scheduleBDisbursement.TotalPages,
                 PrincipalCommitteeId = committeeId
             };
-            TableEntity scheduleBOverviewEntity = scheduleBCandidateOverview.ModelToTableEntity(tableClient, "ScheduleBOverview", scheduleBCandidateOverview.CandidateId);
+            TableEntity scheduleBOverviewEntity = scheduleBCandidateOverview.ModelToTableEntity(tableClient, General.EnvVars["partition_scheduleB_overview"].ToString(), scheduleBCandidateOverview.CandidateId);
             try
             {
                 await tableClient.AddEntityAsync(scheduleBOverviewEntity);
@@ -74,21 +76,27 @@ namespace MDWatch.ScheduleBDisbursement
 
         public static async Task GenerateScheduleBDetailMessagesAsync(QueueClient scheduleBCandidateQueue, ScheduleBCandidateOverview scheduleBCandidateOverview, QueueMessage candidate, TableEntity candidateEntity)
         {
-            QueueClient scheduleBPagesQueue = new QueueClient("UseDevelopmentStorage=true", "schedulebpageprocess");
+            CandidateQueueMessage candidateMessage = AzureUtilities.ParseCandidateQueueMessage(candidate.Body.ToString());
+            QueueClient scheduleBPagesQueue = AzureUtilities.GetQueueClient(General.EnvVars["queue_scheduleb_page"].ToString());
+            
             dynamic principalCommittee = JsonConvert.DeserializeObject(candidateEntity.GetString("PrincipalCommitteesJson"));
             string recipientId = principalCommittee[0]["committee_id"];
             for (int i = 1; i <= scheduleBCandidateOverview.TotalResultPages; i++)
             {
-                await scheduleBPagesQueue.SendMessageAsync(candidate.Body.ToString() + "," + recipientId + "," + i);
+                string scheduleBDetailMessage = AzureUtilities.MakeScheduleBQueueMessage(recipientId, candidateMessage.State, i);
+                await scheduleBPagesQueue.SendMessageAsync(scheduleBDetailMessage);
+                
             }
             await scheduleBCandidateQueue.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
         }
 
-        public static async Task MarkProcessedandDequeueAsync(ILogger log, TableClient tableClient, QueueClient scheduleBCandidateQueue, QueueMessage candidate)
+        public static async Task MarkProcessedandDeleteAsync(ILogger log, TableClient tableClient, QueueClient scheduleBCandidateQueue, QueueMessage candidate)
         {
-            TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("CandidateStatus", candidate.Body.ToString());
+            CandidateQueueMessage candidateMessage = AzureUtilities.ParseCandidateQueueMessage(candidate.Body.ToString());
+            //TableEntity entity = AzureUtilities.GetTableClient(candidateMessage.State);
+            TableEntity entity = await tableClient.GetEntityAsync<TableEntity>(General.EnvVars["partition_candidate_status"].ToString(),candidateMessage.CandidateId);
             entity["ScheduleBProcessed"] = true;
-            log.LogInformation("Candidate: {1} No ScheduleB disbursements, will not be processed", candidate.Body.ToString());
+            log.LogInformation("Candidate: {1} No ScheduleB disbursements, will not be processed", candidateMessage.CandidateId);
             await tableClient.UpdateEntityAsync(entity, entity.ETag);
             await scheduleBCandidateQueue.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
         }

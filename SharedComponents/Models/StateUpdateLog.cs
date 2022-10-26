@@ -10,5 +10,7 @@ namespace SharedComponents.Models
         public int FinanceTotalsCount { get; set; }
         public int ScheduleBCount { get; set; }
         public int CommitteesCount { get; set; }
+        public int TotalCandidates { get; set; }
+        
     }
 }

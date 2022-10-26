@@ -49,11 +49,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildCandidatebyYearPartiti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetStateCandidates", "GetStateCandidates\GetStateCandidates.csproj", "{4AADFA7A-5495-46E4-803B-2894F484D3F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionBootStrap", "SolutionBootStrap\SolutionBootStrap.csproj", "{7438767A-3072-49D4-A532-4042D7E91014}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolutionBootStrap", "SolutionBootStrap\SolutionBootStrap.csproj", "{7438767A-3072-49D4-A532-4042D7E91014}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FB6F6979-D4D4-428B-B82C-D03671C61ABA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLoad", "DataLoad\DataLoad.csproj", "{E608C703-B563-4B36-9394-E3F685C4A191}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLoad", "DataLoad\DataLoad.csproj", "{E608C703-B563-4B36-9394-E3F685C4A191}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

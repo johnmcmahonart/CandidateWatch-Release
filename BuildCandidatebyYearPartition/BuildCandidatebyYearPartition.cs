@@ -14,6 +14,8 @@ using Azure.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 
 namespace MDWatch
 {
@@ -22,38 +24,52 @@ namespace MDWatch
         //builds partition of candidates grouped by year
         private static string apiKey { get => General.GetFECAPIKey(); }
         
-        private const string _partitionKey = "CandidatebyYear";
+        
         [FunctionName("BuildCandidatebyYearPartition")]
 
         //this function is used to optimize retrieval of candidates grouped by date for UI and repository
         public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
-            string state = req.Query["state"];
-            //clear table so data can be regenerated
-            TablePurge.Purge(_partitionKey, state);
-            List < Candidate > allCandidatesModel = new();
-
-            
-            TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
-            
-            AsyncPageable<TableEntity> candidates = tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'Candidate'");
-            
-            //convert table entity to model
-            await foreach (var candidate in candidates)
+            QueueClient uiQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_ui_build"].ToString());
+            QueueMessage[] uiMessages = await uiQueueClient.ReceiveMessagesAsync(2);
+            foreach (var state in uiMessages)
             {
-                allCandidatesModel.Add(candidate.TableEntityToModel<Candidate>());
+                //clear table so data can be regenerated
+                TablePurge.Purge(General.EnvVars["partition_candidate_by_year"].ToString(), state.Body.ToString());
+                List<Candidate> allCandidatesModel = new();
+
+                TableClient tableClient = AzureUtilities.GetTableClient(state.Body.ToString());
+                
+
+                AsyncPageable<TableEntity> candidates = tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{General.EnvVars["partition_candidate"].ToString()}'");
+
+                //convert table entity to model
+                await foreach (var candidate in candidates)
+                {
+                    allCandidatesModel.Add(candidate.TableEntityToModel<Candidate>());
+                }
+
+                //sort model
+                IEnumerable<CandidatebyYear> sortedCandidates = CandidateSort.Year((IEnumerable<Candidate>)allCandidatesModel);
+
+                //write to table storage
+
+                try
+                {
+                    foreach (var year in sortedCandidates)
+                    {
+                        await tableClient.AddEntityAsync<TableEntity>(year.ModelToTableEntity(tableClient, General.EnvVars["partition_candidate_by_year"].ToString(), year.Year.ToString()));
+                    }
+                    await uiQueueClient.DeleteMessageAsync(state.MessageId, state.PopReceipt);
+                    log.LogInformation("Generated UI data for {1}", state.Body.ToString());
+                }
+                catch
+                {
+                    log.LogInformation("Problem generating UI data for {1}", state.Body.ToString());
+                }
             }
-
-            //sort model
-             IEnumerable<CandidatebyYear> sortedCandidates = CandidateSort.Year((IEnumerable<Candidate>)allCandidatesModel);
-
-            //write to table storage
-
-            foreach (var year in sortedCandidates)
-            {
-                await tableClient.AddEntityAsync<TableEntity>(year.ModelToTableEntity(tableClient, _partitionKey, year.Year.ToString()));
-            }
+            
             
             
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");

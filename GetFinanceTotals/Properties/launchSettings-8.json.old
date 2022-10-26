@@ -1,8 +1,8 @@
 {
   "profiles": {
-    "DataLoad": {
+    "GetFinanceTotals": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7297",
+      "commandLineArgs": "--port 7298",
       "launchBrowser": false,
       "environmentVariables": {
         "dev_table_affix": "WatchDEV",
@@ -25,8 +25,7 @@
         "queue_scheduleb_candidate": "schedulebcandidateprocess",
         "queue_scheduleb_page": "schedulebpageprocess",
         "queue_candidate": "candidateprocess",
-        "queue_data_load": "dataloadprocess",
-        "queue_ui_build": "uibuildprocess"
+        "queue_data_load": "dataloadprocess"
       }
     }
   }

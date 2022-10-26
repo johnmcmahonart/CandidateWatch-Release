@@ -19,6 +19,7 @@ namespace MDWatch
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
+            string responseMessage = "";
             log.LogInformation("Booting Solution...");
 
             try
@@ -26,20 +27,25 @@ namespace MDWatch
                 string statesPath = "states.json";
                 string statesJson = await new StreamReader(statesPath).ReadToEndAsync();
                 dynamic states = JsonConvert.DeserializeObject(statesJson);
-                QueueClient queueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_state_candidate"].ToString());
+                QueueClient stateQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_state_candidate"].ToString());
+                QueueClient uiQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_ui_build"].ToString());
                 foreach (string state in states)
                 {
-                    await queueClient.SendMessageAsync(state);
+                    await stateQueueClient.SendMessageAsync(state);
+                    await uiQueueClient.SendMessageAsync(state);
                 }
+                log.LogInformation("Application Boot completed Successfully. Please be patient while data is loaded into the solution. Run Ui build via http trigger when all data is loaded into solution.");
+                responseMessage = "Application Boot completed Successfully. Please be patient while data is loaded into the solution. Run Ui build via http trigger when all data is loaded into solution.";
             }
             catch
             {
                 log.LogInformation("APPLICATION BOOT FAILED: VALIDATE DATA STATE BEFORE TRYING AGAIN");
+                responseMessage = "APPLICATION BOOT FAILED: VALIDATE DATA STATE BEFORE TRYING AGAIN";
             }
 
 
-            log.LogInformation("Application Boot completed Successfully. Please be patient while data is loaded into the solution");
-            string responseMessage = "Application Boot completed Successfully. Please be patient while data is loaded into the solution";
+            log.LogInformation("Application Boot completed Successfully. Please be patient while data is loaded into the solution. Run Ui build via http trigger when all data is loaded into solution.");
+            
 
             return new OkObjectResult(responseMessage);
         }

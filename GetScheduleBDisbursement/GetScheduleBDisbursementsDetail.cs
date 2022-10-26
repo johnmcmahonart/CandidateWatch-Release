@@ -10,6 +10,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using SharedComponents.Models;
 
 namespace MDWatch
 {
@@ -22,21 +23,25 @@ namespace MDWatch
         [FunctionName("GetScheduleBDisbursementsDetail")]
         public async Task Run([TimerTrigger("0 */3 * * * *")] TimerInfo myTimer, ILogger log)
         {
-            TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
-            QueueClient scheduleBPageProcess = new QueueClient("UseDevelopmentStorage=true", "schedulebpageprocess");
-            ScheduleBDisbursementClient scheduleBDisbursement = new ScheduleBDisbursementClient(apiKey);
+            
+            QueueClient scheduleBPageProcess = AzureUtilities.GetQueueClient(General.EnvVars["queue_scheduleb_page"].ToString());
             QueueMessage[] scheduleBPages = await scheduleBPageProcess.ReceiveMessagesAsync(32);
+            
+            ScheduleBDisbursementClient scheduleBDisbursement = new ScheduleBDisbursementClient(apiKey);
+            
 
             //get committee page detail, write to storage, remove from queue
             foreach (var page in scheduleBPages)
             {
+                ScheduleBQueueMessage queueMessage = AzureUtilities.ParseScheduleBQueueMessage(page.Body.ToString());
+                TableClient tableClient = AzureUtilities.GetTableClient(queueMessage.State);
                 
-                string[] scheduleBToken = page.Body.ToString().Split(',');
+                
                 
                 scheduleBDisbursement.SetQuery(new FECQueryParms
                 {
-                    CommitteeId = scheduleBToken[1],
-                    PageIndex = Int32.Parse(scheduleBToken[2])
+                    CommitteeId = queueMessage.CommitteeId,
+                    PageIndex = queueMessage.PageIndex
                 });
                 try
                 {
@@ -45,18 +50,18 @@ namespace MDWatch
                     {
 
                         var fixedItem = item.AddUTC();
-                        var scheduleBDetailEntity = fixedItem.ModelToTableEntity(tableClient, "ScheduleBDetail", Guid.NewGuid().ToString());
+                        var scheduleBDetailEntity = fixedItem.ModelToTableEntity(tableClient, General.EnvVars["partition_scheduleB_detail"].ToString(), Guid.NewGuid().ToString());
                         await tableClient.AddEntityAsync(scheduleBDetailEntity);
 
                     }
-                    log.LogInformation("Added page {1} for {2} to storage", scheduleBToken[2], scheduleBToken[1]);
+                    log.LogInformation("Added page {1} for {2} to storage", queueMessage.PageIndex, queueMessage.State);
                     
                     await scheduleBPageProcess.DeleteMessageAsync(page.MessageId, page.PopReceipt);
                 }
                 catch (Exception ex)
                 {
                     log.LogInformation(ex.ToString());
-                    log.LogInformation("Problem retrieving scheduleB details information for committee:{1} on page:{2}", scheduleBToken[1], scheduleBToken[2]);
+                    log.LogInformation("Problem retrieving scheduleB details information for committee:{1} on page:{2}", queueMessage.CommitteeId, queueMessage.PageIndex);
                 }
                 
                 

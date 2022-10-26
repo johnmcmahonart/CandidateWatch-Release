@@ -18,7 +18,8 @@ namespace MDWatch
     public class DataLoad
     {
         [FunctionName("DataLoad")]
-        public static async Task Run([TimerTrigger("0 */2* * * *")] TimerInfo myTimer, ILogger log)
+        
+        public static async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
@@ -34,9 +35,9 @@ namespace MDWatch
                     QueueClient committeeQueue = AzureUtilities.GetQueueClient(General.EnvVars["queue_committee"].ToString());
                     await committeeQueue.SendMessageAsync(candidate.Body.ToString());
                     QueueClient financeQueue = AzureUtilities.GetQueueClient(General.EnvVars["queue_finance_totals"].ToString());
-                    await committeeQueue.SendMessageAsync(candidate.Body.ToString());
+                    await financeQueue.SendMessageAsync(candidate.Body.ToString());
                     QueueClient scheduleBQueue = AzureUtilities.GetQueueClient(General.EnvVars["queue_scheduleb_candidate"].ToString());
-                    await committeeQueue.SendMessageAsync(candidate.Body.ToString());
+                    await scheduleBQueue.SendMessageAsync(candidate.Body.ToString());
                     await dataLoadQueueClient.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
                     log.LogInformation("Data Load for {1} completed",queueMessage.CandidateId);
                 }
