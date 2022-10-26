@@ -14,6 +14,23 @@ namespace MDWatch.Utilities
 {
     public static class AzureUtilities
     {
+        public static string MakeScheduleBQueueMessage(string committeeId, string state,Int32 pageIndex)
+        {
+            return committeeId + "," + state+","+pageIndex.ToString();
+        }
+        public static ScheduleBQueueMessage ParseScheduleBQueueMessage(string queueMessage)
+        {
+            var splitMessage = queueMessage.Split(',');
+            ScheduleBQueueMessage outMessage = new ScheduleBQueueMessage
+            {
+                CommitteeId = splitMessage[0],
+                State = splitMessage[1],
+                PageIndex=Int32.Parse(splitMessage[2])
+                
+            };
+            return outMessage;
+        }
+
         public static string MakeCandidateQueueMessage(string candidateId, string state)
         {
             return candidateId + "," + state;

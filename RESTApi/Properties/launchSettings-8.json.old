@@ -27,8 +27,7 @@
         "queue_scheduleb_candidate": "schedulebcandidateprocess",
         "queue_scheduleb_page": "schedulebpageprocess",
         "queue_candidate": "candidateprocess",
-        "queue_data_load": "dataloadprocess",
-        "queue_ui_build": "uibuildprocess"
+        "queue_data_load": "dataloadprocess"
       }
     },
     "IIS Express": {
@@ -56,8 +55,7 @@
         "queue_scheduleb_candidate": "schedulebcandidateprocess",
         "queue_scheduleb_page": "schedulebpageprocess",
         "queue_candidate": "candidateprocess",
-        "queue_data_load": "dataloadprocess",
-        "queue_ui_build": "uibuildprocess"
+        "queue_data_load": "dataloadprocess"
       }
     }
   },

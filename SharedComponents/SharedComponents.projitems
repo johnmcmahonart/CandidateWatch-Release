@@ -20,6 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\ScheduleBCandidateOverview.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clients\ScheduleBDisbursement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clients\CandidateFinance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ScheduleBQueueMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\StateCandidatesQueueMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\StateUpdateLog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TablePurge.cs" />

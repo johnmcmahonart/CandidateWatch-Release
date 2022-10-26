@@ -22,46 +22,52 @@ namespace MDWatch
         public async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-            QueueClient queueClient = new QueueClient("UseDevelopmentStorage=true", "financetotalsprocess");
-            TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
-            QueueMessage[] candidateIDs = await queueClient.ReceiveMessagesAsync(32);
-            CandidateFinanceClient finance = new CandidateFinanceClient(apiKey);
             //process candidate IDs by looking up candidate ID from queue message using FEC API, write data to table storage
+            QueueClient queueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_finance_totals"].ToString());
+            QueueMessage[] candidateIDs = await queueClient.ReceiveMessagesAsync(32);
+            
+            
 
             
             foreach (var candidate in candidateIDs)
             {
-                finance.SetQuery(new FECQueryParms { CandidateId = candidate.Body.ToString() });
+                CandidateQueueMessage queueMessage = AzureUtilities.ParseCandidateQueueMessage(candidate.Body.ToString());
+                TableClient tableClient = AzureUtilities.GetTableClient(queueMessage.State);
+                
 
-                log.LogInformation("Getting aggregate financial information for candidate: {1}", candidate.Body.ToString());
+                CandidateFinanceClient finance = new CandidateFinanceClient(apiKey);
+                finance.SetQuery(new FECQueryParms { CandidateId = queueMessage.CandidateId });
+
+                log.LogInformation("Getting aggregate financial information for candidate: {1}", queueMessage.CandidateId);
 
                 try
                 {
                     await finance.SubmitAsync();
-                    var cycleTotals = from cycle in finance.Contributions where cycle.CandidateId.Contains(candidate.Body.ToString()) select cycle;
+                    var cycleTotals = from cycle in finance.Contributions where cycle.CandidateId.Contains(queueMessage.CandidateId) select cycle;
                     
-                    var nonIndividualContributions = from c in finance.Contributions where c.CandidateId.Contains(candidate.Body.ToString()) select c.OtherPoliticalCommitteeContributions;
-                    var individualContributions = from c in finance.Contributions where c.CandidateId.Contains(candidate.Body.ToString()) select c.IndividualItemizedContributions;
+                    var nonIndividualContributions = from c in finance.Contributions where c.CandidateId.Contains(queueMessage.CandidateId) select c.OtherPoliticalCommitteeContributions;
+                    var individualContributions = from c in finance.Contributions where c.CandidateId.Contains(queueMessage.CandidateId) select c.IndividualItemizedContributions;
                     CandidateFinanceOverview overview = new()
                     {
-                        CandidateId = candidate.Body.ToString(),
+                        CandidateId = queueMessage.CandidateId,
                         TotalIndividualContributions = (decimal)individualContributions.Sum(),
                         TotalNonIndividualContributions = (decimal)nonIndividualContributions.Sum()
                     };
                     
                     try
                     {
-                        TableEntity overviewEntity = overview.ModelToTableEntity(tableClient, "FinanceOverview", overview.CandidateId);
+                        TableEntity overviewEntity = overview.ModelToTableEntity(tableClient, General.EnvVars["partition_finance_overview"].ToString(), overview.CandidateId);
+                        
                         await tableClient.AddEntityAsync(overviewEntity);
 
                         foreach (var cycle in cycleTotals)
                         {
                          
                  
-                            TableEntity cycleEntity = cycle.ModelToTableEntity(tableClient, "FinanceTotals", Guid.NewGuid().ToString());
+                            TableEntity cycleEntity = cycle.ModelToTableEntity(tableClient, General.EnvVars["partition_finance_totals"].ToString(), Guid.NewGuid().ToString());
                             await tableClient.AddEntityAsync(cycleEntity);
                         }
-                        TableEntity entity = await tableClient.GetEntityAsync<TableEntity>("CandidateStatus", candidate.Body.ToString());
+                        TableEntity entity = await tableClient.GetEntityAsync<TableEntity>(General.EnvVars["partition_candidate_status"].ToString(), queueMessage.CandidateId);
                         entity[Utilities.General.GetMemberName((CandidateStatus c) => c.FinanceTotalProcessed)] = true;
                         await tableClient.UpdateEntityAsync(entity, entity.ETag);
                         await queueClient.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
@@ -69,13 +75,13 @@ namespace MDWatch
                     catch (Exception ex)
                     {
                         log.LogInformation(ex.ToString());
-                        log.LogInformation("problem writing FinanceTotals to table storage for {1}", candidate.Body.ToString());
+                        log.LogInformation("problem writing FinanceTotals to table storage for {1}", queueMessage.CandidateId);
                     }
                 }
                 catch (Exception ex)
                 {
                     log.LogInformation(ex.ToString());
-                    log.LogInformation("problem retrieving aggregate Financial information "); //todo fix this, should reference the specific candidate
+                    log.LogInformation("problem retrieving aggregate Financial information "); //TODO fix this, should reference the specific candidate
                 }
             }
         }

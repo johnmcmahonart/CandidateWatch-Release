@@ -17,7 +17,7 @@ namespace MDWatch
         private static string apiKey { get => General.GetFECAPIKey(); }
 
         [FunctionName("GetStateCandidates")]
-        public static async Task<IActionResult> Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)
+        public static async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
@@ -40,16 +40,25 @@ namespace MDWatch
                     try
                     {
                         await candidateQueueClient.SendMessageAsync(AzureUtilities.MakeStateCandidatesQueueMessage(state, i));
+                        
                     }
                     catch
                     {
-                        log.LogInformation("Problem writing candidate pages to table:Number={1}", i);
+                        log.LogInformation("Problem sending candidate page messages to queue:Number={1}", i);
                     }
+                }
+                try
+                {
+                    await stateQueueClient.DeleteMessageAsync(item.MessageId, item.PopReceipt);
+                }
+                catch
+                {
+                    log.LogInformation("Problem removing  state candidate page from queue:State={1}", item.Body.ToString());
                 }
             }
             
 
-            return new OkResult();
+            
         }
     }
 }

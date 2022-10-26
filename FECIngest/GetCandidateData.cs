@@ -61,7 +61,8 @@ namespace MDWatch
                             totalFailures++;
                         }
                     }
-                    //no errors, remove message from queue
+                    //no errors, remove message from queue, add total to log
+
                     await candidateQueueClient.DeleteMessageAsync(page.MessageId, page.PopReceipt);
                 }
                 catch
