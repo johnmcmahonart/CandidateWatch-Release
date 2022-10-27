@@ -10,6 +10,8 @@ Foreach ($kvPair in $configurationObject.confsettings){
 $environmentVars.Add($kvPair.key,$kvPair.value)
 }
 
+#need to tell rest api to run in development mode when running locally
+$environmentVars.Add("ASPNETCORE_ENVIRONMENT","Development")
 $launchSettings|foreach{
     
 $launchSettingsObj =  Get-Content $_|ConvertFrom-Json -Depth 9
