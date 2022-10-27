@@ -142,17 +142,26 @@ secret_permissions = [
     "Get",
   ]
 }
+
 resource "azurerm_key_vault_access_policy" "terraformaccess" {
   key_vault_id = var.keyvault_id
   tenant_id    = "${data.azurerm_client_config.current.tenant_id}"
-  object_id    = "bcfa59e0-364b-450d-ae1b-a04ee5ae5a89"
-
+  object_id    = "8f637ebd-d24d-43b6-9b63-2f5a8bbb9d21"
+  #application_id = "bcfa59e0-364b-450d-ae1b-a04ee5ae5a89"
   key_permissions = [
     "Get",
+    "Create",
+    "Delete",
+    "Update",
+    "List"
   ]
 
   secret_permissions = [
     "Get",
+    "Set",
+    "Delete",
+    "List"
+    
   ]
 }
 
@@ -278,17 +287,16 @@ resource "azurerm_key_vault_secret" "applicationInsights_ConnectionString" {
   value        = "${azurerm_application_insights.functionappinsights.connection_string}"
   key_vault_id = var.keyvault_id
     
-depends_on = [
-  azurerm_key_vault_access_policy.terraformaccess
-]
+
 }
 
 data "azurerm_key_vault_secret" "appinsightcs" {
   name         = "applicationinsightsConnectionString"
   key_vault_id = "${data.azurerm_key_vault.keyvault.id}"
+
 depends_on = [
   azurerm_key_vault_secret.applicationInsights_ConnectionString,
-azurerm_key_vault_access_policy.terraformaccess
+
 ]
 }
 
