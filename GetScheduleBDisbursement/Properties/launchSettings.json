@@ -26,7 +26,8 @@
         "queue_scheduleb_page": "schedulebpageprocess",
         "queue_candidate": "candidateprocess",
         "queue_data_load": "dataloadprocess",
-        "queue_ui_build": "uibuildprocess"
+        "queue_ui_build": "uibuildprocess",
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }

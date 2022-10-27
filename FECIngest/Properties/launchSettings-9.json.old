@@ -1,9 +1,7 @@
 {
   "profiles": {
-    "SendUpdates": {
+    "GetCandidateData": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7100",
-      "launchBrowser": false,
       "environmentVariables": {
         "dev_table_affix": "WatchDEV",
         "table_update_log": "UpdateLog",
@@ -26,8 +24,7 @@
         "queue_scheduleb_page": "schedulebpageprocess",
         "queue_candidate": "candidateprocess",
         "queue_data_load": "dataloadprocess",
-        "queue_ui_build": "uibuildprocess",
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "queue_ui_build": "uibuildprocess"
       }
     }
   }
