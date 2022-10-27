@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Azure.Storage.Queues;
@@ -37,15 +38,12 @@ namespace MDWatch
                 log.LogInformation("Application Boot completed Successfully. Please be patient while data is loaded into the solution. Run Ui build via http trigger when all data is loaded into solution.");
                 responseMessage = "Application Boot completed Successfully. Please be patient while data is loaded into the solution. Run Ui build via http trigger when all data is loaded into solution.";
             }
-            catch
+            catch (Exception ex)
             {
+                log.LogInformation(ex.ToString());
                 log.LogInformation("APPLICATION BOOT FAILED: VALIDATE DATA STATE BEFORE TRYING AGAIN");
                 responseMessage = "APPLICATION BOOT FAILED: VALIDATE DATA STATE BEFORE TRYING AGAIN";
             }
-
-
-            log.LogInformation("Application Boot completed Successfully. Please be patient while data is loaded into the solution. Run Ui build via http trigger when all data is loaded into solution.");
-            
 
             return new OkObjectResult(responseMessage);
         }
