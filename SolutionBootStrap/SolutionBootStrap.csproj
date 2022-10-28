@@ -2,6 +2,9 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
+	  <_FunctionsSkipCleanOutput>
+		  true
+		  </_FunctionsSkipCleanOutput>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="states.json" />
