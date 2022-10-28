@@ -61,7 +61,7 @@ namespace RESTApi.Controllers
     }
 
     [HttpGet("years")]
-    public async Task<IEnumerable<ScheduleBDetailDTO>> GetbyElectionYearAsync([FromQuery] List<int> years)
+    public async Task<IEnumerable<ScheduleBDetailDTO>> GetbyElectionYearAsync([FromQuery] string years)
     {
             List<int> yearsResult = years.Split(',').Select(int.Parse).ToList();
             IEnumerable<ScheduleBByRecipientID> modelOut = await _scheduleBDetailRepository.GetbyElectionYearsAsync(yearsResult);
