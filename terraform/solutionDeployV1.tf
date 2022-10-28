@@ -14,7 +14,7 @@ variable "fec_access_key"{}
 variable "table_affix" {}
 variable "process_queues" {}
 variable "functions" {}
-variable "state_twoletter" {}
+#variable "state_twoletter" {}
 variable "keyvault_id" {}
 data azurerm_client_config "current" { }
 data azurerm_subscription "current" {}
@@ -24,7 +24,7 @@ data "azurerm_key_vault" "keyvault" {
 }
 locals{
   appconfigkeys = jsondecode(file("./appconfigurationsettingsv1.json"))    
-
+state_twoletter = jsondecode(file("./states.json"))    
 configkeys = {for kvpair in local.appconfigkeys.confsettings:kvpair.key => kvpair}
 confreferences =flatten([for ref, value in local.appconfigkeys: flatten([for data in value:{
 "${data.key}"="${data.value}"
@@ -143,6 +143,7 @@ secret_permissions = [
   ]
 }
 
+/*
 resource "azurerm_key_vault_access_policy" "terraformaccess" {
   key_vault_id = var.keyvault_id
   tenant_id    = "${data.azurerm_client_config.current.tenant_id}"
@@ -164,13 +165,13 @@ resource "azurerm_key_vault_access_policy" "terraformaccess" {
     
   ]
 }
-
+*/
 
 ### END SECURITY
 
 #tables for solution
 resource "azurerm_storage_table" "defaulttables" {
-  for_each=toset(var.state_twoletter)
+  for_each=toset(local.state_twoletter)
 
   
   name= "${each.key}${var.table_affix}"
@@ -187,6 +188,28 @@ resource "azurerm_storage_table" "updatelog" {
   
   storage_account_name = azurerm_storage_account.SolutionStorageAccount.name
   
+}
+
+resource "azurerm_storage_table" "solutionconfigurationtable" {
+  
+
+  
+  name= "SolutionConfiguration${var.table_affix}"
+  
+  storage_account_name = azurerm_storage_account.SolutionStorageAccount.name
+  
+}
+
+resource "azurerm_storage_table_entity" "statesentity" {
+  storage_account_name = azurerm_storage_account.SolutionStorageAccount.name
+  table_name           = "${azurerm_storage_table.solutionconfigurationtable.name}"
+
+  partition_key = "Config"
+  row_key       = "states"
+
+  entity = {
+    allStatesJson = file("./states.json")
+  }
 }
 
 
@@ -286,7 +309,9 @@ resource "azurerm_key_vault_secret" "applicationInsights_ConnectionString" {
   name         = "applicationinsightsConnectionString"
   value        = "${azurerm_application_insights.functionappinsights.connection_string}"
   key_vault_id = var.keyvault_id
-    
+depends_on = [
+  azurerm_application_insights.functionappinsights
+] 
 
 }
 

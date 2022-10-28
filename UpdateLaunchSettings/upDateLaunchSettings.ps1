@@ -20,26 +20,17 @@ $launchSettingsObj.profiles[0].PSObject.Properties.Value.environmentVariables|Ad
       
  
 
-#check if there is an existing file from a previous run, if so append 1 to the number of the old file
+#check if there is an existing file from a previous run, if so remove previous file and rename
 
-$filesInDir = Get-ChildItem $_.DirectoryName
-$newestFile=$filesInDir|Where-Object{$_.BaseName -like '*launchSettings-*'}|Select-Object *|Sort-Object CreationTime -Bottom 1
-try{
-    if ($newestFile.BaseName.Split('-').Count -gt 0){
-        $fileArray=$newestFile.BaseName.Split('-')
-        $fileNumber=$fileArray[1].Split('.')
-        $fileCount=[int]$fileNumber[0]+1
-    }
-    else{
-        $fileCount=0
-    }
+#$filesInDir = Get-ChildItem $_.DirectoryName
+$fullPath = $_.DirectoryName+"\launchSettings.json.old"
+if (Test-Path -Path $fullPath -PathType Leaf){
+    Remove-Item $fullPath -Force
 }
-catch{
-    $fileCount=0
-}
-#rename current file by appending -<number>.old and save the updated file
 
-$backupName = $_.BaseName+"-"+$fileCount+".json.old"
+#rename current file and save the updated file
+
+$backupName = "launchSettings.json.old"
 try{
     Rename-Item $_ -NewName $backupName -force
     $launchSettingsObj|ConvertTo-Json -depth 9|Out-File $_ -force -NoClobber

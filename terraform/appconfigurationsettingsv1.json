@@ -9,8 +9,16 @@
 			"value": "UpdateLog"
 		},
 		{
+			"key": "table_solution_config",
+			"value": "SolutionConfiguration"
+		},
+		{
 			"key": "partition_update_log",
 			"value": "log"
+		},
+		{
+			"key": "partition_solution_config",
+			"value": "Config"
 		},
 		{
 			"key": "production_table_affix",

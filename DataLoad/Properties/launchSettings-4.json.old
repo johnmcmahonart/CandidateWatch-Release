@@ -1,15 +1,13 @@
 {
   "profiles": {
-    "GetCommitteeData": {
+    "DataLoad": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7195",
+      "commandLineArgs": "--port 7297",
       "launchBrowser": false,
       "environmentVariables": {
         "dev_table_affix": "WatchDEV",
         "table_update_log": "UpdateLog",
-        "table_solution_config": "SolutionConfiguration",
         "partition_update_log": "log",
-        "partition_solution_config": "Config",
         "production_table_affix": "Table",
         "partition_candidate": "Candidate",
         "partition_candidate_status": "CandidateStatus",

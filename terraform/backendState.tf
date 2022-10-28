@@ -18,6 +18,7 @@ provider "azurerm" {
   features {
     key_vault {
       recover_soft_deleted_secrets=false
+      purge_soft_deleted_secrets_on_destroy=true
     }
   }
     
