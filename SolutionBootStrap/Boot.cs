@@ -25,7 +25,7 @@ namespace MDWatch
 
             try
             {
-                string statesPath = "states.json";
+                string statesPath = "./states.json";
                 string statesJson = await new StreamReader(statesPath).ReadToEndAsync();
                 dynamic states = JsonConvert.DeserializeObject(statesJson);
                 QueueClient stateQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_state_candidate"].ToString());
