@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using MDWatch.Utilities;
 using Microsoft.AspNetCore.Http;
@@ -25,9 +26,9 @@ namespace MDWatch
 
             try
             {
-                string statesPath = "./states.json";
-                string statesJson = await new StreamReader(statesPath).ReadToEndAsync();
-                dynamic states = JsonConvert.DeserializeObject(statesJson);
+                TableClient solutionConfigTableClient = AzureUtilities.GetTableClient(General.EnvVars["table_solution_config"].ToString());
+                TableEntity statesEntity = await solutionConfigTableClient.GetEntityAsync<TableEntity>(General.EnvVars["partition_solution_config"].ToString(), "states");
+                dynamic states = JsonConvert.DeserializeObject(statesEntity["allStatesJson"].ToString());
                 QueueClient stateQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_state_candidate"].ToString());
                 QueueClient uiQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_ui_build"].ToString());
                 foreach (string state in states)
