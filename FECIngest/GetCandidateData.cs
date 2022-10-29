@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
@@ -23,7 +24,9 @@ namespace MDWatch
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
+            
             QueueClient dataLoadQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_data_load"].ToString());
+            
             QueueClient candidateQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_candidate"].ToString());
 
             QueueMessage[] candidatePages = await candidateQueueClient.ReceiveMessagesAsync(32);
@@ -51,7 +54,13 @@ namespace MDWatch
                         try
                         {
                             await tableClient.AddEntityAsync(candidateEntity);
-                            await dataLoadQueueClient.SendMessageAsync(AzureUtilities.MakeCandidateQueueMessage(candidate.CandidateId, candidate.State));
+
+                            //sending to dataload queue, which is queue trigger, which uses base64 encoding
+                            //https://stackoverflow.com/questions/71439701/error-message-has-reached-maxdequeuecount-of-5-moving-message-to-queue-webjo
+                            var bytes = Encoding.UTF8.GetBytes(AzureUtilities.MakeCandidateQueueMessage(candidate.CandidateId, candidate.State));
+                            
+                            await dataLoadQueueClient.SendMessageAsync(Convert.ToBase64String(bytes));
+                            
 
                             await tableClient.AddEntityAsync(candidateStatusEntity);
                         }
