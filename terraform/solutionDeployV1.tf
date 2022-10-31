@@ -106,6 +106,13 @@ resource "azurerm_role_assignment" "blobaccessfunctions" {
   principal_id       = azurerm_user_assigned_identity.solution_worker.principal_id
 }
 
+resource "azurerm_role_assignment" "blobaccessapim" {
+  scope              = data.azurerm_subscription.current.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id       = azurerm_user_assigned_identity.apim_worker.principal_id
+}
+
+
 resource "azurerm_role_assignment" "storageaccountfunctions" {
   scope              = data.azurerm_subscription.current.id
   role_definition_name = "Storage Account Contributor"
@@ -143,29 +150,6 @@ secret_permissions = [
   ]
 }
 
-/*
-resource "azurerm_key_vault_access_policy" "terraformaccess" {
-  key_vault_id = var.keyvault_id
-  tenant_id    = "${data.azurerm_client_config.current.tenant_id}"
-  object_id    = "8f637ebd-d24d-43b6-9b63-2f5a8bbb9d21"
-  #application_id = "bcfa59e0-364b-450d-ae1b-a04ee5ae5a89"
-  key_permissions = [
-    "Get",
-    "Create",
-    "Delete",
-    "Update",
-    "List"
-  ]
-
-  secret_permissions = [
-    "Get",
-    "Set",
-    "Delete",
-    "List"
-    
-  ]
-}
-*/
 
 ### END SECURITY
 
@@ -244,6 +228,8 @@ resource "azurerm_app_configuration_key" "configkeys" {
 
 }
 */
+
+
 resource "azurerm_service_plan" "appserviceplan" {
   name                = "defaultserviceplan"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
@@ -252,6 +238,32 @@ resource "azurerm_service_plan" "appserviceplan" {
   sku_name            = "Y1"
 }
 
+### DEFINE API INFRASTRUCTURE
+resource "azurerm_service_plan" "backendserviceplan" {
+  name                = "backendserviceplan"
+  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+  location            = azurerm_resource_group.CandidateWatchRG.location
+  os_type             = "Windows"
+  sku_name            = "B1"
+}
+
+resource azurerm_storage_container "restbackend"{
+  name = "restbackend"
+  storage_account_name = azurerm_storage_account.SolutionStorageAccount.name
+  container_access_type = "private"
+}
+
+/*
+resource "azurerm_storage_blob" "restblob" {
+  name                   = "apiblob"
+  storage_account_name   = azurerm_storage_account.SolutionStorageAccount.name
+  storage_container_name = azurerm_storage_container.restbackend.name
+  type                   = "Block"
+  depends_on = [
+    azurerm_storage_container.restbackend
+  ]
+}
+*/
 resource "azurerm_api_management" "restapi" {
   name                = "${var.solution_prefix}apim"
   location            = azurerm_resource_group.CandidateWatchRG.location
@@ -266,16 +278,56 @@ resource "azurerm_api_management" "restapi" {
   }
   }
 
-/*
+
 resource "azurerm_windows_web_app" "restapiapp" {
-  name                = "restapiapp"
+    name                = "CW-restapiapp"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
   location            = azurerm_resource_group.CandidateWatchRG.location
-  service_plan_id     = azurerm_service_plan.appserviceplan.id
-
-  site_config {}
+  service_plan_id     = azurerm_service_plan.backendserviceplan.id
+  
+identity {
+ type = "UserAssigned"
+    identity_ids = ["${azurerm_user_assigned_identity.apim_worker.id}"] 
 }
-*/
+app_settings = local.mergedappsettings
+  storage_account {
+    access_key ="${azurerm_storage_account.SolutionStorageAccount.primary_access_key}"
+    account_name=azurerm_storage_account.SolutionStorageAccount.name
+    name="restdatastore"
+    share_name="${azurerm_storage_container.restbackend.name}"
+    type="AzureFiles"
+  }
+  
+  site_config {
+  always_on = "false"
+  use_32_bit_worker = "true"
+  application_stack{
+    current_stack = "dotnet"
+    dotnet_version = "v6.0"
+  }  
+  }
+depends_on = [
+  azurerm_storage_container.restbackend
+]
+
+}
+
+resource "azurerm_api_management_api" "restapi" {
+  name                = "restapi"
+  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+  api_management_name = azurerm_api_management.restapi.name
+  revision            = "1"
+  display_name        = "RESTAPI"
+  path                = "rest"
+  protocols = ["http","https"]
+service_url = "https://cw-restapiapp.azurewebsites.net"
+  import {
+    content_format = "openapi+json"
+    content_value  = file("./restapiV1definition.json")
+  }
+}
+### END API INFRASTRUCTURE
+
   resource "azurerm_static_site" "frontend" {
   name                = "frontend"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
