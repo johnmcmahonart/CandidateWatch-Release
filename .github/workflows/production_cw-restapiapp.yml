@@ -9,7 +9,7 @@ on:
       - Production
   workflow_dispatch:
 env:
-PROJECT_FILE:"./RESTApi/RESTApi.csproj"
+  PROJECT_FILE: "./RESTApi/RESTApi.csproj"
 
 jobs:
   build:
