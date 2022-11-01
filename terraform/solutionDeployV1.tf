@@ -33,6 +33,16 @@ confreferences =flatten([for ref, value in local.appconfigkeys: flatten([for dat
 }])])
 
 
+apibackendbase = tomap({
+"AzureWebJobsStorage__credential":"managedidentity",
+  "AzureWebJobsStorage__clientId":"${azurerm_user_assigned_identity.apim_worker.client_id}",
+  "APPLICATIONINSIGHTS_CONNECTION_STRING":"${data.azurerm_key_vault_secret.appinsightcs.value}",
+  "AZURE_CLIENT_ID":"${azurerm_user_assigned_identity.apim_worker.client_id}",
+  "netFrameworkVersion":"6.0",
+
+
+})
+
 functionappsettingsbase = tomap({
 "AzureWebJobsStorage__credential":"managedidentity",
   "AzureWebJobsStorage__clientId":"${azurerm_user_assigned_identity.solution_worker.client_id}",
@@ -46,6 +56,7 @@ functionappsettingsbase = tomap({
 #each function gets this block of settings when built, as well as base settings so the function can connect to application insights using shared user created managed id
 functionappsettingflat = {for setting in local.confreferences: keys(setting)[0] =>values(setting)[0]}
 mergedappsettings = merge(local.functionappsettingsbase,local.functionappsettingflat)
+mergedapiappsettings = merge(local.apibackendbase,local.functionappsettingflat)
 } 
 
   
@@ -289,7 +300,7 @@ identity {
  type = "UserAssigned"
     identity_ids = ["${azurerm_user_assigned_identity.apim_worker.id}"] 
 }
-app_settings = local.mergedappsettings
+app_settings = local.mergedapiappsettings
   storage_account {
     access_key ="${azurerm_storage_account.SolutionStorageAccount.primary_access_key}"
     account_name=azurerm_storage_account.SolutionStorageAccount.name
@@ -318,7 +329,7 @@ resource "azurerm_api_management_api" "restapi" {
   api_management_name = azurerm_api_management.solutionapim.name
   revision            = "1"
   display_name        = "RESTAPI"
-  path                = "rest"
+  path                = "api"
   protocols = ["http","https"]
 service_url = "https://cw-restapiapp.azurewebsites.net"
   import {
@@ -332,7 +343,7 @@ resource "azurerm_api_management_backend" "apibackend" {
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
   api_management_name = azurerm_api_management.solutionapim.name
   protocol            = "http"
-  url                 = "https://${azurerm_windows_web_app.restapiapp.name}.azurewebsites.net/rest/"
+  url                 = "https://${azurerm_windows_web_app.restapiapp.name}.azurewebsites.net"
 
   
 }
