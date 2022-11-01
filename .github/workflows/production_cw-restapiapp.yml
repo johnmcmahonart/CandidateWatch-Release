@@ -25,7 +25,7 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build '${{PROJECT_FILE}}' --configuration Release --output ./output
+        run: dotnet build '${{ env.PROJECT_FILE }}' --configuration Release --output ./output
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ./output
