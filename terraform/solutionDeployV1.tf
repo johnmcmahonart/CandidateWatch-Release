@@ -264,7 +264,7 @@ resource "azurerm_storage_blob" "restblob" {
   ]
 }
 */
-resource "azurerm_api_management" "restapi" {
+resource "azurerm_api_management" "solutionapim" {
   name                = "${var.solution_prefix}apim"
   location            = azurerm_resource_group.CandidateWatchRG.location
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
@@ -315,7 +315,7 @@ depends_on = [
 resource "azurerm_api_management_api" "restapi" {
   name                = "restapi"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
-  api_management_name = azurerm_api_management.restapi.name
+  api_management_name = azurerm_api_management.solutionapim.name
   revision            = "1"
   display_name        = "RESTAPI"
   path                = "rest"
@@ -326,6 +326,31 @@ service_url = "https://cw-restapiapp.azurewebsites.net"
     content_value  = file("./restapiV1definition.json")
   }
 }
+
+resource "azurerm_api_management_backend" "apibackend" {
+  name                = "defaultbackend"
+  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+  api_management_name = azurerm_api_management.solutionapim.name
+  protocol            = "http"
+  url                 = "https://${azurerm_windows_web_app.restapiapp.name}.azurewebsites.net/rest/"
+
+  
+}
+resource "azurerm_api_management_api_policy" "backendpolicy" {
+  api_name            = azurerm_api_management_api.restapi.name
+  api_management_name = azurerm_api_management_api.restapi.api_management_name
+  resource_group_name = azurerm_api_management_api.restapi.resource_group_name
+
+  xml_content = <<XML
+<policies>
+  <inbound>
+    <base/>
+    <set-backend-service backend-id="defaultbackend" />
+  </inbound>
+</policies>
+XML
+}
+
 ### END API INFRASTRUCTURE
 
   resource "azurerm_static_site" "frontend" {

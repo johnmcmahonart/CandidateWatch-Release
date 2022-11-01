@@ -2,6 +2,7 @@
 using AutoMapper;
 using MDWatch.Utilities;
 using RESTApi.Mapper;
+using MDWatch.Utilities;
 namespace RESTApi.Repositories
 {
     public abstract class AzTableRepository 
@@ -9,7 +10,7 @@ namespace RESTApi.Repositories
         
     {
         private protected string? _partitionKey = default;
-        private protected static TableClient _tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
+        private protected static TableClient _tableClient = AzureUtilities.GetTableClient("MD");
         
     }
 }
