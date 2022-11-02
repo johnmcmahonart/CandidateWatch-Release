@@ -18,6 +18,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -62,12 +70,21 @@
           {
             "name": "years",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "array",
               "items": {
                 "type": "integer",
                 "format": "int32"
               }
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -117,6 +134,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -161,11 +186,20 @@
           {
             "name": "keys",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "array",
               "items": {
                 "type": "string"
               }
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -220,6 +254,7 @@
           {
             "name": "keys",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "array",
               "items": {
@@ -234,6 +269,14 @@
             "schema": {
               "type": "integer",
               "format": "int32"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -288,6 +331,7 @@
           {
             "name": "years",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "array",
               "items": {
@@ -299,6 +343,14 @@
           {
             "name": "key",
             "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "string"
@@ -347,12 +399,21 @@
           {
             "name": "years",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "array",
               "items": {
                 "type": "integer",
                 "format": "int32"
               }
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -402,6 +463,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -446,6 +515,7 @@
           {
             "name": "keys",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "array",
               "items": {
@@ -460,6 +530,14 @@
             "schema": {
               "type": "integer",
               "format": "int32"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -514,11 +592,20 @@
           {
             "name": "keys",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "array",
               "items": {
                 "type": "string"
               }
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -573,6 +660,7 @@
           {
             "name": "years",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "array",
               "items": {
@@ -584,6 +672,14 @@
           {
             "name": "key",
             "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "string"
@@ -632,12 +728,21 @@
           {
             "name": "years",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "array",
               "items": {
                 "type": "integer",
                 "format": "int32"
               }
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -687,6 +792,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -731,11 +844,20 @@
           {
             "name": "keys",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "array",
               "items": {
                 "type": "string"
               }
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -802,6 +924,13 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -841,6 +970,16 @@
       "get": {
         "tags": [
           "UI"
+        ],
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {

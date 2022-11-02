@@ -5,16 +5,17 @@ using MDWatch.Utilities;
 
 namespace RESTApi.Repositories
 {
-    public class ScheduleBOverviewRepository : AzTableRepository, IScheduleBOverviewRepository<ScheduleBCandidateOverview>
+    public class ScheduleBOverviewRepository : IScheduleBOverviewRepository<ScheduleBCandidateOverview>
     {
+        private string? _partitionKey = default;
         public async Task AddAsync(IEnumerable<ScheduleBCandidateOverview> inEntity)
         {
             try
             {
                 foreach (var item in inEntity)
                 {
-                    TableEntity outEntity = inEntity.ModelToTableEntity(_tableClient, _partitionKey!, item.CandidateId);
-                    await _tableClient.AddEntityAsync(outEntity);
+                    TableEntity outEntity = inEntity.ModelToTableEntity(IStateAzureTableClient._tableClient, _partitionKey!, item.CandidateId);
+                    await IStateAzureTableClient._tableClient.AddEntityAsync(outEntity);
                 }
             }
             catch
@@ -27,15 +28,15 @@ namespace RESTApi.Repositories
         {
             foreach (var item in inEntity)
             {
-                TableEntity entityDelete = item.ModelToTableEntity(_tableClient, _partitionKey!, item.CandidateId);
-                await _tableClient.DeleteEntityAsync(entityDelete.PartitionKey, entityDelete.RowKey);
+                TableEntity entityDelete = item.ModelToTableEntity(IStateAzureTableClient._tableClient, _partitionKey!, item.CandidateId);
+                await IStateAzureTableClient._tableClient.DeleteEntityAsync(entityDelete.PartitionKey, entityDelete.RowKey);
             }
         }
 
         public async Task<IEnumerable<ScheduleBCandidateOverview>> GetAllAsync()
         {
             List<ScheduleBCandidateOverview> outList = new();
-            AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
+            AsyncPageable<TableEntity> candidates = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
             await foreach (var candidate in candidates)
             {
                 outList.Add(candidate.TableEntityToModel<ScheduleBCandidateOverview>());
@@ -45,7 +46,7 @@ namespace RESTApi.Repositories
 
         public async Task<IEnumerable<ScheduleBCandidateOverview>> GetbyKeyAsync(string key)
         {
-            TableEntity candidate = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, key);
+            TableEntity candidate = await IStateAzureTableClient._tableClient.GetEntityAsync<TableEntity>(_partitionKey, key);
 
             return new List<ScheduleBCandidateOverview> { candidate.TableEntityToModel<ScheduleBCandidateOverview>() };
         }
@@ -60,7 +61,7 @@ namespace RESTApi.Repositories
             foreach (var candidate in keys)
             {
                 //use query instead of GetEntity since the entity may not exist
-                AsyncPageable<TableEntity> candidateEntity = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and RowKey eq '{candidate}'");
+                AsyncPageable<TableEntity> candidateEntity = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and RowKey eq '{candidate}'");
 
                 var candidateResult = await candidateEntity.FirstOrDefaultAsync<TableEntity>();
                 if (candidateResult != null)
@@ -76,10 +77,10 @@ namespace RESTApi.Repositories
         {
             foreach (var item in inEntity)
             {
-                TableEntity entity = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, item.CandidateId);
-                entity = inEntity.ModelToTableEntity(_tableClient, _partitionKey!, item.CandidateId);
+                TableEntity entity = await IStateAzureTableClient._tableClient.GetEntityAsync<TableEntity>(_partitionKey, item.CandidateId);
+                entity = inEntity.ModelToTableEntity(IStateAzureTableClient._tableClient, _partitionKey!, item.CandidateId);
 
-                await _tableClient.UpdateEntityAsync(entity, entity.ETag);
+                await IStateAzureTableClient._tableClient.UpdateEntityAsync(entity, entity.ETag);
             }
         }
 

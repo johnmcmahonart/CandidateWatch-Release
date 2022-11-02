@@ -5,17 +5,17 @@ using MDWatch.Utilities;
 
 namespace RESTApi.Repositories
 {
-    public class FinanceTotalsRepository : AzTableRepository, IFinanceTotalsRepository<CandidateHistoryTotal>
+    public class FinanceTotalsRepository : IFinanceTotalsRepository<CandidateHistoryTotal>
     {
-        public string PartitionKey => _partitionKey;
-        public TableClient Client => _tableClient;
+        private string? _partitionKey = default;
+                                    
 
         public async Task AddAsync(IEnumerable<CandidateHistoryTotal> inEntity)
         {
             foreach (var item in inEntity)
             {
-                TableEntity outEntity = item.ModelToTableEntity(_tableClient, _partitionKey!, Guid.NewGuid().ToString());
-                await _tableClient.AddEntityAsync(outEntity);
+                TableEntity outEntity = item.ModelToTableEntity(IStateAzureTableClient._tableClient, _partitionKey!, Guid.NewGuid().ToString());
+                await IStateAzureTableClient._tableClient.AddEntityAsync(outEntity);
             }
         }
 
@@ -25,10 +25,10 @@ namespace RESTApi.Repositories
             {
                 foreach (var item in inEntity)
                 {
-                    AsyncPageable<TableEntity> financeRow = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateId)}  eq '{item.CandidateId}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateElectionYear)}  eq '{item.CandidateElectionYear}' ");
+                    AsyncPageable<TableEntity> financeRow = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateId)}  eq '{item.CandidateId}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateElectionYear)}  eq '{item.CandidateElectionYear}' ");
                     await foreach (var row in financeRow)
                     {
-                        await _tableClient.DeleteEntityAsync(row.PartitionKey, row.RowKey);
+                        await IStateAzureTableClient._tableClient.DeleteEntityAsync(row.PartitionKey, row.RowKey);
                     }
                 }
             }
@@ -41,7 +41,7 @@ namespace RESTApi.Repositories
         public async Task<IEnumerable<CandidateHistoryTotal>> GetAllAsync()
         {
             List<CandidateHistoryTotal> outList = new List<CandidateHistoryTotal>();
-            AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
+            AsyncPageable<TableEntity> candidates = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
             await foreach (var candidate in candidates)
             {
                 outList.Add(candidate.TableEntityToModel<CandidateHistoryTotal>());
@@ -53,7 +53,7 @@ namespace RESTApi.Repositories
         {
             List<CandidateHistoryTotal> outList
                 = new List<CandidateHistoryTotal>();
-            AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateId)} eq '{key}'");
+            AsyncPageable<TableEntity> candidate = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateId)} eq '{key}'");
             await foreach (var historyRows in candidate)
             {
                 outList.Add(historyRows.TableEntityToModel<CandidateHistoryTotal>());
@@ -67,7 +67,7 @@ namespace RESTApi.Repositories
             List<CandidatebyYear> sortedCandidates = new();
 
             //get candidates grouped by year
-            AsyncPageable<TableEntity> candidatebyYear = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'CandidatebyYear'");
+            AsyncPageable<TableEntity> candidatebyYear = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'CandidatebyYear'");
             await foreach (var item in candidatebyYear)
             {
                 sortedCandidates.Add(item.TableEntityToModel<CandidatebyYear>());
@@ -79,7 +79,7 @@ namespace RESTApi.Repositories
                 var i = sortedCandidates.FindIndex(x => x.Year.Equals(year));
                 foreach (var candidateforYear in sortedCandidates[i].Candidates)
                 {
-                    AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateId)}  eq '{candidateforYear}'");
+                    AsyncPageable<TableEntity> candidate = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((CandidateHistoryTotal c) => c.CandidateId)}  eq '{candidateforYear}'");
                     await foreach (var record in candidate)
                     {
                         outList.Add(record.TableEntityToModel<CandidateHistoryTotal>());
@@ -95,9 +95,9 @@ namespace RESTApi.Repositories
             //this probably isn't correct either. REVIEW AND FIX
             foreach (var item in inEntity)
             {
-                TableEntity entity = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, item.CandidateId);
-                entity = inEntity.ModelToTableEntity(_tableClient, _partitionKey!, item.CandidateId);
-                await _tableClient.UpdateEntityAsync(entity, entity.ETag);
+                TableEntity entity = await IStateAzureTableClient._tableClient.GetEntityAsync<TableEntity>(_partitionKey, item.CandidateId);
+                entity = inEntity.ModelToTableEntity(IStateAzureTableClient._tableClient, _partitionKey!, item.CandidateId);
+                await IStateAzureTableClient._tableClient.UpdateEntityAsync(entity, entity.ETag);
             }
         }
 
@@ -121,7 +121,7 @@ namespace RESTApi.Repositories
                 foreach (var candidate in keys)
                 {
                     //use query instead of GetEntity since the entity may not exist
-                    AsyncPageable<TableEntity> candidateEntity = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and CandidateId eq '{candidate}'");
+                    AsyncPageable<TableEntity> candidateEntity = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and CandidateId eq '{candidate}'");
 
                     var candidateResult = await candidateEntity.FirstOrDefaultAsync<TableEntity>();
                     if (candidateResult != null)
