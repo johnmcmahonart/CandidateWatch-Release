@@ -5,23 +5,23 @@ using MDWatch.Utilities;
 
 namespace RESTApi.Repositories
 {
-    public class ScheduleBDetailRepository : AzTableRepository, IScheduleBDetailRepository<ScheduleBByRecipientID>
+    public class ScheduleBDetailRepository : IScheduleBDetailRepository<ScheduleBByRecipientID>
     {
         private List<ScheduleBByRecipientID> _inMemList = new();
-
+        private string? _partitionKey = default;
         public async Task AddAsync(IEnumerable<ScheduleBByRecipientID> inEntity)
         {
             try
             {
                 foreach (var item in inEntity)
                 {
-                    TableEntity outEntity = inEntity.ModelToTableEntity(_tableClient, _partitionKey!, Guid.NewGuid().ToString());
-                    await _tableClient.AddEntityAsync(outEntity);
+                    TableEntity outEntity = inEntity.ModelToTableEntity(IStateAzureTableClient._tableClient, _partitionKey!, Guid.NewGuid().ToString());
+                    await IStateAzureTableClient._tableClient.AddEntityAsync(outEntity);
                 }
             }
             catch
             {
-                //todo
+                //TODO
             }
         }
 
@@ -29,10 +29,10 @@ namespace RESTApi.Repositories
         {
             foreach (var item in inEntity)
             {
-                Pageable<TableEntity> scheduleBDetail = _tableClient.Query<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{item.RecipientId}'");
+                Pageable<TableEntity> scheduleBDetail = IStateAzureTableClient._tableClient.Query<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{item.RecipientId}'");
                 foreach (var disbursement in scheduleBDetail)
                 {
-                    await _tableClient.DeleteEntityAsync(disbursement.PartitionKey, disbursement.RowKey);
+                    await IStateAzureTableClient._tableClient.DeleteEntityAsync(disbursement.PartitionKey, disbursement.RowKey);
                 }
             }
         }
@@ -40,7 +40,7 @@ namespace RESTApi.Repositories
         public async Task<IEnumerable<ScheduleBByRecipientID>> GetAllAsync()
         {
             List<ScheduleBByRecipientID> outList = new List<ScheduleBByRecipientID>();
-            AsyncPageable<TableEntity> candidates = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
+            AsyncPageable<TableEntity> candidates = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}'");
             await foreach (var candidate in candidates)
             {
                 outList.Add(candidate.TableEntityToModel<ScheduleBByRecipientID>());
@@ -53,8 +53,8 @@ namespace RESTApi.Repositories
             List<List<ScheduleBByRecipientID>> outList = new();
             foreach (var candidate in keys)
             {
-                TableEntity candidateScheduleBOverview = await _tableClient.GetEntityAsync<TableEntity>("ScheduleBOverview", candidate);
-                AsyncPageable<TableEntity> scheduleBDetail = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{candidateScheduleBOverview.TableEntityToModel<ScheduleBCandidateOverview>().PrincipalCommitteeId}'");
+                TableEntity candidateScheduleBOverview = await IStateAzureTableClient._tableClient.GetEntityAsync<TableEntity>("ScheduleBOverview", candidate);
+                AsyncPageable<TableEntity> scheduleBDetail = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{candidateScheduleBOverview.TableEntityToModel<ScheduleBCandidateOverview>().PrincipalCommitteeId}'");
                 List<ScheduleBByRecipientID> candidateScheduleB = new();
                 await foreach (var disbursement in scheduleBDetail)
                 {
@@ -86,13 +86,13 @@ namespace RESTApi.Repositories
         public async Task<IEnumerable<ScheduleBByRecipientID>> GetbyKeyAsync(string key)
         {
             List<ScheduleBByRecipientID> outList = new();
-            AsyncPageable<TableEntity> candidateScheduleBOverview = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'ScheduleBOverview' and RowKey eq '{key}'");
+            AsyncPageable<TableEntity> candidateScheduleBOverview = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'ScheduleBOverview' and RowKey eq '{key}'");
 
             var candidateScheduleBOverviewResult = await candidateScheduleBOverview.FirstOrDefaultAsync<TableEntity>();
             if (candidateScheduleBOverviewResult != null)
             {
                 //TableEntity candidateScheduleBOverview = await _tableClient.GetEntityAsync<TableEntity>("ScheduleBOverview", key);
-                AsyncPageable<TableEntity> scheduleBDetail = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{candidateScheduleBOverviewResult.TableEntityToModel<ScheduleBCandidateOverview>().PrincipalCommitteeId}'");
+                AsyncPageable<TableEntity> scheduleBDetail = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{candidateScheduleBOverviewResult.TableEntityToModel<ScheduleBCandidateOverview>().PrincipalCommitteeId}'");
                 await foreach (var disbursement in scheduleBDetail)
                 {
                     outList.Add(disbursement.TableEntityToModel<ScheduleBByRecipientID>());
@@ -109,7 +109,7 @@ namespace RESTApi.Repositories
             List<CandidatebyYear> sortedCandidates = new();
 
             //get candidates grouped by year
-            AsyncPageable<TableEntity> candidatebyYear = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'CandidatebyYear'");
+            AsyncPageable<TableEntity> candidatebyYear = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'CandidatebyYear'");
             await foreach (var item in candidatebyYear)
             {
                 sortedCandidates.Add(item.TableEntityToModel<CandidatebyYear>());
@@ -123,14 +123,14 @@ namespace RESTApi.Repositories
                 foreach (var candidateforYear in sortedCandidates[i].Candidates)
                 {
                     //get recipient ID that matches candidateID
-                    AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'ScheduleBOverview' and {General.GetMemberName((ScheduleBCandidateOverview c) => c.CandidateId)}  eq '{candidateforYear}'");
+                    AsyncPageable<TableEntity> candidate = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'ScheduleBOverview' and {General.GetMemberName((ScheduleBCandidateOverview c) => c.CandidateId)}  eq '{candidateforYear}'");
                     await foreach (var record in candidate)
                     {
                         string committeeId = record.TableEntityToModel<ScheduleBCandidateOverview>().PrincipalCommitteeId;
 
                         //get ScheduleBDetail data
 
-                        AsyncPageable<TableEntity> scheduleBDetails = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{committeeId}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.Cycle)} eq {year} ");
+                        AsyncPageable<TableEntity> scheduleBDetails = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{committeeId}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.Cycle)} eq {year} ");
                         await foreach (var row in scheduleBDetails)
                         {
                             outList.Add(row.TableEntityToModel<ScheduleBByRecipientID>());
@@ -159,13 +159,13 @@ namespace RESTApi.Repositories
         {
             foreach (var recipient in inEntity)
             {
-                AsyncPageable<TableEntity> scheduleBDetailRow = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{recipient.RecipientId}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.CommitteeId)}  eq '{recipient.CommitteeId}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.Cycle)}  eq '{recipient.Cycle}' ");
+                AsyncPageable<TableEntity> scheduleBDetailRow = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_partitionKey}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.RecipientId)}  eq '{recipient.RecipientId}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.CommitteeId)}  eq '{recipient.CommitteeId}' and {General.GetMemberName((ScheduleBByRecipientID c) => c.Cycle)}  eq '{recipient.Cycle}' ");
                 await foreach (var disbursement in scheduleBDetailRow)
                 {
-                    TableEntity entity = await _tableClient.GetEntityAsync<TableEntity>(_partitionKey, disbursement.RowKey);
+                    TableEntity entity = await IStateAzureTableClient._tableClient.GetEntityAsync<TableEntity>(_partitionKey, disbursement.RowKey);
 
-                    entity = recipient.ModelToTableEntity(_tableClient, _partitionKey!, disbursement.RowKey);
-                    await _tableClient.UpdateEntityAsync(entity, entity.ETag);
+                    entity = recipient.ModelToTableEntity(IStateAzureTableClient._tableClient, _partitionKey!, disbursement.RowKey);
+                    await IStateAzureTableClient._tableClient.UpdateEntityAsync(entity, entity.ETag);
                 }
             }
         }

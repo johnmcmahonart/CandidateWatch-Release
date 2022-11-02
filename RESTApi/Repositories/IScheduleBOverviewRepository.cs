@@ -1,6 +1,6 @@
 ﻿namespace RESTApi.Repositories
 {
-    public interface IScheduleBOverviewRepository<T> : IRepository<T>, IGetbyKeys<T> where T : class, new()
+    public interface IScheduleBOverviewRepository<T> : IRepository<T>, IGetbyKeys<T>, IStateAzureTableClient where T : class, new()
     {
     }
 }

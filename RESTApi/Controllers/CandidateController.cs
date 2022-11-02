@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using MDWatch.Model;
 using RESTApi.Repositories;
+using System.ComponentModel.DataAnnotations;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace RESTApi.Controllers
@@ -17,9 +18,10 @@ namespace RESTApi.Controllers
         private readonly ICandidateRepository<Candidate> _candidateRepository;
         // GET: api/<CandidateController>
         [HttpGet("{key}")]
-        public async Task<IEnumerable<CandidateDTO>> GetbyKeyAsync(string key)
+        public async Task<IEnumerable<CandidateDTO>> GetbyKeyAsync([Required] string key,  [Required]string state)
 
         {
+            _candidateRepository.SetState(state);
             IEnumerable<Candidate> modelOut = await _candidateRepository.GetbyKeyAsync(key);
             return _mapper.Map<IEnumerable<Candidate>, IEnumerable<CandidateDTO>>(modelOut);
                 
@@ -29,8 +31,9 @@ namespace RESTApi.Controllers
 
                 
         [HttpGet("years")]
-        public async Task<IEnumerable<CandidateDTO>> GetbyElectionYearAsync([FromQuery]List<int> years)
+        public async Task<IEnumerable<CandidateDTO>> GetbyElectionYearAsync([FromQuery][Required] List<int> years, [Required] string state)
         {
+            _candidateRepository.SetState(state);
             IEnumerable<Candidate> modelOut = await _candidateRepository.GetbyElectionYearsAsync(years);
             return _mapper.Map<IEnumerable<Candidate>, IEnumerable<CandidateDTO>>(modelOut);
 

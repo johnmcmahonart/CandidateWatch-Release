@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using RESTApi.DTOs;
 using RESTApi.Repositories;
@@ -15,15 +16,18 @@ namespace RESTApi.Controllers
         private readonly IUINavRepository _UIRepository;
 
         [HttpGet("CandidatesbyYear/{year}")]
-        public async Task<IEnumerable<CandidateUIDTO>> GetCandidates([FromQuery] bool wasElected, int year)
+        public async Task<IEnumerable<CandidateUIDTO>> GetCandidates([FromQuery] bool wasElected, int year, string state)
 
         {
+            _UIRepository.SetState(state);
             return await _UIRepository.GetCandidates(year, wasElected);
         }
 
         [HttpGet("ElectionYears")]
-        public async Task<IEnumerable<int>> GetElectionYearsAsync()
+        public async Task<IEnumerable<int>> GetElectionYearsAsync([Required] string state)
         {
+
+            _UIRepository.SetState(state);
             return await _UIRepository.GetElectionYears();
         }
 
