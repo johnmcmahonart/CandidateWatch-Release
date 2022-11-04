@@ -22,6 +22,13 @@ data "azurerm_key_vault" "keyvault" {
   name                = "${var.keyvault_name}"
   resource_group_name = "BatchRendering"
 }
+data "azurerm_key_vault_certificate" "cloudflarecert" {
+  name                = "cloudflare"
+  key_vault_id = var.keyvault_id
+}
+
+
+
 locals{
   appconfigkeys = jsondecode(file("./appconfigurationsettingsv1.json"))    
 state_twoletter = jsondecode(file("./states.json"))    
@@ -64,6 +71,56 @@ resource "azurerm_resource_group" "CandidateWatchRG" {
   name     = var.rg_name
   location = "eastus"
 }
+
+### NETWORK CONFIGURATION
+
+resource "azurerm_network_security_group" "edgensg"{
+name = "EdgeNSG"
+location = azurerm_resource_group.CandidateWatchRG.location
+  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+}
+resource "azurerm_network_security_rule" "edgerules"{
+ 
+  for_each                    = local.nsgrules 
+  name                        = each.key
+  direction                   = each.value.direction
+  access                      = each.value.access
+  priority                    = each.value.priority
+  protocol                    = each.value.protocol
+  source_port_range           = each.value.source_port_range
+  destination_port_range      = each.value.destination_port_range
+  source_address_prefix       = each.value.source_address_prefix
+  destination_address_prefix  = each.value.destination_address_prefix
+  resource_group_name         = azurerm_resource_group.CandidateWatchRG.name
+  network_security_group_name = azurerm_network_security_group.edgensg.name 
+}
+
+
+
+resource "azurerm_virtual_network" "defaultvnet" {
+  name = "defaultnetwork"
+  location = azurerm_resource_group.CandidateWatchRG.location
+  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+  address_space=["10.0.0.0/16"]
+  
+}
+resource azurerm_subnet subnet1 {
+    resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+    virtual_network_name = azurerm_virtual_network.defaultvnet.name
+    name="subnet1"
+    address_prefixes=["10.0.1.0/24"]
+  
+  }
+resource "azurerm_subnet_network_security_group_association" "subnetnsgassociation" {
+  subnet_id = azurerm_subnet.subnet1.id
+  network_security_group_id = azurerm_network_security_group.edgensg.id
+}
+
+
+
+### END NETWORK
+
+
 
 resource "azurerm_storage_account" "SolutionStorageAccount" {
   name="st${var.solution_prefix}data01"
@@ -162,6 +219,25 @@ secret_permissions = [
 }
 
 
+resource "azurerm_key_vault_access_policy" "apim_said" {
+  key_vault_id       = var.keyvault_id
+  object_id          = azurerm_api_management.solutionapim.identity.0.principal_id
+  tenant_id          = data.azurerm_client_config.current.tenant_id
+  certificate_permissions = [
+    "Get",
+    "List"
+  ]
+secret_permissions = [
+  "Get",
+  "List"
+]
+depends_on = [
+  azurerm_api_management.solutionapim
+]
+}
+
+
+
 ### END SECURITY
 
 #tables for solution
@@ -258,23 +334,26 @@ resource "azurerm_service_plan" "backendserviceplan" {
   sku_name            = "B1"
 }
 
-resource azurerm_storage_container "restbackend"{
-  name = "restbackend"
-  storage_account_name = azurerm_storage_account.SolutionStorageAccount.name
-  container_access_type = "private"
-}
-
 /*
-resource "azurerm_storage_blob" "restblob" {
-  name                   = "apiblob"
-  storage_account_name   = azurerm_storage_account.SolutionStorageAccount.name
-  storage_container_name = azurerm_storage_container.restbackend.name
-  type                   = "Block"
-  depends_on = [
-    azurerm_storage_container.restbackend
-  ]
+resource "azurerm_api_management_certificate" "cloudflarecert" {
+  name                = "cloudflare"
+  api_management_name = azurerm_api_management.solutionapim.name
+  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+
+  key_vault_secret_id = data.azurerm_key_vault_certificate.cloudflarecert.id
 }
 */
+resource "azurerm_api_management_custom_domain" "defaultdomain" {
+  api_management_id = azurerm_api_management.solutionapim.id
+
+  gateway {
+    host_name    = "uscandidatewatch.org"
+    key_vault_id = data.azurerm_key_vault_certificate.cloudflarecert.secret_id
+  }
+
+  
+}
+
 resource "azurerm_api_management" "solutionapim" {
   name                = "${var.solution_prefix}apim"
   location            = azurerm_resource_group.CandidateWatchRG.location
@@ -282,11 +361,19 @@ resource "azurerm_api_management" "solutionapim" {
   publisher_name      = "John McMahon"
   publisher_email     = "john@johnmcmahonart.com"
 
-  sku_name = "Consumption_0"
+  
+  
+  sku_name = "Developer_1"
   identity {
-    type = "UserAssigned"
-    identity_ids = ["${azurerm_user_assigned_identity.apim_worker.id}"]
+    type = "SystemAssigned"
+    
   }
+  virtual_network_type = "External"
+  virtual_network_configuration {
+    subnet_id= azurerm_subnet.subnet1.id
+  }
+  
+  public_ip_address_id = azurerm_public_ip.frontendip.id
   }
 
 
@@ -301,13 +388,6 @@ identity {
     identity_ids = ["${azurerm_user_assigned_identity.apim_worker.id}"] 
 }
 app_settings = local.mergedapiappsettings
-  storage_account {
-    access_key ="${azurerm_storage_account.SolutionStorageAccount.primary_access_key}"
-    account_name=azurerm_storage_account.SolutionStorageAccount.name
-    name="restdatastore"
-    share_name="${azurerm_storage_container.restbackend.name}"
-    type="AzureFiles"
-  }
   
   site_config {
   always_on = "false"
@@ -317,9 +397,7 @@ app_settings = local.mergedapiappsettings
     dotnet_version = "v6.0"
   }  
   }
-depends_on = [
-  azurerm_storage_container.restbackend
-]
+
 
 }
 
@@ -362,8 +440,48 @@ resource "azurerm_api_management_api_policy" "backendpolicy" {
 XML
 }
 
+resource "azurerm_api_management_api" "frontendroute" {
+  name                = "frontend"
+  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+  api_management_name = azurerm_api_management.solutionapim.name
+  revision            = "1"
+  display_name        = "frontend"
+  path                = "frontend"
+  protocols = ["http","https"]
+service_url = "https://${azurerm_static_site.frontend.default_host_name}"
+  
+}
+
+resource "azurerm_api_management_backend" "frontend" {
+  name                = "frontend"
+  resource_group_name = azurerm_resource_group.CandidateWatchRG.name
+  api_management_name = azurerm_api_management.solutionapim.name
+  protocol            = "http"
+  url                 = "https://${azurerm_static_site.frontend.default_host_name}"
+
+  
+}
+resource "azurerm_api_management_api_policy" "frontendpolicy" {
+  api_name            = azurerm_api_management_api.frontendroute.name
+  api_management_name = azurerm_api_management_api.frontendroute.api_management_name
+  resource_group_name = azurerm_api_management_api.frontendroute.resource_group_name
+
+  xml_content = <<XML
+<policies>
+  <inbound>
+    <base/>
+    <set-backend-service backend-id="frontend" />
+  </inbound>
+</policies>
+XML
+}
+
+
+
+
 ### END API INFRASTRUCTURE
 
+### FRONTEND
   resource "azurerm_static_site" "frontend" {
   name                = "frontend"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
@@ -377,6 +495,9 @@ sku_size = "Standard"
 
 }
 
+
+
+### END FRONTEND
 resource "azurerm_log_analytics_workspace" "solutionlogs" {
   name                = "cwlogs01"
   location            = azurerm_resource_group.CandidateWatchRG.location
@@ -453,7 +574,8 @@ resource "azurerm_public_ip" "frontendip" {
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
   location            = azurerm_resource_group.CandidateWatchRG.location
   allocation_method   = "Static"
-
+domain_name_label="edge-dns"
+sku = "Standard"
   tags = {
     environment = "Production"
   }
