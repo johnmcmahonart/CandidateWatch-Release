@@ -17,7 +17,7 @@ export default function useTop5CandidateDonationDataBuilder(): IChartData[] | JS
     const scheduleBData: Map<string, number> = new Map<string, number>;
 
     //uiData contains full name, which we need. We also need scheduleB overview data to join candidateId to recipientId. recipientId is used as key scheduleBDetail data
-    const uiData = useGetApiUiCandidatesbyYearByYearQuery({ wasElected: true, year: uiSelectionData.electionYear });
+    const uiData = useGetApiUiCandidatesbyYearByYearQuery({ wasElected: true, year: uiSelectionData.electionYear, state:"MD" });
 
     const buildTop5CandidateData = (source: Map<string, number>): IChartData[] => {
         const mappedData: Array<IChartData> = [];
@@ -34,8 +34,8 @@ export default function useTop5CandidateDonationDataBuilder(): IChartData[] | JS
 
         return PrepareLabelsforDisplay(mappedData.orderBy((x: IChartData) => x.dataKey, NumberComparer).reverse().take(5).toArray(),true, 10);
     }
-    const scheduleBOverviewData = useGetApiScheduleBOverviewKeysQuery({ keys: uiContainerData });
-    const candidateScheduleBData = useGetApiScheduleBDetailByYearKeysQuery({ keys: uiContainerData, year: uiSelectionData.electionYear })
+    const scheduleBOverviewData = useGetApiScheduleBOverviewKeysQuery({ keys: uiContainerData, state:"MD" });
+    const candidateScheduleBData = useGetApiScheduleBDetailByYearKeysQuery({ keys: uiContainerData, year: uiSelectionData.electionYear, state:"MD" })
     if (uiData.isSuccess && scheduleBOverviewData.isSuccess && candidateScheduleBData.isSuccess) {
         candidateScheduleBData.data.map((candidateScheduleBDetail: ScheduleBDetailDto[]) => {
             let sum: number = 0

@@ -10,7 +10,7 @@ import { NumberComparer } from "linq-to-typescript";
 export default function useTop5PACDataBuilder() :IChartData[]|JSX.Element
     {
     const uiSelectionData = useSelector(selectData);
-    const scheduleBData = useGetApiScheduleBDetailByKeyYearsQuery({ key: uiSelectionData.candidateId, years: [uiSelectionData.electionYear] });
+    const scheduleBData = useGetApiScheduleBDetailByKeyYearsQuery({ key: uiSelectionData.candidateId, years: [uiSelectionData.electionYear],state:"MD" });
     const buildTop5ChartData = (source: any): IChartData[] => {
         const mappedData: Array<IChartData> = [];
 

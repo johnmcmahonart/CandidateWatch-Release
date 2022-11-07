@@ -5,7 +5,10 @@ const injectedRtkApi = api.injectEndpoints({
       GetApiCandidateByKeyApiResponse,
       GetApiCandidateByKeyApiArg
     >({
-      query: (queryArg) => ({ url: `/api/Candidate/${queryArg.key}` }),
+      query: (queryArg) => ({
+        url: `/api/Candidate/${queryArg.key}`,
+        params: { state: queryArg.state },
+      }),
     }),
     getApiCandidateYears: build.query<
       GetApiCandidateYearsApiResponse,
@@ -13,14 +16,17 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/api/Candidate/years`,
-        params: { years: queryArg.years },
+        params: { years: queryArg.years, state: queryArg.state },
       }),
     }),
     getApiFinanceTotalsByKey: build.query<
       GetApiFinanceTotalsByKeyApiResponse,
       GetApiFinanceTotalsByKeyApiArg
     >({
-      query: (queryArg) => ({ url: `/api/FinanceTotals/${queryArg.key}` }),
+      query: (queryArg) => ({
+        url: `/api/FinanceTotals/${queryArg.key}`,
+        params: { state: queryArg.state },
+      }),
     }),
     getApiFinanceTotalsKeys: build.query<
       GetApiFinanceTotalsKeysApiResponse,
@@ -28,7 +34,7 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/api/FinanceTotals/keys`,
-        params: { keys: queryArg.keys },
+        params: { keys: queryArg.keys, state: queryArg.state },
       }),
     }),
     getApiFinanceTotalsByYearKeys: build.query<
@@ -37,7 +43,7 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/api/FinanceTotals/${queryArg.year}/keys`,
-        params: { keys: queryArg.keys },
+        params: { keys: queryArg.keys, state: queryArg.state },
       }),
     }),
     getApiFinanceTotalsByKeyYears: build.query<
@@ -46,7 +52,7 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/api/FinanceTotals/${queryArg.key}/years`,
-        params: { years: queryArg.years },
+        params: { years: queryArg.years, state: queryArg.state },
       }),
     }),
     getApiFinanceTotalsYears: build.query<
@@ -55,14 +61,17 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/api/FinanceTotals/years`,
-        params: { years: queryArg.years },
+        params: { years: queryArg.years, state: queryArg.state },
       }),
     }),
     getApiScheduleBDetailByKey: build.query<
       GetApiScheduleBDetailByKeyApiResponse,
       GetApiScheduleBDetailByKeyApiArg
     >({
-      query: (queryArg) => ({ url: `/api/ScheduleBDetail/${queryArg.key}` }),
+      query: (queryArg) => ({
+        url: `/api/ScheduleBDetail/${queryArg.key}`,
+        params: { state: queryArg.state },
+      }),
     }),
     getApiScheduleBDetailByYearKeys: build.query<
       GetApiScheduleBDetailByYearKeysApiResponse,
@@ -70,7 +79,7 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/api/ScheduleBDetail/${queryArg.year}/keys`,
-        params: { keys: queryArg.keys },
+        params: { keys: queryArg.keys, state: queryArg.state },
       }),
     }),
     getApiScheduleBDetailKeys: build.query<
@@ -79,7 +88,7 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/api/ScheduleBDetail/keys`,
-        params: { keys: queryArg.keys },
+        params: { keys: queryArg.keys, state: queryArg.state },
       }),
     }),
     getApiScheduleBDetailByKeyYears: build.query<
@@ -88,7 +97,7 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/api/ScheduleBDetail/${queryArg.key}/years`,
-        params: { years: queryArg.years },
+        params: { years: queryArg.years, state: queryArg.state },
       }),
     }),
     getApiScheduleBDetailYears: build.query<
@@ -97,14 +106,17 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/api/ScheduleBDetail/years`,
-        params: { years: queryArg.years },
+        params: { years: queryArg.years, state: queryArg.state },
       }),
     }),
     getApiScheduleBOverviewByKey: build.query<
       GetApiScheduleBOverviewByKeyApiResponse,
       GetApiScheduleBOverviewByKeyApiArg
     >({
-      query: (queryArg) => ({ url: `/api/ScheduleBOverview/${queryArg.key}` }),
+      query: (queryArg) => ({
+        url: `/api/ScheduleBOverview/${queryArg.key}`,
+        params: { state: queryArg.state },
+      }),
     }),
     getApiScheduleBOverviewKeys: build.query<
       GetApiScheduleBOverviewKeysApiResponse,
@@ -112,7 +124,7 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/api/ScheduleBOverview/keys`,
-        params: { keys: queryArg.keys },
+        params: { keys: queryArg.keys, state: queryArg.state },
       }),
     }),
     getApiUiCandidatesbyYearByYear: build.query<
@@ -121,14 +133,17 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/api/UI/CandidatesbyYear/${queryArg.year}`,
-        params: { wasElected: queryArg.wasElected },
+        params: { wasElected: queryArg.wasElected, state: queryArg.state },
       }),
     }),
     getApiUiElectionYears: build.query<
       GetApiUiElectionYearsApiResponse,
       GetApiUiElectionYearsApiArg
     >({
-      query: () => ({ url: `/api/UI/ElectionYears` }),
+      query: (queryArg) => ({
+        url: `/api/UI/ElectionYears`,
+        params: { state: queryArg.state },
+      }),
     }),
   }),
   overrideExisting: false,
@@ -138,85 +153,102 @@ export type GetApiCandidateByKeyApiResponse =
   /** status 200 Success */ CandidateDto[];
 export type GetApiCandidateByKeyApiArg = {
   key: string;
+  state: string;
 };
 export type GetApiCandidateYearsApiResponse =
   /** status 200 Success */ CandidateDto[];
 export type GetApiCandidateYearsApiArg = {
-  years?: number[];
+  years: number[];
+  state: string;
 };
 export type GetApiFinanceTotalsByKeyApiResponse =
   /** status 200 Success */ FinanceTotalsDto[];
 export type GetApiFinanceTotalsByKeyApiArg = {
   key: string;
+  state: string;
 };
 export type GetApiFinanceTotalsKeysApiResponse =
   /** status 200 Success */ FinanceTotalsDto[][];
 export type GetApiFinanceTotalsKeysApiArg = {
-  keys?: string[];
+  keys: string[];
+  state: string;
 };
 export type GetApiFinanceTotalsByYearKeysApiResponse =
   /** status 200 Success */ FinanceTotalsDto[][];
 export type GetApiFinanceTotalsByYearKeysApiArg = {
-  keys?: string[];
+  keys: string[];
   year: number;
+  state: string;
 };
 export type GetApiFinanceTotalsByKeyYearsApiResponse =
   /** status 200 Success */ FinanceTotalsDto[];
 export type GetApiFinanceTotalsByKeyYearsApiArg = {
-  years?: number[];
+  years: number[];
   key: string;
+  state: string;
 };
 export type GetApiFinanceTotalsYearsApiResponse =
   /** status 200 Success */ FinanceTotalsDto[];
 export type GetApiFinanceTotalsYearsApiArg = {
-  years?: number[];
+  years: number[];
+  state: string;
 };
 export type GetApiScheduleBDetailByKeyApiResponse =
   /** status 200 Success */ ScheduleBDetailDto[];
 export type GetApiScheduleBDetailByKeyApiArg = {
   key: string;
+  state: string;
 };
 export type GetApiScheduleBDetailByYearKeysApiResponse =
   /** status 200 Success */ ScheduleBDetailDto[][];
 export type GetApiScheduleBDetailByYearKeysApiArg = {
-  keys?: string[];
+  keys: string[];
   year: number;
+  state: string;
 };
 export type GetApiScheduleBDetailKeysApiResponse =
   /** status 200 Success */ ScheduleBDetailDto[][];
 export type GetApiScheduleBDetailKeysApiArg = {
-  keys?: string[];
+  keys: string[];
+  state: string;
 };
 export type GetApiScheduleBDetailByKeyYearsApiResponse =
   /** status 200 Success */ ScheduleBDetailDto[];
 export type GetApiScheduleBDetailByKeyYearsApiArg = {
-  years?: number[];
+  years: number[];
   key: string;
+  state: string;
 };
 export type GetApiScheduleBDetailYearsApiResponse =
   /** status 200 Success */ ScheduleBDetailDto[];
 export type GetApiScheduleBDetailYearsApiArg = {
-  years?: number[];
+  years: number[];
+  state: string;
 };
 export type GetApiScheduleBOverviewByKeyApiResponse =
   /** status 200 Success */ ScheduleBCandidateOverview[];
 export type GetApiScheduleBOverviewByKeyApiArg = {
   key: string;
+  state: string;
 };
 export type GetApiScheduleBOverviewKeysApiResponse =
   /** status 200 Success */ ScheduleBCandidateOverview[][];
 export type GetApiScheduleBOverviewKeysApiArg = {
-  keys?: string[];
+  keys: string[];
+  state: string;
 };
 export type GetApiUiCandidatesbyYearByYearApiResponse =
   /** status 200 Success */ CandidateUidto[];
 export type GetApiUiCandidatesbyYearByYearApiArg = {
   wasElected?: boolean;
   year: number;
+  state: string;
 };
 export type GetApiUiElectionYearsApiResponse =
   /** status 200 Success */ number[];
-export type GetApiUiElectionYearsApiArg = void;
+export type GetApiUiElectionYearsApiArg = {
+  state: string;
+};
 export type CandidatePrincipalCommittees = {
   affiliatedCommitteeName?: string | null;
   candidateIds?: string[] | null;

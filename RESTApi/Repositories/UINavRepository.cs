@@ -11,7 +11,7 @@ namespace RESTApi.Repositories
     {
         private string _electionYearsPartition = "CandidatebyYear";
         private string _candidatePartition = "Candidate";
-        private TableClient _tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
+        
         private bool CurrentlyElected(Candidate candidate)
         {
             //candidatestatus c = current candidate, candidatestatus f = future candidate
@@ -26,7 +26,7 @@ namespace RESTApi.Repositories
                 List<CandidatebyYear> sortedCandidates = new();
 
                 //get candidates grouped by year
-                AsyncPageable<TableEntity> candidatebyYear = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_electionYearsPartition}'");
+                AsyncPageable<TableEntity> candidatebyYear = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_electionYearsPartition}'");
                 await foreach (var item in candidatebyYear)
                 {
                     sortedCandidates.Add(item.TableEntityToModel<CandidatebyYear>());
@@ -37,7 +37,7 @@ namespace RESTApi.Repositories
                 var i = sortedCandidates.FindIndex(x => x.Year.Equals(year));
                 foreach (var candidateforYear in sortedCandidates[i].Candidates)
                 {
-                    AsyncPageable<TableEntity> candidate = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_candidatePartition}' and {General.GetMemberName((Candidate c) => c.CandidateId)}  eq '{candidateforYear}'");
+                    AsyncPageable<TableEntity> candidate = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_candidatePartition}' and {General.GetMemberName((Candidate c) => c.CandidateId)}  eq '{candidateforYear}'");
 
                     await foreach (var record in candidate)
                     {
@@ -95,7 +95,7 @@ namespace RESTApi.Repositories
         {
             List<CandidatebyYear> yearsFromTable = new();
             var yearsOut = new List<int>();
-            AsyncPageable<TableEntity> candidatebyYear = _tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_electionYearsPartition}'");
+            AsyncPageable<TableEntity> candidatebyYear = IStateAzureTableClient._tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq '{_electionYearsPartition}'");
             await foreach (var item in candidatebyYear)
             {
                 yearsFromTable.Add(item.TableEntityToModel<CandidatebyYear>());
