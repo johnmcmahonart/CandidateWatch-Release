@@ -38,7 +38,7 @@ jobs:
       - run: npm build:prod
 
       - name: Build And Deploy
-        uses: Azure/static-web-apps-deploy@1
+        uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_SITE_FRONTEND }}
           action: "upload"
@@ -52,7 +52,7 @@ jobs:
     name: Close
     steps:
       - name: Close
-        uses: Azure/static-web-apps-deploy@1
+        uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_SITE_FRONTEND }}
           action: "close"
