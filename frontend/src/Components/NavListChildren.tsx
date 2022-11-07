@@ -16,7 +16,7 @@ export default function NavListChildren(): JSX.Element {
     
 
 
-    const uiData = useGetApiUiCandidatesbyYearByYearQuery({ year: 2022, wasElected: true });
+    const uiData = useGetApiUiCandidatesbyYearByYearQuery({ year: 2022, wasElected: true, state:"MD" });
 
     //return react fragments once data is loaded
     if (uiData.isSuccess) {

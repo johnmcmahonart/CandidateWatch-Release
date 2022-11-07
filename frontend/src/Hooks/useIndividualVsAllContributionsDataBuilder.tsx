@@ -34,7 +34,8 @@ export default function useIndividualVsAllContributionsDataBuilder(): IChartData
         return PrepareLabelsforDisplay(outData, false, 10);
     }
     //get data for House members
-    const financeDataHouse = useGetApiFinanceTotalsByYearKeysQuery({ keys: uiContainerData.where((c: string) => c.startsWith("H")).toArray(), year: uiSelectionData.electionYear })
+    const financeDataHouse = useGetApiFinanceTotalsByYearKeysQuery({ keys: uiContainerData.where((c: string) => c.startsWith("H")).toArray(), year: uiSelectionData.electionYear, state:"MD"
+        })
 
     const senateCandidates = uiContainerData.where((c: string) => c.startsWith("S")).toArray();
 

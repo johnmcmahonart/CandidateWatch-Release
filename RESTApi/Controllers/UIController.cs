@@ -16,7 +16,7 @@ namespace RESTApi.Controllers
         private readonly IUINavRepository _UIRepository;
 
         [HttpGet("CandidatesbyYear/{year}")]
-        public async Task<IEnumerable<CandidateUIDTO>> GetCandidates([FromQuery] bool wasElected, int year, string state)
+        public async Task<IEnumerable<CandidateUIDTO>> GetCandidates([FromQuery] bool wasElected, [Required] int year, [Required] string state)
 
         {
             _UIRepository.SetState(state);

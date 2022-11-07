@@ -12,7 +12,7 @@ export default function CandidateCardLoaderInner(props: ICardLoader) {
     if (props.uiData.candidateId) {
         key = props.uiData.candidateId;
     }
-    const candidatesDetailData = useGetApiCandidateByKeyQuery({ key: key })
+    const candidatesDetailData = useGetApiCandidateByKeyQuery({ key: key, state:"MD" })
     if (candidatesDetailData.isSuccess) {
         return <>
             {
