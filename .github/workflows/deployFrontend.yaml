@@ -33,7 +33,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: cd $APP_LOCATION
+      - run: cd frontend
       - run: npm ci
       - run: npm build:prod
 
