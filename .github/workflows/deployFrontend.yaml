@@ -34,6 +34,7 @@ jobs:
         with:
           node-version: 18.8
       - run: cd frontend
+      - run: ls
       - run: npm ci
       - run: npm build:prod
 
