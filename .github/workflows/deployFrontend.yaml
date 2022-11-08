@@ -32,7 +32,7 @@ jobs:
           submodules: true
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 18.8
       - run: cd frontend
       - run: npm ci
       - run: npm build:prod
