@@ -342,7 +342,8 @@ resource "azurerm_api_management_certificate" "cloudflarecert" {
 
   key_vault_secret_id = data.azurerm_key_vault_certificate.cloudflarecert.id
 }
-*/
+
+
 resource "azurerm_api_management_custom_domain" "defaultdomain" {
   api_management_id = azurerm_api_management.solutionapim.id
 
@@ -353,7 +354,7 @@ resource "azurerm_api_management_custom_domain" "defaultdomain" {
 
   
 }
-
+*/
 resource "azurerm_api_management" "solutionapim" {
   name                = "${var.solution_prefix}apim"
   location            = azurerm_resource_group.CandidateWatchRG.location
@@ -409,6 +410,7 @@ resource "azurerm_api_management_api" "restapi" {
   display_name        = "RESTAPI"
   path                = "api"
   protocols = ["http","https"]
+subscription_required = false
 service_url = "https://cw-restapiapp.azurewebsites.net"
   import {
     content_format = "openapi+json"
@@ -446,10 +448,63 @@ resource "azurerm_api_management_api" "frontendroute" {
   api_management_name = azurerm_api_management.solutionapim.name
   revision            = "1"
   display_name        = "frontend"
-  path                = "frontend"
+  path                = ""
   protocols = ["http","https"]
+subscription_required = false
 service_url = "https://${azurerm_static_site.frontend.default_host_name}"
-  
+import {
+    content_format = "openapi+json"
+    content_value  = <<JSON
+      {
+    "openapi": "3.0.1",
+    "info": {
+        "title": "frontend",
+        "description": "",
+        "version": "1.0"
+    },
+    "servers": [
+        {
+            "url": "http://uscandidatewatch.org"
+        },
+        {
+            "url": "https://uscandidatewatch.org"
+        }
+    ],
+    "paths": {
+        "/*": {
+            "get": {
+                "summary": "route",
+                "operationId": "route",
+                "responses": {
+                    "200": {
+                        "description": null
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "apiKeyHeader": {
+                "type": "apiKey",
+                "name": "Ocp-Apim-Subscription-Key",
+                "in": "header"
+            },
+            "apiKeyQuery": {
+                "type": "apiKey",
+                "name": "subscription-key",
+                "in": "query"
+            }
+        }
+    },
+    "security": [
+        {
+            "apiKeyHeader": []
+        },
+        {
+            "apiKeyQuery": []
+        }
+    ]
 }
 
 resource "azurerm_api_management_backend" "frontend" {
