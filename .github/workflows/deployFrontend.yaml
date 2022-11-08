@@ -33,7 +33,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18.8
-      - run: cd frontend && npm ci && npm build:prod
+      - run: cd frontend && npm ci && npm run build:prod
 
       - name: Build And Deploy
         uses: Azure/static-web-apps-deploy@v1
