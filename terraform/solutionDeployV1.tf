@@ -449,64 +449,14 @@ resource "azurerm_api_management_api" "frontendroute" {
   revision            = "1"
   display_name        = "frontend"
   path                = ""
-  protocols = ["http","https"]
+  protocols = ["https"]
 subscription_required = false
 service_url = "https://${azurerm_static_site.frontend.default_host_name}"
 import {
     content_format = "openapi+json"
-    content_value  = <<JSON
-      {
-    "openapi": "3.0.1",
-    "info": {
-        "title": "frontend",
-        "description": "",
-        "version": "1.0"
-    },
-    "servers": [
-        {
-            "url": "http://uscandidatewatch.org"
-        },
-        {
-            "url": "https://uscandidatewatch.org"
-        }
-    ],
-    "paths": {
-        "/*": {
-            "get": {
-                "summary": "route",
-                "operationId": "route",
-                "responses": {
-                    "200": {
-                        "description": null
-                    }
-                }
-            }
-        }
-    },
-    "components": {
-        "securitySchemes": {
-            "apiKeyHeader": {
-                "type": "apiKey",
-                "name": "Ocp-Apim-Subscription-Key",
-                "in": "header"
-            },
-            "apiKeyQuery": {
-                "type": "apiKey",
-                "name": "subscription-key",
-                "in": "query"
-            }
-        }
-    },
-    "security": [
-        {
-            "apiKeyHeader": []
-        },
-        {
-            "apiKeyQuery": []
-        }
-    ]
+    content_value  = file("./frontendapiv1definition.json")
+      }
 }
-
 resource "azurerm_api_management_backend" "frontend" {
   name                = "frontend"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
@@ -593,9 +543,6 @@ depends_on = [
 
 resource "azurerm_windows_function_app" "functionworkers" {
 for_each = toset(var.functions)
-#output "test" {value=each.value[0]}
-#for_each = var.functions
-
 
   name = "${each.key}"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
@@ -618,7 +565,7 @@ app_scale_limit = "2"
 
 
 }
-#https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference?tabs=azurewebjobsstorage#common-properties-for-identity-based-connections
+
 app_settings = local.mergedappsettings
   
 }
