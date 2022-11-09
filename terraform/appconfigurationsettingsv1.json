@@ -71,7 +71,7 @@
 
 		{
 			"key": "queue_validate_scheduleB",
-			"value": "scheduleBvalidateprocess"
+			"value": "schedulebvalidateprocess"
 		},
 		{
 			"key": "queue_committee",

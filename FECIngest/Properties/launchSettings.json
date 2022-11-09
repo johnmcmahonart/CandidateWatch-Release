@@ -20,7 +20,7 @@
         "partition_candidate_by_year": "CandidateByYear",
         "queue_state_candidate": "statecandidateprocess",
         "queue_update_log": "updateprocess",
-        "queue_validate_scheduleB": "scheduleBvalidateprocess",
+        "queue_validate_scheduleB": "schedulebvalidateprocess",
         "queue_committee": "committeeprocess",
         "queue_finance_totals": "financetotalsprocess",
         "queue_scheduleb_candidate": "schedulebcandidateprocess",

@@ -31,7 +31,7 @@ namespace MDWatch
                 dynamic states = JsonConvert.DeserializeObject(statesEntity["allStatesJson"].ToString());
                 QueueClient stateQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_state_candidate"].ToString());
                 QueueClient uiQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_ui_build"].ToString());
-                QueueClient scheduleBValidationQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_scheduleB_validate"].ToString());
+                QueueClient scheduleBValidationQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_validate_scheduleB"].ToString());
                 foreach (string state in states)
                 {
                     await stateQueueClient.SendMessageAsync(state);
