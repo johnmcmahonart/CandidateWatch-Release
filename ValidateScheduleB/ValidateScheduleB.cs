@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
+using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 using MDWatch.Model;
 using MDWatch.Utilities;
 using Microsoft.Azure.WebJobs;
@@ -21,7 +23,9 @@ namespace MDWatch
 
             int totalCorrect = 0;
             int totalCandidatesNotProcessed = 0;
-            TableClient tableClient = new TableClient("UseDevelopmentStorage=true", "MDWatchDEV");
+            QueueClient validateScheduleBQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_validate_scheduleB"].ToString());
+            QueueMessage[] state = await validateScheduleBQueueClient.ReceiveMessagesAsync(1);
+            TableClient tableClient = AzureUtilities.GetTableClient(state[0].Body.ToString());
 
             Pageable<TableEntity> candidatesScheduleBNotProcessed = tableClient.Query<TableEntity>(filter: $"PartitionKey eq 'CandidateStatus' and {Utilities.General.GetMemberName((CandidateStatus c) => c.ScheduleBProcessed)} eq false");
 
@@ -57,6 +61,16 @@ namespace MDWatch
             }
 
             log.LogInformation("Found {1} of {2} candidates that have correct amount of scheduleB disbursements recorded", totalCorrect, totalCandidatesNotProcessed);
+            try
+            {
+                await validateScheduleBQueueClient.DeleteMessageAsync(state[0].MessageId, state[0].PopReceipt);
+            }
+            catch
+            {
+                log.LogInformation("Problem removing  state candidate page from queue:State={1}", state[0].Body.ToString());
+            }
+
+
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
         }
     }

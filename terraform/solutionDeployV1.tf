@@ -342,7 +342,8 @@ resource "azurerm_api_management_certificate" "cloudflarecert" {
 
   key_vault_secret_id = data.azurerm_key_vault_certificate.cloudflarecert.id
 }
-*/
+
+
 resource "azurerm_api_management_custom_domain" "defaultdomain" {
   api_management_id = azurerm_api_management.solutionapim.id
 
@@ -353,7 +354,7 @@ resource "azurerm_api_management_custom_domain" "defaultdomain" {
 
   
 }
-
+*/
 resource "azurerm_api_management" "solutionapim" {
   name                = "${var.solution_prefix}apim"
   location            = azurerm_resource_group.CandidateWatchRG.location
@@ -409,6 +410,7 @@ resource "azurerm_api_management_api" "restapi" {
   display_name        = "RESTAPI"
   path                = "api"
   protocols = ["http","https"]
+subscription_required = false
 service_url = "https://cw-restapiapp.azurewebsites.net"
   import {
     content_format = "openapi+json"
@@ -446,12 +448,15 @@ resource "azurerm_api_management_api" "frontendroute" {
   api_management_name = azurerm_api_management.solutionapim.name
   revision            = "1"
   display_name        = "frontend"
-  path                = "frontend"
-  protocols = ["http","https"]
+  path                = ""
+  protocols = ["https"]
+subscription_required = false
 service_url = "https://${azurerm_static_site.frontend.default_host_name}"
-  
+import {
+    content_format = "openapi+json"
+    content_value  = file("./frontendapiv1definition.json")
+      }
 }
-
 resource "azurerm_api_management_backend" "frontend" {
   name                = "frontend"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
@@ -538,9 +543,6 @@ depends_on = [
 
 resource "azurerm_windows_function_app" "functionworkers" {
 for_each = toset(var.functions)
-#output "test" {value=each.value[0]}
-#for_each = var.functions
-
 
   name = "${each.key}"
   resource_group_name = azurerm_resource_group.CandidateWatchRG.name
@@ -563,7 +565,7 @@ app_scale_limit = "2"
 
 
 }
-#https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference?tabs=azurewebjobsstorage#common-properties-for-identity-based-connections
+
 app_settings = local.mergedappsettings
   
 }

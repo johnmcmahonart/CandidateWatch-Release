@@ -31,10 +31,12 @@ namespace MDWatch
                 dynamic states = JsonConvert.DeserializeObject(statesEntity["allStatesJson"].ToString());
                 QueueClient stateQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_state_candidate"].ToString());
                 QueueClient uiQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_ui_build"].ToString());
+                QueueClient scheduleBValidationQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_validate_scheduleB"].ToString());
                 foreach (string state in states)
                 {
                     await stateQueueClient.SendMessageAsync(state);
                     await uiQueueClient.SendMessageAsync(state);
+                    await scheduleBValidationQueueClient.SendMessageAsync(state);
                 }
                 log.LogInformation("Application Boot completed Successfully. Please be patient while data is loaded into the solution. Run Ui build via http trigger when all data is loaded into solution.");
                 responseMessage = "Application Boot completed Successfully. Please be patient while data is loaded into the solution. Run Ui build via http trigger when all data is loaded into solution.";

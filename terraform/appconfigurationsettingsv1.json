@@ -70,6 +70,10 @@
 		},
 
 		{
+			"key": "queue_validate_scheduleB",
+			"value": "schedulebvalidateprocess"
+		},
+		{
 			"key": "queue_committee",
 			"value": "committeeprocess"
 		},

@@ -53,6 +53,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolutionBootStrap", "Soluti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLoad", "DataLoad\DataLoad.csproj", "{E608C703-B563-4B36-9394-E3F685C4A191}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetMissingCandidateData", "GetMissingCandidateData\GetMissingCandidateData.csproj", "{04DDD47E-912E-49EF-8B08-B030B64620DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -169,6 +171,14 @@ Global
 		{E608C703-B563-4B36-9394-E3F685C4A191}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E608C703-B563-4B36-9394-E3F685C4A191}.Release|x86.ActiveCfg = Release|Any CPU
 		{E608C703-B563-4B36-9394-E3F685C4A191}.Release|x86.Build.0 = Release|Any CPU
+		{04DDD47E-912E-49EF-8B08-B030B64620DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04DDD47E-912E-49EF-8B08-B030B64620DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04DDD47E-912E-49EF-8B08-B030B64620DB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{04DDD47E-912E-49EF-8B08-B030B64620DB}.Debug|x86.Build.0 = Debug|Any CPU
+		{04DDD47E-912E-49EF-8B08-B030B64620DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04DDD47E-912E-49EF-8B08-B030B64620DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04DDD47E-912E-49EF-8B08-B030B64620DB}.Release|x86.ActiveCfg = Release|Any CPU
+		{04DDD47E-912E-49EF-8B08-B030B64620DB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -180,6 +190,7 @@ Global
 		SolutionGuid = {6426C91B-6650-422F-B23F-E3C05DED9E1B}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SharedComponents\SharedComponents.projitems*{04ddd47e-912e-49ef-8b08-b030b64620db}*SharedItemsImports = 5
 		SharedComponents\SharedComponents.projitems*{07bcdd26-bd15-4313-9e65-5786571da664}*SharedItemsImports = 5
 		SharedComponents\SharedComponents.projitems*{09979b27-0f71-403f-b4ae-c479229b3e47}*SharedItemsImports = 5
 		SharedComponents\SharedComponents.projitems*{14d00b33-17cd-4128-a388-0e2b106f0b50}*SharedItemsImports = 5
