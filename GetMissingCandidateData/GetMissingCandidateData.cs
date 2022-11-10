@@ -7,6 +7,7 @@ using MDWatch.Model;
 using MDWatch.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -21,23 +22,20 @@ namespace MDWatch
         public static async Task<HttpResponseMessage> RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context, ILogger log)
         {
-            string Start = await context.WaitForExternalEvent<string>("Start");
-
-            if (Start=="true")
-            {
-                log.LogInformation("GetMissingCandidateData Invoked from external trigger");
-                HttpResponseMessage response = await context.CallActivityAsync<HttpResponseMessage>(nameof(ProcessStateCandidates), "");
+            
+                HttpResponseMessage response = await context.CallActivityAsync<HttpResponseMessage>(nameof(ProcessStateCandidates), "Started processing");
                 return response;
-            }
+           
 
-            return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+            
         }
 
         
         [FunctionName(nameof(ProcessStateCandidates))]
-        public static async Task<HttpResponseMessage> ProcessStateCandidates([ActivityTrigger] IDurableActivityContext startContext, ILogger log)
+        public static async Task<HttpResponseMessage> ProcessStateCandidates([ActivityTrigger] string caller, ILogger log)
 
         {
+            log.LogInformation(caller);
             TableClient solutionConfigTableClient = AzureUtilities.GetTableClient(General.EnvVars["table_solution_config"].ToString());
             TableEntity statesEntity = await solutionConfigTableClient.GetEntityAsync<TableEntity>(General.EnvVars["partition_solution_config"].ToString(), "states");
             QueueClient committeeQueue = AzureUtilities.GetQueueClient(General.EnvVars["queue_committee"].ToString());
@@ -82,5 +80,19 @@ namespace MDWatch
 
             
         }
+        [FunctionName("GetMissingData_HttpStart")]
+        public static async Task<HttpResponseMessage> HttpStart(
+                [HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestMessage req,
+                [DurableClient] IDurableOrchestrationClient starter,
+                ILogger log)
+        {
+            // Function input comes from the request content.
+            string instanceId = await starter.StartNewAsync("Orchestrator", null);
+
+            log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
+
+            return starter.CreateCheckStatusResponse(req, instanceId);
+        }
+
     }
 }
