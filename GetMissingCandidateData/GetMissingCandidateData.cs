@@ -71,8 +71,9 @@ namespace MDWatch
                         await financeQueue.SendMessageAsync(financeMessage);
                         log.LogInformation("{1} missing finance information", candidateModel.CandidateId);
                     }
-                    log.LogInformation("Completed MissingCandidateData for {1}", state);
+                    
                 }
+                log.LogInformation("Completed MissingCandidateData for {1}", state);
             }
             return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
 
