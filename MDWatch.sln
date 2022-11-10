@@ -55,6 +55,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLoad", "DataLoad\DataLo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetMissingCandidateData", "GetMissingCandidateData\GetMissingCandidateData.csproj", "{04DDD47E-912E-49EF-8B08-B030B64620DB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgePartition", "PurgePartition\PurgePartition.csproj", "{BEE04174-4A09-4B44-A362-244E28790293}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,6 +185,14 @@ Global
 		{04DDD47E-912E-49EF-8B08-B030B64620DB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{04DDD47E-912E-49EF-8B08-B030B64620DB}.Release|x86.ActiveCfg = Release|Any CPU
 		{04DDD47E-912E-49EF-8B08-B030B64620DB}.Release|x86.Build.0 = Release|Any CPU
+		{BEE04174-4A09-4B44-A362-244E28790293}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEE04174-4A09-4B44-A362-244E28790293}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEE04174-4A09-4B44-A362-244E28790293}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BEE04174-4A09-4B44-A362-244E28790293}.Debug|x86.Build.0 = Debug|Any CPU
+		{BEE04174-4A09-4B44-A362-244E28790293}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEE04174-4A09-4B44-A362-244E28790293}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEE04174-4A09-4B44-A362-244E28790293}.Release|x86.ActiveCfg = Release|Any CPU
+		{BEE04174-4A09-4B44-A362-244E28790293}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -206,6 +216,7 @@ Global
 		SharedComponents\SharedComponents.projitems*{a8df492c-1942-4576-9b45-6155bd487ef1}*SharedItemsImports = 5
 		SharedComponents\SharedComponents.projitems*{afc188a1-3011-49bd-a168-606a670d8960}*SharedItemsImports = 5
 		SharedComponents\SharedComponents.projitems*{b399c9e7-ba89-4008-932e-d06a576ae8c4}*SharedItemsImports = 5
+		SharedComponents\SharedComponents.projitems*{bee04174-4a09-4b44-a362-244e28790293}*SharedItemsImports = 5
 		SharedComponents\SharedComponents.projitems*{dd85f33b-2eda-4373-84a0-d5c2c67c9ffc}*SharedItemsImports = 5
 		SharedComponents\SharedComponents.projitems*{e4b7e1ac-6e2d-4659-97d6-94c2e0b913d4}*SharedItemsImports = 5
 		SharedComponents\SharedComponents.projitems*{e608c703-b563-4b36-9394-e3f685c4a191}*SharedItemsImports = 5
