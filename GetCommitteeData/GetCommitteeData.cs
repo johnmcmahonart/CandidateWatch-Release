@@ -42,7 +42,7 @@ namespace MDWatch
                 try
                 {
                     await committeeSearch.SubmitAsync();
-                    TableEntity entity = await tableClient.GetEntityAsync<TableEntity>(General.EnvVars["partition_candidate"].ToString(), queueMessage.CandidateId);
+                    TableEntity entity = await tableClient.GetEntityAsync<TableEntity>(General.EnvVars["partition_candidate_status"].ToString(), queueMessage.CandidateId);
                     entity["CommitteeProcessed"] = true;
                     await tableClient.UpdateEntityAsync(entity, entity.ETag);
                     await queueClient.DeleteMessageAsync(candidate.MessageId, candidate.PopReceipt);
@@ -57,7 +57,7 @@ namespace MDWatch
                         {
                             //todo handle duplicate committee's during reprocessing
                             log.LogInformation("Problem writing committee to storage for {1}", queueMessage.CandidateId);
-                            TableEntity failed = await tableClient.GetEntityAsync<TableEntity>(General.EnvVars["partition_candidate"].ToString(), queueMessage.CandidateId);
+                            TableEntity failed = await tableClient.GetEntityAsync<TableEntity>(General.EnvVars["partition_candidate_status"].ToString(), queueMessage.CandidateId);
                             entity["CommitteeProcessed"] = false;
                             await tableClient.UpdateEntityAsync(failed, failed.ETag);
                         }
