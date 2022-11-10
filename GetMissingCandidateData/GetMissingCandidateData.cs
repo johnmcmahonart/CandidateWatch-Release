@@ -26,15 +26,16 @@ namespace MDWatch
             if (Start=="true")
             {
                 log.LogInformation("GetMissingCandidateData Invoked from external trigger");
-                HttpResponseMessage response = await context.CallActivityAsync<HttpResponseMessage>("Start", "");
+                HttpResponseMessage response = await context.CallActivityAsync<HttpResponseMessage>(nameof(ProcessStateCandidates), "");
                 return response;
             }
 
             return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
         }
 
-        [FunctionName("ProcessStateCandidates")]
-        public static async Task<HttpResponseMessage> Start([ActivityTrigger] IDurableActivityContext startContext, ILogger log)
+        
+        [FunctionName(nameof(ProcessStateCandidates))]
+        public static async Task<HttpResponseMessage> ProcessStateCandidates([ActivityTrigger] IDurableActivityContext startContext, ILogger log)
 
         {
             TableClient solutionConfigTableClient = AzureUtilities.GetTableClient(General.EnvVars["table_solution_config"].ToString());
