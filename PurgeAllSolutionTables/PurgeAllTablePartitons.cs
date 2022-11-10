@@ -28,14 +28,15 @@ namespace MDWatch
         {
             log.LogInformation($"Started at {DateTime.Now}:Purging all solution Data....");
 
+            string[] tableParittions = { "Candidate", "FinanceTotals", "ScheduleBOverview", "ScheduleBDetail", "Committee", "CandidateStatus", "FinanceOverview" };
             TableClient solutionConfigTableClient = AzureUtilities.GetTableClient(General.EnvVars["table_solution_config"].ToString());
             TableEntity statesEntity = await solutionConfigTableClient.GetEntityAsync<TableEntity>(General.EnvVars["partition_solution_config"].ToString(), "states");
 
             dynamic states = JsonConvert.DeserializeObject(statesEntity["allStatesJson"].ToString());
             foreach (string state in states)
             {
-                //only data partitions stage only
-                string[] tableParittions = { "Candidate", "FinanceTotals", "ScheduleBOverview", "ScheduleBDetail", "Committee", "CandidateStatus", "FinanceOverview" };
+                //only data partitions
+                
 
                 foreach (var partition in tableParittions)
                 {
