@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
 using MDWatch.Utilities;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -18,14 +17,6 @@ namespace MDWatch
         public static async Task<HttpResponseMessage> RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context, ILogger log)
         {
-            HttpResponseMessage response = await context.CallActivityAsync<HttpResponseMessage>(nameof(PurgeAllSolutionTables), "Started processing");
-            return response;
-        }
-
-        [FunctionName(nameof(PurgeAllSolutionTables))]
-        public static async Task<HttpResponseMessage> PurgeAllSolutionTables([ActivityTrigger] string caller, ILogger log)
-
-        {
             log.LogInformation($"Started at {DateTime.Now}:Purging all solution Data....");
 
             string[] tableParittions = { "Candidate", "FinanceTotals", "ScheduleBOverview", "ScheduleBDetail", "Committee", "CandidateStatus", "FinanceOverview" };
@@ -36,16 +27,25 @@ namespace MDWatch
             foreach (string state in states)
             {
                 //only data partitions
-                
 
                 foreach (var partition in tableParittions)
                 {
-                    log.LogInformation("Purging {1} table", partition);
-                    string result = TablePurge.Purge(partition, state) ? "Purge partition succeeded" : "Problem purging partition";
-                    log.LogInformation(result);
-                }
+                    string callMessage = partition + ',' + state;
+                    HttpResponseMessage response = await context.CallActivityAsync<HttpResponseMessage>(nameof(PurgeTable), callMessage);
 
+                    log.LogInformation("Purging {1} table", partition);
+                }
             }
+            return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+        }
+
+        [FunctionName(nameof(PurgeTable))]
+        public static HttpResponseMessage PurgeTable([ActivityTrigger] string callMessage, ILogger log)
+
+        {
+            var splitMessage = callMessage.Split(',');
+            string result = TablePurge.Purge(splitMessage[0], splitMessage[1]) ? "Purge partition succeeded" : "Problem purging partition";
+
             return new HttpResponseMessage(System.Net.HttpStatusCode.Accepted);
         }
 
