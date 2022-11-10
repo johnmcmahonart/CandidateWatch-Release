@@ -21,9 +21,9 @@ namespace MDWatch
         public static async Task<HttpResponseMessage> RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context, ILogger log)
         {
-            bool Start = await context.WaitForExternalEvent<bool>("Start");
+            string Start = await context.WaitForExternalEvent<string>("Start");
 
-            if (Start)
+            if (Start=="true")
             {
                 log.LogInformation("GetMissingCandidateData Invoked from external trigger");
                 HttpResponseMessage response = await context.CallActivityAsync<HttpResponseMessage>("Start", "");
