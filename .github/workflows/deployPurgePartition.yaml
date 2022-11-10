@@ -1,4 +1,4 @@
-name: Deploy PurgeAllTablePartitions
+name: Deploy PurgePartition
 
 on: workflow_dispatch
 
