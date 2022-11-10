@@ -11,6 +11,7 @@ namespace MDWatch
     public class PurgePartition
     {
         [FunctionName("PurgePartition")]
+
         
         public static async Task Run([QueueTrigger("purgeprocess")] QueueMessage purgeMessage, ILogger log)
         {

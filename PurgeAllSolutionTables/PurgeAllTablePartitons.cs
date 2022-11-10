@@ -37,7 +37,7 @@ namespace MDWatch
 
                 foreach (var partition in tableParittions)
                 {
-                    string callMessage = partition + ',' + state;
+                    string callMessage = partition + "," + state;
 
                     QueueClient purgeQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_purge"].ToString());
 
