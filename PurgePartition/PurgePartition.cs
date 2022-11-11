@@ -2,12 +2,18 @@ using System;
 using System.Threading.Tasks;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
+using MDWatch.Model;
 using MDWatch.Utilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+
 namespace MDWatch
 {
+    
+
+
     public class PurgePartition
     {
         [FunctionName("PurgePartition")]
@@ -17,10 +23,10 @@ namespace MDWatch
         {
             QueueClient purgeProcessQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_purge"].ToString());
 
-            var splitMessage = purgeMessage.Body.ToString().Split(',');
+            CandidateQueueMessage decodedMessage = JsonConvert.DeserializeObject<CandidateQueueMessage>(purgeMessage.ToString());
 
-            log.LogInformation("C# Queue trigger function processed: {1}:{2}", splitMessage[0], splitMessage[1]);
-            string result = TablePurge.Purge(splitMessage[0], splitMessage[1]) ? "Purge partiton completed successfully" : "Problem purging partition";
+            log.LogInformation("C# Queue trigger function processed: {1}:{2}",decodedMessage.CandidateId,decodedMessage.State);
+            string result = TablePurge.Purge(decodedMessage.CandidateId, decodedMessage.State) ? "Purge partiton completed successfully" : "Problem purging partition";
             log.LogInformation(result);
             await purgeProcessQueueClient.DeleteMessageAsync(purgeMessage.MessageId, purgeMessage.PopReceipt);
         }
