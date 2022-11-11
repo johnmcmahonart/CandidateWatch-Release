@@ -38,11 +38,11 @@ namespace MDWatch
 
                 foreach (var partition in tableParittions)
                 {
-                    CandidateQueueMessage callMessage = new CandidateQueueMessage { CandidateId = partition, State = state };
+                    //CandidateQueueMessage callMessage = new CandidateQueueMessage { CandidateId = partition, State = state };
 
                     QueueClient purgeQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_purge"].ToString());
 
-                    var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(callMessage));
+                    var bytes = Encoding.UTF8.GetBytes(AzureUtilities.MakeCandidateQueueMessage(partition,state));
 
                     //await dataLoadQueueClient.SendMessageAsync(Convert.ToBase64String(bytes));
 
