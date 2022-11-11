@@ -408,7 +408,7 @@ resource "azurerm_api_management_api" "restapi" {
   api_management_name = azurerm_api_management.solutionapim.name
   revision            = "1"
   display_name        = "RESTAPI"
-  path                = "api"
+  path                = "getdata"
   protocols = ["http","https"]
 subscription_required = false
 service_url = "https://cw-restapiapp.azurewebsites.net"
