@@ -3,7 +3,36 @@
     "PurgePartition": {
       "commandName": "Project",
       "commandLineArgs": "--port 7001",
-      "launchBrowser": false
+      "launchBrowser": false,
+      "environmentVariables": {
+        "dev_table_affix": "WatchDEV",
+        "table_update_log": "UpdateLog",
+        "table_solution_config": "SolutionConfiguration",
+        "partition_update_log": "log",
+        "partition_solution_config": "Config",
+        "production_table_affix": "Table",
+        "partition_candidate": "Candidate",
+        "partition_candidate_status": "CandidateStatus",
+        "partition_committee": "Committee",
+        "partition_finance_overview": "FinanceOverview",
+        "partition_finance_totals": "FinanceTotals",
+        "table_storage_affix_json": "Json",
+        "partition_scheduleB_overview": "ScheduleBOverview",
+        "partition_scheduleB_detail": "ScheduleBDetail",
+        "partition_candidate_by_year": "CandidateByYear",
+        "queue_state_candidate": "statecandidateprocess",
+        "queue_update_log": "updateprocess",
+        "queue_purge": "purgeprocess",
+        "queue_validate_scheduleB": "schedulebvalidateprocess",
+        "queue_committee": "committeeprocess",
+        "queue_finance_totals": "financetotalsprocess",
+        "queue_scheduleb_candidate": "schedulebcandidateprocess",
+        "queue_scheduleb_page": "schedulebpageprocess",
+        "queue_candidate": "candidateprocess",
+        "queue_data_load": "dataloadprocess",
+        "queue_ui_build": "uibuildprocess",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   }
 }
