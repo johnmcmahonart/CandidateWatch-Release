@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
+using MDWatch.Model;
 using MDWatch.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,11 +38,11 @@ namespace MDWatch
 
                 foreach (var partition in tableParittions)
                 {
-                    string callMessage = partition + "," + state;
+                    CandidateQueueMessage callMessage = new CandidateQueueMessage { CandidateId = partition, State = state };
 
                     QueueClient purgeQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_purge"].ToString());
 
-                    var bytes = Encoding.UTF8.GetBytes(callMessage);
+                    var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(callMessage));
 
                     //await dataLoadQueueClient.SendMessageAsync(Convert.ToBase64String(bytes));
 
