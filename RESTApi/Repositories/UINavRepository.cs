@@ -9,8 +9,8 @@ namespace RESTApi.Repositories
     public class UINavRepository : IUINavRepository
     //minimal repository for displaying parts of the UI
     {
-        private string _electionYearsPartition = "CandidatebyYear";
-        private string _candidatePartition = "Candidate";
+        private string _electionYearsPartition = General.EnvVars["partition_candidate_by_year"].ToString();
+        private string _candidatePartition = General.EnvVars["partition_candidate"].ToString();
         
         private bool CurrentlyElected(Candidate candidate)
         {
