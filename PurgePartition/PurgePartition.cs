@@ -23,10 +23,10 @@ namespace MDWatch
         {
             QueueClient purgeProcessQueueClient = AzureUtilities.GetQueueClient(General.EnvVars["queue_purge"].ToString());
 
-            CandidateQueueMessage decodedMessage = JsonConvert.DeserializeObject<CandidateQueueMessage>(purgeMessage.ToString());
+            CandidateQueueMessage parsedMessage = AzureUtilities.ParseCandidateQueueMessage(purgeMessage.Body.ToString());
 
-            log.LogInformation("C# Queue trigger function processed: {1}:{2}",decodedMessage.CandidateId,decodedMessage.State);
-            string result = TablePurge.Purge(decodedMessage.CandidateId, decodedMessage.State) ? "Purge partiton completed successfully" : "Problem purging partition";
+            log.LogInformation("C# Queue trigger function processed: {1}:{2}",parsedMessage.CandidateId,parsedMessage.State);
+            string result = TablePurge.Purge(parsedMessage.CandidateId, parsedMessage.State) ? "Purge partiton completed successfully" : "Problem purging partition";
             log.LogInformation(result);
             await purgeProcessQueueClient.DeleteMessageAsync(purgeMessage.MessageId, purgeMessage.PopReceipt);
         }
