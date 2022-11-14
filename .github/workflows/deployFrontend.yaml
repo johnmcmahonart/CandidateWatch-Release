@@ -13,8 +13,7 @@ env:
   APP_LOCATION: "./frontend" # location of your client code
   APP_ARTIFACT_LOCATION: "./frontend/build" # location of client code build output
   NODE_VERSION: 18.2.0
-  CUSTOM_BUILD_COMMAND: npm ci
-  RUN_BUILD_COMMAND: npm run build:prod
+
 on:
   push:
     branches:
