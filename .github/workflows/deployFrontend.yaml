@@ -12,7 +12,7 @@ name: Deploy web app to Azure Static Web Apps
 env:
   APP_LOCATION: "./frontend" # location of your client code
   APP_ARTIFACT_LOCATION: "build" # location of client code build output
-  NODE_VERSION: 18.8
+  NODE_VERSION: 18.2.0
   CUSTOM_BUILD_COMMAND: cd frontend && npm ci
   RUN_BUILD_COMMAND: cd frontend && npm run build:prod
 on:
