@@ -435,7 +435,7 @@ resource "azurerm_api_management_api_policy" "backendpolicy" {
   xml_content = <<XML
 <policies>
   <inbound>
-    <base/>
+    
     <set-backend-service backend-id="defaultbackend" />
   </inbound>
 </policies>
@@ -474,7 +474,8 @@ resource "azurerm_api_management_api_policy" "frontendpolicy" {
   xml_content = <<XML
 <policies>
   <inbound>
-    <base/>
+    
+    
     <set-backend-service backend-id="frontend" />
   </inbound>
 </policies>
