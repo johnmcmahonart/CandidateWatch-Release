@@ -8,6 +8,8 @@ on:
     branches:
       - Production
   workflow_dispatch:
+env:
+  PROJECT_FILE: "./RESTApi/RESTApi.csproj"
 
 jobs:
   build:
@@ -23,16 +25,16 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build '${{ env.PROJECT_FILE }}' --configuration Release --output ./build/restapi
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish '${{ env.PROJECT_FILE }}' -c Release -o ./build/restapi
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ./build/restapi
 
   deploy:
     runs-on: windows-latest
