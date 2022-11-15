@@ -23,15 +23,6 @@
 						"description": null
 					}
 				}
-			},
-			"options": {
-				"summary": "corsroute",
-				"operationId": "corsroute",
-				"responses": {
-					"200": {
-						"description": null
-					}
-				}
 			}
 		}
 	},
